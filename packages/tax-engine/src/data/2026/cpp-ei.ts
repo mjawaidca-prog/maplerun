@@ -1,40 +1,40 @@
 import type { CppTable, EiTable } from '../../types';
 
 /**
- * CPP for 2026. YMPE/YAMPE announced by CRA Nov 2025.
- * Max employee contribution: (74,900 − 3,500) × 5.95% = $4,248.30.
- * Max CPP2: (85,400 − 74,900) × 4% = $420.00.
+ * CPP for 2026 — VERIFIED against T4127 121st ed. Tables 8.3–8.6 and CRA's
+ * CPP rates page (docs/sources/cra-cpp.html, cra-t4127.html).
+ * Max employee contribution: (74,600 − 3,500) × 5.95% = $4,230.45 (base share $3,519.45).
+ * CPP2: (85,000 − 74,600) × 4% = $416.00.
  */
 export const CPP_2026: CppTable = {
   year: 2026,
-  ympe: 74_900,
-  yampe: 85_400,
+  ympe: 74_600,
+  yampe: 85_000,
   basicExemption: 3_500,
   employeeRate: 0.0595,
   baseRate: 0.0495,
   cpp2Rate: 0.04,
   meta: {
-    verified: false,
-    source:
-      'Model knowledge of CRA Nov-2025 announcement. YAMPE rounding uncertain (85,400 vs 85,300) — VERIFY.',
+    verified: true,
+    source: 'CRA T4127 121st ed. Tables 8.3–8.6 (YMPE 74,600; YAMPE 85,000; max 4,230.45; CPP2 max 416.00).',
     lastReviewed: '2026-06-10',
   },
 };
 
 /**
- * EI for 2026 (CEIC announcement Sept 2025).
- * Max employee premium: 68,500 × 1.63% = $1,116.55 (QC: 1.30% = $890.50).
+ * EI for 2026 — VERIFIED against T4127 121st ed. Table 8.7 and CRA's EI
+ * premium-rates page (docs/sources/cra-ei.html).
+ * Max employee premium: 68,900 × 1.63% = $1,123.07 (QC: 1.30% = $895.70).
  */
 export const EI_2026: EiTable = {
   year: 2026,
-  maxInsurableEarnings: 68_500,
+  maxInsurableEarnings: 68_900,
   employeeRate: 0.0163,
   employeeRateQuebec: 0.013,
   employerMultiple: 1.4,
   meta: {
-    verified: false,
-    source:
-      'Model knowledge of CEIC Sept-2025 rate setting. QC rate medium confidence — VERIFY.',
+    verified: true,
+    source: 'CRA T4127 121st ed. Table 8.7 (MIE 68,900; 1.63%/1.30% QC; employer 1.4× = 2.282%).',
     lastReviewed: '2026-06-10',
   },
 };

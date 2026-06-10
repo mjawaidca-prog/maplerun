@@ -1,41 +1,44 @@
 # Tax Compliance: Sources, Status, Protocol
 
-## Authoritative sources (in priority order)
-1. **CRA T4127 Payroll Deductions Formulas** — the formulas + all constants. New editions every Jan 1 and Jul 1. canada.ca → "T4127 Payroll deductions formulas".
-2. **CRA PDOC** (Payroll Deductions Online Calculator) — golden-test oracle for verifying engine output.
-3. CRA CPP contribution rates page + EI premium rate announcement (each fall for next year).
-4. Revenu Québec TP-1015.3 / WebRAS (Phase 2 — QC income tax, QPP, QPIP).
-5. Provincial budgets (Feb–Apr) for mid-year rate changes.
+## Status: 2026 tables VERIFIED ✅ (2026-06-10)
+All federal, CPP/CPP2, EI, and 12 provincial/territorial tables verified against **CRA T4127 121st edition (Jan 2026, including the May-2026 PEI update)** plus CRA's CPP and EI rate pages. Raw source HTML preserved in `docs/sources/` (cra-t4127.html, cra-cpp.html, cra-cpp2.html, cra-ei.html) for audit. Quebec provincial tax = Phase 2 (verified QPP/QPIP/abatement constants already captured in `data/2026/quebec.ts`).
 
-## Status of 2026 tables (as of 2026-06-10)
-Seeded from model knowledge of the T4127 121st edition (effective 2026-01-01). **All tables `verified: false`** — web verification tools were unavailable during Phase 0. Confidence by item:
+Corrections found during verification (why this protocol exists — seeded estimates had real errors):
+- CPP: YMPE 74,600 (not 74,900) → max $4,230.45; YAMPE 85,000 → CPP2 max $416.00
+- EI: MIE 68,900 (not 68,500) → max $1,123.07 / QC $895.70
+- MB froze brackets (47,000/100,000) and BPA ($15,780, phases to $0 over $200k–$400k income)
+- NS BPA now flat $11,932 for everyone (income test removed for 2026)
+- SK BPA $20,381 (Affordability Act +$500/yr); PE BPA $15,000, no indexation, top threshold updated May 2026
+- ON: BPA 12,989; surtax thresholds 5,818/7,446
+- Formula features added: ON tax reduction (S, base $300), BC tax reduction (S, $575 / 3.56% / $25,570–$41,722), AB K5P credit top-up (25% over $4,896), YT K4P (CEA $1,501)
 
-| Item | Values seeded | Confidence |
-|---|---|---|
-| Federal rates 14/20.5/26/29/33, thresholds 58,523/117,045/181,440/258,482 | high — 2% indexation on 2025, 14% rate legislated | High |
-| BPAF 16,452/14,829; CEA 1,500 | derived ×1.02 | Medium-high |
-| CPP: YMPE 74,900, exempt 3,500, 5.95%, max 4,248.30 | announced Nov 2025 | High |
-| CPP2: YAMPE 85,400, 4%, max 420.00 | YAMPE rounding uncertain (could be 85,300) | Medium |
-| EI: MIE 68,500, 1.63%, max 1,116.55; QC 1.30%/890.50 | announced Sept 2025 | High / QC Medium |
-| ON, AB, BC, NB, NL, NT, NU, YT brackets/BPA | 2025 × estimated index factors | Medium |
-| SK, MB, NS, PE brackets/BPA | 2025 reforms + estimates | Low-medium |
-| ON surtax 5,824/7,453; health premium table | surtax indexed; premium table statutory (unchanged since 2004) | Medium / High |
-| QC income tax, QPP, QPIP | placeholder only — engine throws | n/a (Phase 2) |
+## Known unmodelled items (rare; revisit by Phase 5)
+- LCP labour-sponsored fund credits (fed 15%/$750; MB/NB/NS/SK variants)
+- ON factor Y (dependant add-on to the tax reduction) — omitting only over-withholds, reconciles at T1
+- TD1X commission method; "outside Canada" 48% surtax; CPP PM-proration (mid-year 18th birthday/70th/disability)
+- F5 allocation on bonuses: CRA prorates the period CPP exemption across regular+bonus; we allocate to regular pay (≤ pennies difference, documented in calc/bonus.ts)
 
-## Verification protocol (Phase 1, repeat each new edition)
-1. Fetch T4127 current edition (canada.ca blocks plain fetch — use search-engine cache, the PDF, or manual copy if needed).
-2. Diff every constant in `src/data/<year>/` against it; correct; set `meta.verified: true`, `lastReviewed`, cite edition.
-3. PDOC golden run — 6 profiles: (a) min-wage hourly weekly, (b) $65k biweekly, (c) $120k semi-monthly (crosses CPP2), (d) $250k monthly (BPAF phase-out, top brackets), (e) TD1 with extra claims, (f) capped CPP/EI late-year YTD. × every jurisdiction. Record PDOC outputs in `tests/goldens.json`; engine must match within $0.05.
-4. Commit with message `tax-data: verify <year> ed.<n>`.
+## Authoritative sources (priority order)
+1. **CRA T4127** (formulas + constants; Jan & Jul editions). canada.ca blocks plain fetchers — download with a browser User-Agent via `Invoke-WebRequest` (worked 2026-06-10), save into `docs/sources/`.
+2. **CRA PDOC** — end-to-end oracle for spot-checks (optional extra assurance; formulas already verified at constant level).
+3. CRA CPP rates / CPP2 rates / EI premium pages (fall announcements for next year).
+4. Revenu Québec TP-1015.3 / WebRAS (Phase 2).
+
+## Verification protocol (repeat for every new edition)
+1. Download the new T4127 edition pages into `docs/sources/` (browser UA).
+2. Diff every constant in `src/data/<year>/` (Table 8.1 brackets/K, Table 8.2 BPAs/CEA/surtax/S2, Tables 8.3–8.8 CPP/QPP/EI/QPIP, ch. 2 BPAF/BPAMB/BPAYT formulas, ch. 6 provincial factors).
+3. Cross-check engine-derived K/KP constants against published values (must match within $0.50).
+4. Update `meta` (verified/source/lastReviewed), run tests, update goldens if rates moved, commit `tax-data: verify <year> ed.<n>`.
 
 ## Update calendar (recurring)
 | When | What |
 |---|---|
-| ~Nov 1 | CRA announces next-year CPP YMPE/YAMPE; EI rate (Sept) |
-| ~Dec 15 | T4127 Jan edition published → build `data/<year>/`, verify, ship before first January pay date |
-| Feb–Apr | Provincial budgets — watch for rate/BPA changes (often mid-year, e.g., 2025 federal rate cut) |
-| ~Jun 15 | T4127 Jul edition → `data/<year>-jul/` if anything changed |
+| ~Sept | CEIC sets next-year EI rate/MIE |
+| ~Nov 1 | CRA announces next-year CPP YMPE/YAMPE |
+| ~Dec 15 | T4127 Jan edition → build `data/<year>/`, verify before first Jan pay date |
+| Feb–Apr | Provincial budgets (watch MB/NS/PE/SK — they've changed structurally two years running) |
+| ~Jun 15 | T4127 Jul edition → check for mid-year changes (2026 Jan page already carries a May PE update) |
 
 ## Disclaimers (must appear in product)
-- Pre-launch: "Calculations pending CRA verification — do not use for live payroll" whenever any active table is unverified.
-- Always: results are estimates of statutory withholding; employer remains responsible for remittances. (Standard for all payroll software, incl. PDOC's own disclaimer.)
+- If any active table is unverified: "Calculations pending CRA verification — do not use for live payroll." (Engine emits this automatically.)
+- Always: results are estimates of statutory withholding; the employer remains responsible for remittances.

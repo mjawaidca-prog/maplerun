@@ -58,6 +58,24 @@ export interface SurtaxThreshold {
   rate: number;
 }
 
+/** BC low-income tax reduction (factor S): min(tax, max − rate × (A − start)), zero above end. */
+export interface LowIncomeReduction {
+  max: number;
+  phaseOutStart: number;
+  phaseOutRate: number;
+  phaseOutEnd: number;
+}
+
+/** ON tax reduction (factor S): lesser of tax and 2 × base − tax, floored at zero. */
+export interface OntarioTaxReduction {
+  base: number;
+}
+
+/** AB K5P: credits beyond the first bracket's tax are topped up by this rate (8% credits effective at 10%). */
+export interface CreditTopUp {
+  rate: number;
+}
+
 export interface HealthPremiumBand {
   /** Band applies when annual taxable income exceeds this amount. */
   over: number;
@@ -76,6 +94,14 @@ export interface ProvincialTable {
   surtax?: SurtaxThreshold[];
   /** Ontario health premium schedule. */
   healthPremiumBands?: HealthPremiumBand[];
+  /** Provincial Canada-employment-amount credit (K4P) — Yukon only. */
+  cea?: number;
+  /** Alberta K5P. */
+  creditTopUp?: CreditTopUp;
+  /** BC factor S. */
+  lowIncomeReduction?: LowIncomeReduction;
+  /** ON factor S (Y dependant amounts not yet modelled — over-deduction reconciles at T1 filing). */
+  ontarioTaxReduction?: OntarioTaxReduction;
   /** Quebec until Phase 2 — engine refuses to compute. */
   notImplemented?: boolean;
   /** Known unmodelled features (e.g. BC tax reduction) — surfaced as warnings. */

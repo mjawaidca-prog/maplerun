@@ -32,21 +32,25 @@ docs/BRAND.md                  ← name (MapleRun), alternates, pricing draft, l
 packages/tax-engine/src/
   types.ts                     ← all shared types (provinces, frequencies, tables, inputs/results)
   money.ts                     ← roundCent + clamp helpers
-  data/2026/federal.ts         ← federal brackets, BPAF, CEA
-  data/2026/cpp-ei.ts          ← CPP/CPP2/EI constants
-  data/2026/provinces.ts       ← all 13 provincial/territorial tables (QC placeholder)
+  data/2026/federal.ts         ← federal brackets, BPAF, CEA (verified)
+  data/2026/cpp-ei.ts          ← CPP/CPP2/EI constants (verified)
+  data/2026/provinces.ts       ← all 13 provincial/territorial tables (verified; QC placeholder)
+  data/2026/quebec.ts          ← QPP/QPIP/abatement constants, Phase-2-ready (verified)
   data/index.ts                ← table registry; pay-date → year edition lookup
   calc/cpp.ts                  ← CPP + CPP2 per-period with YTD caps
   calc/ei.ts                   ← EI premium with YTD cap, QC-reduced rate
-  calc/income-tax.ts           ← T4127 option-1 annualized federal + provincial tax (K1–K4, surtax, ON health premium)
+  calc/income-tax.ts           ← annual T3/T2 helpers + per-period tax (K1–K5P, surtax, reductions, health premium)
+  calc/bonus.ts                ← T4127 bonus/non-periodic payment method
   calc/pay-run.ts              ← orchestrator → PayResult (employee + employer sides, warnings)
-  index.ts                     ← public API: calculatePay()
+  index.ts                     ← public API: calculatePay(), calculateBonus()
+docs/sources/                  ← downloaded CRA pages (audit trail; canada.ca needs browser UA)
 packages/tax-engine/tests/engine.test.ts
 ```
 
-## Domain cheat-sheet (saves re-derivation)
-- T4127 = CRA "Payroll Deductions Formulas", new editions every Jan + Jul. Current target: 121st ed., Jan 2026.
-- Per-period CPP: `0.0595 × (pensionable − 3500/P)`, YTD-capped at $4,248.30 (2026). CPP2: 4% of pensionable between YMPE 74,900 and YAMPE 85,400 (max $420), tracked cumulatively.
-- EI: `1.63% × insurable` capped $1,116.55 (QC employee 1.30%). Employer = 1.4×.
-- Income tax: annualize `A = P×(I − F − F5) − HD`; F5 = CPP enhancement (C×1/5.95) + all CPP2 (deduction, not credit). Credits at lowest rate: K1 (TD1 claim), K2 (base CPP 4.95/5.95 share + EI), K4 (CEA, federal only). ON adds surtax (20%/36%) + health premium table. Final: annual tax ÷ P, round to cent.
-- PDOC = CRA's online calculator = our golden-test oracle.
+## Domain cheat-sheet (2026 VERIFIED vs T4127 121st ed. — sources in docs/sources/)
+- T4127 = CRA "Payroll Deductions Formulas", new editions every Jan + Jul.
+- CPP: `0.0595 × (pensionable − 3500/P)`, max $4,230.45 (YMPE 74,600). CPP2: 4% between YMPE and YAMPE 85,000 (max $416), cumulative. QPP 2026: 6.30% (data/2026/quebec.ts).
+- EI: `1.63% × insurable`, MIE 68,900, max $1,123.07 (QC 1.30%/$895.70). Employer = 1.4×.
+- Income tax: annualize `A = P×(I − F − F5) − HD`; F5 = CPP enhancement (C×1/5.95) + all CPP2 (deduction, not credit). Credits at lowest rate: K1 (TD1 claim; BPAF/BPAMB/BPAYT are income-tested on NI=A+HD), K2 (base CPP 4.95/5.95 share + EI), K4 (CEA 1,501, federal + YT only). Province extras: ON surtax (20% > 5,818 / 36% > 7,446) + health premium + tax reduction (S, 2×300); BC reduction (575 → 0 across A 25,570–41,722); AB K5P top-up. Final: annual ÷ P, round to cent.
+- Bonus method (calc/bonus.ts): tax = annualTax(A+B−F5b) − annualTax(A), withheld in full; CPP on bonus has no period exemption.
+- Engine derives K/KP cumulatively from thresholds — verified ≡ CRA's published constants ±$0.50. Never hardcode K.

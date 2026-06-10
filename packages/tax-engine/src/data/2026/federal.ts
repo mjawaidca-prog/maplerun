@@ -1,9 +1,10 @@
 import type { FederalTable } from '../../types';
 
 /**
- * Federal income tax, 2026 (T4127 121st edition, effective 2026-01-01).
- * Lowest rate 14% (legislated cut from 15% → 14.5% effective 2025 → 14% for 2026).
- * Thresholds = 2025 values × 1.02 indexation.
+ * Federal income tax, 2026 — VERIFIED against T4127 121st ed. (Jan 2026),
+ * Table 8.1/8.2 and BPAF formula. Source saved: docs/sources/cra-t4127.html.
+ * CRA published K constants (0 / 3,804 / 10,241 / 15,685 / 26,024) match the
+ * engine's cumulative derivation within $0.50/yr.
  */
 export const FEDERAL_2026: FederalTable = {
   year: 2026,
@@ -16,13 +17,12 @@ export const FEDERAL_2026: FederalTable = {
     { upTo: 258_482, rate: 0.29 },
     { upTo: null, rate: 0.33 },
   ],
-  // BPAF phases from max down to min across the fourth bracket.
+  // BPAF formula: 16,452 − (NI − 181,440) × (1,623 / 77,042), bounded [14,829, 16,452].
   bpa: { max: 16_452, min: 14_829, phaseOutStart: 181_440, phaseOutEnd: 258_482 },
-  cea: 1_500,
+  cea: 1_501,
   meta: {
-    verified: false,
-    source:
-      'Model knowledge of T4127 121st ed.: 2026 indexation 2.0% on 2025 values; 14% lowest rate per 2025 legislation. VERIFY against published T4127 before live use.',
+    verified: true,
+    source: 'CRA T4127 121st ed. (Jan 2026): Table 8.1 (R/K), Table 8.2 (CEA 1,501, index 2.0%), BPAF formula ch. 2.',
     lastReviewed: '2026-06-10',
   },
 };
