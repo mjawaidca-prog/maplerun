@@ -1,0 +1,198 @@
+// MapleRun — Canadian Payroll SaaS
+// PostgreSQL on Neon (ca-central-1), multi-tenant, AES-256-GCM encrypted PII
+//
+// Iron rules:
+//  - Every tenant row carries companyId — access scoped via Prisma client extension
+//  - SIN + bank details encrypted at rest (AES-256-GCM, per-field, key from env)
+//  - Immutable pay runs — corrections via reversing/adjustment runs
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  VIEWER
+}
+
+enum PayFrequency {
+  WEEKLY
+  BIWEEKLY
+  SEMIMONTHLY
+  MONTHLY
+}
+
+// ─── Auth.js v5 models (Prisma adapter) ───────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts    Account[]
+  sessions    Session[]
+  memberships Membership[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Application models ───────────────────────────────────────────────────────
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+  employees   Employee[]
+  payGroups   PayGroup[]
+}
+
+/// Links a User to a Company with a role. Multi-tenancy gateway.
+model Membership {
+  id        String         @id @default(cuid())
+  userId    String
+  companyId String
+  role      MembershipRole @default(ADMIN)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+}
+
+/// Employee record. companyId scopes every query. SIN encrypted at app layer.
+model Employee {
+  id            String    @id @default(cuid())
+  companyId     String
+  firstName     String
+  lastName      String
+  /// AES-256-GCM encrypted SIN — never log, never expose in API responses without explicit permission
+  sinEncrypted  String
+  dateOfBirth   DateTime?
+  email         String?
+  phone         String?
+  addressLine1  String?
+  addressLine2  String?
+  city          String?
+  province      String?
+  postalCode    String?
+  /// AES-256-GCM encrypted direct-deposit details (transit/institution/account)
+  bankEncrypted String?
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  td1Profiles TD1Profile[]
+  ytdLedgers  YtdLedger[]
+
+  @@index([companyId])
+}
+
+/// Federal and provincial TD1 claim amounts for an employee.
+model TD1Profile {
+  id                String   @id @default(cuid())
+  employeeId        String
+  /// Tax year (e.g. 2026)
+  year              Int
+  /// Total federal claim amount (TD1 line TC)
+  federalClaim      Float?
+  /// Total provincial/territorial claim amount (TD1 line TCP)
+  provincialClaim   Float?
+  /// Additional tax to deduct per period (TD1 line 2)
+  extraTaxPerPeriod Float?
+  /// CPP/QPP exempt flag
+  cppExempt         Boolean  @default(false)
+  /// EI exempt flag
+  eiExempt          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, year])
+}
+
+/// Year-to-date payroll ledger per employee per tax year. Incremented by each finalized pay run.
+model YtdLedger {
+  id                  String   @id @default(cuid())
+  employeeId          String
+  year                Int
+  pensionableEarnings Float    @default(0)
+  cpp                 Float    @default(0)
+  cpp2                Float    @default(0)
+  insurableEarnings   Float    @default(0)
+  ei                  Float    @default(0)
+  updatedAt           DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, year])
+}
+
+/// Pay group — payroll run configuration. Many employees to one pay group.
+model PayGroup {
+  id              String       @id @default(cuid())
+  companyId       String
+  name            String
+  frequency       PayFrequency
+  defaultProvince String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}

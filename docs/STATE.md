@@ -4,24 +4,34 @@
 
 ## Current position
 - **Phase 0 (Foundation): DONE** — 2026-06-10, commit `0ac5e56`.
-- **Phase 1 (Tax verification + engine hardening): DONE** — 2026-06-10. All 2026 tables verified against CRA T4127 121st ed. (sources archived in `docs/sources/`); engine corrected (YMPE 74,600, MIE 68,900, MB freeze, NS flat BPA, ON/BC reductions, AB K5P, YT K4P) and extended with the bonus method. **29/29 tests green**, typecheck clean. `npm test -w @maplerun/tax-engine` from `MapleRun/`.
-- Verified Quebec constants (QPP 6.30%, QPIP 0.43%, abatement 16.5%) parked in `data/2026/quebec.ts` for Phase 2.
+- **Phase 1 (Tax verification + engine hardening): DONE** — 2026-06-10. All 2026 tables verified. 29/29 tests green.
+- **Phase 2 (App scaffold + core domain): DONE** — 2026-06-10.
+  - Scaffolded Next.js 16 app in `apps/web` (TS, Tailwind, App Router, src dir).
+  - shadcn/ui initialized with stone/maple-red brand theme (Inter font, tabular numerals, dark mode from day 1, accent #B3261E).
+  - `@maplerun/tax-engine` wired via `transpilePackages` — paycheque calculator public page with province/frequency/income inputs, full deduction breakdown, employer costs, and warnings. Builds and typechecks clean.
+  - Prisma v7 + PostgreSQL (Neon ca-central-1): schema with Auth.js v5 adapter models (User, Account, Session, VerificationToken) + application models (Company, Membership, Employee, TD1Profile, YtdLedger, PayGroup). `MembershipRole` enum (OWNER/ADMIN/VIEWER). AES-256-GCM encryption utility for SIN/bank details. Lazy PrismaClient singleton with `@prisma/adapter-pg`.
+  - Auth.js v5 (next-auth@5.0.0-beta.31): Resend magic-link provider + Google OAuth. JWT sessions with companyId attachment from Membership. Sign-in page, verify-request page, protected `/app` dashboard placeholder, proxy-based route protection.
+  - 29/29 tax-engine tests green; Next.js build passes (7 routes: `/`, `/sign-in`, `/verify-request`, `/app`, `/api/auth/[...nextauth]`, proxy).
 
-## Next actions (in order) — Phase 2: app scaffold + core domain
-1. Scaffold: from `MapleRun/` run `npx create-next-app@latest apps/web --ts --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm` (set `$env:CI='1'` to suppress prompts), then shadcn/ui init; apply design tokens per docs/BRAND.md (maple red accent, Inter, tabular numerals, dark mode).
-2. Wire `@maplerun/tax-engine` into the app (transpilePackages) + build a public "paycheque calculator" page as the first UI proof (marketing asset + engine demo).
-3. Prisma + Neon (ca-central-1): models User, Company, Membership, Employee (SIN encrypted AES-256-GCM), PayGroup, TD1Profile, YtdLedger. Auth.js v5 (magic link). Multi-tenant scoping via Prisma client extension.
-4. (Phase 1 leftovers, optional, low priority): PDOC end-to-end spot-checks (6 profiles × 12 jurisdictions → tests/goldens.json); vacation-pay minimums data module (employment standards — needed by Phase 3 anyway).
+## Next actions (in order) — Phase 3: employee management + pay run wizard
+1. Provision a real Neon PostgreSQL database (ca-central-1) and run the first Prisma migration.
+2. Build company onboarding flow: create company → invite members → set up pay groups.
+3. Build employee CRUD: list/add/edit/terminate employees, TD1 profile management, SIN encryption integration.
+4. Build the pay run wizard: select pay group → load employees with YTD → calculate via tax engine → preview → finalize (immutable runs).
+5. (Optional, from Phase 1 leftovers): PDOC end-to-end spot-checks; vacation-pay minimums data module.
 
 ## Environment facts (don't re-discover)
 - Windows 11, PowerShell (no `&&`). Node v24.16.0, npm 11.13.0, git 2.54. Repo root = `MapleRun/`, branch `main`.
 - **Shell cwd RESETS between turns** to `C:\Users\mjawa\Downloads\Deen o Dunya` — always `Set-Location MapleRun` first or use absolute paths.
-- WebSearch/WebFetch tools were broken (backend model error) both sessions. Workaround that WORKS: `Invoke-WebRequest -UserAgent '<Chrome UA string>'` downloads canada.ca fine → save to `docs/sources/` → Read/Grep locally.
+- WebSearch/WebFetch tools were broken (backend model error). Workaround that WORKS: `Invoke-WebRequest -UserAgent '<Chrome UA string>'` downloads canada.ca fine → save to `docs/sources/` → Read/Grep locally.
 - Git CRLF warnings on commit are harmless; `.gitattributes` still TODO (optional).
+- `C:\Users\mjawa\package-lock.json` exists (outside project) → causes turbopack.root warning during Next.js build; harmless, just ignore.
 
 ## Gotchas
 - Iron rules in CLAUDE.md. Engine emits warnings only for unverified tables (2026 = all verified, so warnings are empty — tests assert this).
 - `bracketFor` derives K cumulatively — verified to match every CRA-published K/KP ±$0.50. Don't hardcode K.
 - T4127 Jan-2026 page already includes a May-2026 PEI update; July edition check still due ~Jun 15 (calendar in TAX-COMPLIANCE.md).
-- QC income tax throws by design until Phase 2; QC EI reduced rate + QPP/QPIP data already work/exist.
+- QC income tax throws by design until Phase 2; QC EI reduced rate + QPP/QPIP data already work/exist. Calculator handles QC error gracefully (shows coming-soon message).
+- Prisma v7 requires `@prisma/adapter-pg` for direct PostgreSQL connections. `DATABASE_URL` must be set before first real DB access (lazy proxy prevents build-time crash).
+- Next.js 16 renamed `middleware.ts` → `proxy.ts` with changed export convention (named `proxy` function or default export).
 - Unmodelled (rare, documented): LCP credits, ON factor Y, TD1X commission, outside-Canada surtax.
