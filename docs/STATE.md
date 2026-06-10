@@ -5,20 +5,22 @@
 ## Current position
 - **Phase 0 (Foundation): DONE** — 2026-06-10, commit `0ac5e56`.
 - **Phase 1 (Tax verification + engine hardening): DONE** — 2026-06-10. All 2026 tables verified. 29/29 tests green.
-- **Phase 2 (App scaffold + core domain): DONE** — 2026-06-10.
-  - Scaffolded Next.js 16 app in `apps/web` (TS, Tailwind, App Router, src dir).
-  - shadcn/ui initialized with stone/maple-red brand theme (Inter font, tabular numerals, dark mode from day 1, accent #B3261E).
-  - `@maplerun/tax-engine` wired via `transpilePackages` — paycheque calculator public page with province/frequency/income inputs, full deduction breakdown, employer costs, and warnings. Builds and typechecks clean.
-  - Prisma v7 + PostgreSQL (Neon ca-central-1): schema with Auth.js v5 adapter models (User, Account, Session, VerificationToken) + application models (Company, Membership, Employee, TD1Profile, YtdLedger, PayGroup). `MembershipRole` enum (OWNER/ADMIN/VIEWER). AES-256-GCM encryption utility for SIN/bank details. Lazy PrismaClient singleton with `@prisma/adapter-pg`.
-  - Auth.js v5 (next-auth@5.0.0-beta.31): Resend magic-link provider + Google OAuth. JWT sessions with companyId attachment from Membership. Sign-in page, verify-request page, protected `/app` dashboard placeholder, proxy-based route protection.
-  - 29/29 tax-engine tests green; Next.js build passes (7 routes: `/`, `/sign-in`, `/verify-request`, `/app`, `/api/auth/[...nextauth]`, proxy).
+- **Phase 2 (App scaffold + core domain): DONE** — 2026-06-10, commit `b838582`. Next.js 16, shadcn/ui maple-red theme, paycheque calculator, Prisma v7 schema, Auth.js v5.
+- **Phase 3 (Employee management + pay run wizard): DONE** — 2026-06-10.
+  - Protected app layout with sidebar navigation (Dashboard, Employees, Payroll, Company). Route group `(app)` applies sidebar + `requireCompany()` guard.
+  - Company onboarding: setup wizard at `/onboarding` (create company + default pay group + owner membership in one step). Company settings page at `/company` shows members, pay groups, details.
+  - Employee CRUD: list at `/employees`, add at `/employees/new` (SIN validation + encryption, address, pay group assignment), detail/edit at `/employees/[id]` (personal info, TD1 profile management, YTD snapshot, terminate). AES-256-GCM encryption applied to SIN on create/update.
+  - Pay run wizard at `/payroll/new`: 3-step flow — (1) select pay group + date + gross amounts, (2) preview tax-engine calculation per employee with totals, (3) finalize creates immutable PayRun + PayRunItem records and updates YTD ledgers. Past runs listed at `/payroll`, detail at `/payroll/[id]`.
+  - Prisma schema extended with PayRun (DRAFT/FINALIZED/REVERSED) and PayRunItem models. Server actions for all domains with tenant-scoped access via `requireCompany()`.
+  - 29/29 tax-engine tests green. Next.js build passes: 13 routes, full compilation + typecheck.
 
-## Next actions (in order) — Phase 3: employee management + pay run wizard
-1. Provision a real Neon PostgreSQL database (ca-central-1) and run the first Prisma migration.
-2. Build company onboarding flow: create company → invite members → set up pay groups.
-3. Build employee CRUD: list/add/edit/terminate employees, TD1 profile management, SIN encryption integration.
-4. Build the pay run wizard: select pay group → load employees with YTD → calculate via tax engine → preview → finalize (immutable runs).
-5. (Optional, from Phase 1 leftovers): PDOC end-to-end spot-checks; vacation-pay minimums data module.
+## Next actions (in order) — Phase 4: remittance + reporting + polish
+1. Provision a real Neon PostgreSQL database (ca-central-1) and run the first Prisma migration (still blocked on external service — use Neon console or `npx create-db` for dev).
+2. Build PD7A remittance summary report (CPP, CPP2, EI totals per period) and T4 year-end output.
+3. Build pay stub view (employee facing, per-pay-run-item detail).
+4. Add ROE (Record of Employment) data export — EI insurable hours + earnings blocks.
+5. Integrate Resend for magic-link emails and employee pay stub delivery.
+6. (Phase 1 leftovers): PDOC end-to-end spot-checks (6 profiles × 12 jurisdictions); vacation-pay minimums data module.
 
 ## Environment facts (don't re-discover)
 - Windows 11, PowerShell (no `&&`). Node v24.16.0, npm 11.13.0, git 2.54. Repo root = `MapleRun/`, branch `main`.
@@ -32,6 +34,7 @@
 - `bracketFor` derives K cumulatively — verified to match every CRA-published K/KP ±$0.50. Don't hardcode K.
 - T4127 Jan-2026 page already includes a May-2026 PEI update; July edition check still due ~Jun 15 (calendar in TAX-COMPLIANCE.md).
 - QC income tax throws by design until Phase 2; QC EI reduced rate + QPP/QPIP data already work/exist. Calculator handles QC error gracefully (shows coming-soon message).
-- Prisma v7 requires `@prisma/adapter-pg` for direct PostgreSQL connections. `DATABASE_URL` must be set before first real DB access (lazy proxy prevents build-time crash).
+- Prisma v7 requires `@prisma/adapter-pg` for direct PostgreSQL connections. `DATABASE_URL` must be set before first real DB access (lazy proxy prevents build-time crash). Prisma Postgres has no Canadian region — Neon (ca-central-1) required for PIPEDA compliance.
 - Next.js 16 renamed `middleware.ts` → `proxy.ts` with changed export convention (named `proxy` function or default export).
+- Protected routes use route group `(app)` which doesn't add URL segments. Layout at `(app)/layout.tsx` protects all routes via `requireCompany()`. Public routes (`/`, `/sign-in`, `/verify-request`) live outside the group.
 - Unmodelled (rare, documented): LCP credits, ON factor Y, TD1X commission, outside-Canada surtax.
