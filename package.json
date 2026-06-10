@@ -1,0 +1,13 @@
+{
+  "name": "maplerun",
+  "private": true,
+  "version": "0.1.0",
+  "description": "MapleRun — Canadian cloud payroll",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm test -w @maplerun/tax-engine"
+  }
+}
