@@ -86,12 +86,13 @@ export default async function PayRunDetailPage({ params }: Props) {
         <CardContent>
           <div className="space-y-1">
             {payRun.items.map((item) => (
-              <div
+              <Link
+                href={`/payroll/${payRun.id}/stub/${item.id}`}
                 key={item.id}
                 className="grid grid-cols-3 sm:grid-cols-5 gap-2 py-2 px-3 rounded-md hover:bg-accent/30 transition-colors text-sm"
               >
-                <div className="col-span-2 sm:col-span-1 font-medium truncate">
-                  {item.employee.firstName} {item.employee.lastName}
+                <div className="col-span-2 sm:col-span-1 font-medium truncate hover:text-primary transition-colors">
+                  {item.employee.firstName} {item.employee.lastName} →
                 </div>
                 <div className="tabular-nums text-right">{fmtCAD(item.gross)}</div>
                 <div className="tabular-nums text-right text-muted-foreground">
@@ -103,7 +104,7 @@ export default async function PayRunDetailPage({ params }: Props) {
                 <div className="hidden sm:block tabular-nums text-right text-muted-foreground">
                   {fmtCAD(item.employerTotal)}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 

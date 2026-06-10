@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { href: "/app", label: "Dashboard", icon: LayoutDashboard },
   { href: "/employees", label: "Employees", icon: Users },
   { href: "/payroll", label: "Payroll", icon: ClipboardList },
+  { href: "/reports", label: "Reports", icon: ClipboardList },
   { href: "/company", label: "Company", icon: Building2 },
 ];
 
