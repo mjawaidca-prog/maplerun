@@ -165,11 +165,14 @@ export const PROVINCES_2026: Record<ProvinceCode, ProvincialTable> = {
   },
   QC: {
     province: 'QC', year: 2026, lowestRate: 0.14,
-    brackets: [],
-    bpa: 0,
-    notImplemented: true,
-    notes: ['Quebec income tax (TP-1015.3/WebRAS), QPP and QPIP land in Phase 2. Verified QPP/QPIP/abatement constants: data/2026/quebec.ts.'],
-    meta: { ...VERIFIED, verified: false, source: 'Placeholder — QC provincial tax is Revenu Québec territory (Phase 2).' },
+    brackets: [
+      { upTo: 54_345, rate: 0.14 },
+      { upTo: 108_680, rate: 0.19 },
+      { upTo: 132_245, rate: 0.24 },
+      { upTo: null, rate: 0.2575 },
+    ],
+    bpa: 18_952,
+    meta: VERIFIED,
   },
   SK: {
     province: 'SK', year: 2026, lowestRate: 0.105,

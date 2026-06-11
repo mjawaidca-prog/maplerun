@@ -40,12 +40,11 @@ describe('table registry', () => {
     expect(() => getTables('June 2026')).toThrow(TaxEngineError);
   });
 
-  it('2026 tables are fully verified (except QC placeholder)', () => {
+  it('2026 tables are fully verified (all provinces including QC)', () => {
     expect(FED.meta.verified).toBe(true);
     expect(CPP.meta.verified).toBe(true);
     expect(EI.meta.verified).toBe(true);
     for (const [code, table] of Object.entries(TABLES_2026.provinces)) {
-      if (code === 'QC') continue;
       expect(table.meta.verified, `${code} should be verified`).toBe(true);
     }
   });
@@ -242,8 +241,27 @@ describe('calculatePay — edges', () => {
     }
   });
 
-  it('Quebec income tax refuses until Phase 2', () => {
-    expect(() => calculatePay({ ...base, province: 'QC' })).toThrow(/not implemented/i);
+  it('Quebec employs QPP, QPIP, provincial tax, and federal abatement', () => {
+    const r = calculatePay({ ...base, province: 'QC' });
+    expect(r.cpp).toBeGreaterThan(0); // QPP deducted
+    expect(r.cpp).not.toBe(140.74); // different from CPP for ON
+    expect(r.ei).toBe(32.5); // QC-reduced EI (1.30%)
+    expect(r.federalTax).toBeGreaterThan(0); // still has federal tax (abated)
+    expect(r.provincialTax).toBeGreaterThan(0); // QC provincial tax
+    expect(r.netPay).toBeGreaterThan(0);
+    expect(r.warnings).toEqual([]);
+  });
+
+  it('Quebec federal tax is lower than Ontario due to 16.5% abatement', () => {
+    const qc = calculatePay({ ...base, province: 'QC' });
+    const on = calculatePay({ ...base, province: 'ON' });
+    // At same gross, QC federal tax ≈ 83.5% of ON federal tax
+    expect(qc.federalTax).toBeLessThan(on.federalTax);
+  });
+
+  it('Quebec gross-to-net invariant holds', () => {
+    const r = calculatePay({ ...base, province: 'QC' });
+    expect(Math.abs(r.gross - (r.netPay + r.totalDeductions))).toBeLessThanOrEqual(0.02);
   });
 
   it('rejects negative gross', () => {
