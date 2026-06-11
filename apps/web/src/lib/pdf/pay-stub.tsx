@@ -181,6 +181,10 @@ export interface PayStubPdfData {
   ytdCpp2: number;
   ytdInsurable: number;
   ytdEi: number;
+  employerCpp: number;
+  employerCpp2: number;
+  employerEi: number;
+  employerTotal: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -268,6 +272,45 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
           <View style={styles.ytdItem}>
             <Text style={styles.ytdLabel}>EI contributed</Text>
             <Text style={styles.ytdValue}>{fmtCAD(data.ytdEi)}</Text>
+          </View>
+        </View>
+
+        {/* YTD summary */}
+        <Text style={styles.sectionTitle}>Year-to-Date (2026)</Text>
+        <View style={styles.ytdGrid}>
+          <View style={styles.ytdItem}>
+            <Text style={styles.ytdLabel}>Pensionable earnings</Text>
+            <Text style={styles.ytdValue}>{fmtCAD(data.ytdPensionable)}</Text>
+          </View>
+          <View style={styles.ytdItem}>
+            <Text style={styles.ytdLabel}>CPP contributed</Text>
+            <Text style={styles.ytdValue}>{fmtCAD(data.ytdCpp)}</Text>
+          </View>
+          <View style={styles.ytdItem}>
+            <Text style={styles.ytdLabel}>CPP2 contributed</Text>
+            <Text style={styles.ytdValue}>{fmtCAD(data.ytdCpp2)}</Text>
+          </View>
+          <View style={styles.ytdItem}>
+            <Text style={styles.ytdLabel}>Insurable earnings</Text>
+            <Text style={styles.ytdValue}>{fmtCAD(data.ytdInsurable)}</Text>
+          </View>
+          <View style={styles.ytdItem}>
+            <Text style={styles.ytdLabel}>EI contributed</Text>
+            <Text style={styles.ytdValue}>{fmtCAD(data.ytdEi)}</Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Employer costs */}
+        <Text style={styles.sectionTitle}>Employer Costs</Text>
+        <View style={styles.columns}>
+          <View style={styles.column}>
+            <Row label="CPP (employer match)" value={fmtCAD(data.employerCpp)} />
+            <Row label="CPP2 (employer)" value={fmtCAD(data.employerCpp2)} />
+            <Row label="EI (1.4× employee)" value={fmtCAD(data.employerEi)} />
+            <View style={styles.divider} />
+            <Row label="Total employer cost" value={fmtCAD(data.employerTotal)} bold />
           </View>
         </View>
 

@@ -50,6 +50,10 @@ export async function GET(
     ytdCpp2: item.ytdCpp2,
     ytdInsurable: item.ytdInsurable,
     ytdEi: item.ytdEi,
+    employerCpp: item.employerCpp,
+    employerCpp2: item.employerCpp2,
+    employerEi: item.employerEi,
+    employerTotal: item.employerTotal,
   };
 
   const buffer = await renderToBuffer(<PayStubPdf data={pdfData} />);

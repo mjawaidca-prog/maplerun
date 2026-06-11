@@ -1,130 +1,100 @@
 /**
- * PD7A Remittance Report — CRA-compliant summary of source deductions.
+ * Reports dashboard — links to all available reports.
  */
 
-import { getPd7aReport, type Pd7aReport } from "@/lib/actions/reports";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-
-function fmtCAD(n: number): string {
-  return `$${n.toFixed(2)}`;
-}
+import { getPd7aReport } from "@/lib/actions/reports";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { FileText, Receipt, FileSpreadsheet, Users, ArrowRight } from "lucide-react";
 
 export default async function ReportsPage() {
+  // Quick PD7A summary for current year
   const year = new Date().getFullYear();
-  let report: Pd7aReport | null = null;
-  let error: string | null = null;
-
+  let pd7aTotal = 0;
   try {
-    report = await getPd7aReport(year, "monthly");
-  } catch (e) {
-    error = e instanceof Error ? e.message : "Failed to generate report.";
-  }
+    const report = await getPd7aReport(year, "monthly");
+    pd7aTotal = report.totals.totalRemittance;
+  } catch { /* No runs yet */ }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">PD7A Remittance Report</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
         <p className="text-muted-foreground mt-1">
-          Summary of source deductions for {year}. Use this to complete your CRA PD7A
-          remittance voucher.
+          Payroll reports, remittance summaries, and year-end filings.
         </p>
       </div>
 
-      {error && (
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardContent className="py-4 text-sm text-destructive">{error}</CardContent>
-        </Card>
-      )}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Link href="/reports/t4">
+          <Card className="border-border/60 hover:border-primary/30 hover:shadow-sm transition-all h-full">
+            <CardHeader>
+              <FileSpreadsheet className="h-8 w-8 text-maple mb-1" />
+              <CardTitle className="text-lg">T4 Slips</CardTitle>
+              <CardDescription>
+                Employee T4 summaries for year-end filing. Box 14, 16, 18, 22, 24, 26 — all populated from finalized pay runs.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <span className="text-sm text-primary font-medium inline-flex items-center gap-1">
+                View T4 report <ArrowRight className="h-3 w-3" />
+              </span>
+            </CardContent>
+          </Card>
+        </Link>
 
-      {report && report.periods.length === 0 && (
         <Card className="border-border/60">
-          <CardContent className="py-12 text-center space-y-3">
-            <p className="text-lg font-semibold">No finalized pay runs in {year}</p>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              The PD7A report aggregates finalized pay runs. Run your first payroll
-              to see remittance data here.
+          <CardHeader>
+            <Receipt className="h-8 w-8 text-maple mb-1" />
+            <CardTitle className="text-lg">PD7A Remittance</CardTitle>
+            <CardDescription>
+              Monthly/quarterly source deduction summary — CPP, CPP2, EI (employee + employer) with remittance amounts.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold tabular-nums text-maple">
+              {pd7aTotal > 0 ? `$${pd7aTotal.toFixed(2)}` : "No data"}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {year} remittance to date
             </p>
           </CardContent>
         </Card>
-      )}
 
-      {report && report.periods.length > 0 && (
-        <>
-          {/* Period-by-period breakdown */}
-          <div className="space-y-3">
-            {report.periods.map((p) => (
-              <Card key={p.period} className="border-border/60">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{p.period}</CardTitle>
-                    <Badge variant="outline" className="text-xs">
-                      {p.payRuns} run{p.payRuns !== 1 ? "s" : ""} &middot; {p.employees} employee{p.employees !== 1 ? "s" : ""}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-                    <Stat label="CPP (employee)" value={fmtCAD(p.employeeCpp)} />
-                    <Stat label="CPP (employer)" value={fmtCAD(p.employerCpp)} />
-                    <Stat label="CPP2 (employee)" value={fmtCAD(p.employeeCpp2)} />
-                    <Stat label="CPP2 (employer)" value={fmtCAD(p.employerCpp2)} />
-                    <Stat label="EI (employee)" value={fmtCAD(p.employeeEi)} />
-                    <Stat label="EI (employer)" value={fmtCAD(p.employerEi)} />
-                  </div>
-                  <Separator className="my-3" />
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold">PD7A Remittance Due</span>
-                    <span className="text-lg font-bold tabular-nums text-maple">
-                      {fmtCAD(p.totalRemittance)}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Annual totals */}
-          <Card className="border-primary/20 bg-primary/5">
+        <Link href="/reports/roe">
+          <Card className="border-border/60 hover:border-primary/30 hover:shadow-sm transition-all h-full">
             <CardHeader>
-              <CardTitle className="text-lg">{year} Totals</CardTitle>
+              <Users className="h-8 w-8 text-maple mb-1" />
+              <CardTitle className="text-lg">Records of Employment</CardTitle>
+              <CardDescription>
+                Generate ROEs when an employee leaves. Block 15A/15B/15C data from finalized pay history.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-                <Stat label="CPP (employee)" value={fmtCAD(report.totals.employeeCpp)} />
-                <Stat label="CPP (employer)" value={fmtCAD(report.totals.employerCpp)} />
-                <Stat label="CPP2 (employee)" value={fmtCAD(report.totals.employeeCpp2)} />
-                <Stat label="CPP2 (employer)" value={fmtCAD(report.totals.employerCpp2)} />
-                <Stat label="EI (employee)" value={fmtCAD(report.totals.employeeEi)} />
-                <Stat label="EI (employer)" value={fmtCAD(report.totals.employerEi)} />
-              </div>
-              <Separator className="my-4" />
-              <div className="flex justify-between items-center">
-                <span className="text-base font-bold">Total Annual Remittance</span>
-                <span className="text-2xl font-bold tabular-nums text-maple">
-                  {fmtCAD(report.totals.totalRemittance)}
-                </span>
-              </div>
+              <span className="text-sm text-primary font-medium inline-flex items-center gap-1">
+                View ROEs <ArrowRight className="h-3 w-3" />
+              </span>
             </CardContent>
           </Card>
+        </Link>
 
-          <p className="text-xs text-muted-foreground text-center">
-            Compare with your CRA PD7A remittance form. These figures are from
-            finalized MapleRun pay runs and should match your CRA remittance
-            obligations for {year}.
-          </p>
-        </>
-      )}
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="font-semibold tabular-nums">{value}</p>
+        <Link href="/payroll">
+          <Card className="border-border/60 hover:border-primary/30 hover:shadow-sm transition-all h-full">
+            <CardHeader>
+              <FileText className="h-8 w-8 text-maple mb-1" />
+              <CardTitle className="text-lg">Payroll Journal</CardTitle>
+              <CardDescription>
+                Complete history of all pay runs with per-employee breakdowns. Filter by date, view details, download PDF stubs.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <span className="text-sm text-primary font-medium inline-flex items-center gap-1">
+                View history <ArrowRight className="h-3 w-3" />
+              </span>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
     </div>
   );
 }
