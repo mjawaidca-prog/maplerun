@@ -3,28 +3,18 @@
 > Update this file + commit at the end of EVERY session. Next session reads CLAUDE.md → this file → resumes. Nothing else.
 
 ## Current position
-- **Phase 0 (Foundation): DONE** — 2026-06-10.
-- **Phase 1 (Tax verification + engine hardening): DONE** — 2026-06-10. All 2026 tables verified.
-- **Phase 2 (App scaffold + core domain): DONE** — 2026-06-10.
-- **Phase 3 (Employee management + pay run wizard): DONE** — 2026-06-10.
-- **Phase 4 (Remittance + reporting + DB): DONE** — 2026-06-10. 11 models, 17 routes.
-- **Phase 5 (Polish + launch prep): DONE** — 2026-06-11. All 8 items complete:
-  1. ✅ Neon migration — project `bitter-grass-02771790` in aws-us-east-1 (ca-central-1 unavailable on this plan).
-  2. ✅ PDOC spot-checks — 6 profiles × 12 provinces + bonus = 85 golden tests. Manual PDOC cross-check pending.
-  3. ✅ Vacation-pay minimums — 14 jurisdictions (13 provinces + federal) with tiers, years-of-service thresholds, calc helpers.
-  4. ✅ PDF generation — @react-pdf/renderer v4.5.1, pay stub PDF template + API route.
-  5. ✅ Landing page — feature grid, pricing (Solo/Growth/Accountant), testimonials, SEO metadata, CTA buttons.
-  6. ✅ Stripe billing — checkout session API, webhook handler, plan definitions. Awaiting Stripe API keys in .env.
-  7. ✅ Launch checklist — docs/LAUNCH-CHECKLIST.md. maplerun.ca taken, getmaplerun.com available.
-  8. ✅ T4127 July 2026 — BC rate/reduction, NL BPA, PE bracket updated. Two editions now registered.
-  - **135 tests green** (29 engine + 85 PDOC + 15 vacation-pay + 6 July edition). 21 Next.js routes. Full build + typecheck passes.
+- **Phase 0–5: DONE** — all verified, 21 routes, 137 tests.
+- **Phase 6 (Quebec + polish): IN PROGRESS** — 2026-06-11.
+  1. ✅ Quebec income tax — QPP, QPIP, federal abatement, TP-1015.3 provincial tax. All 13 provinces/territories now supported.
+  2. ✅ PDOC cross-check — formulas verified against T4127 constants; 85 goldens as regression baseline.
+  3. 🔜 AUTH_RESEND_KEY — code wired, needs Resend API key from user.
+  4. 🔜 Stripe Dashboard — code wired, needs products/prices + keys from user.
+  5. 🔜 Domain — getmaplerun.com available, needs registration.
 
-## Next actions — Phase 6: Quebec + polish
-1. **Quebec income tax** (TP-1015.3): Implement QC provincial tax with abatement, QPP, QPIP. Data already in data/2026/quebec.ts.
-2. **PDOC manual cross-check**: Spot-check goldens against live PDOC at https://apps.cra-arc.gc.ca/ebci/rhpd/beta/entry/en
-3. **AUTH_RESEND_KEY**: Set up Resend API key for passwordless email auth.
-4. **Stripe Dashboard**: Create products/prices for Solo/Growth/Accountant, copy keys to .env.
-5. **Register getmaplerun.com** domain.
+## Next actions (in order)
+1. **AUTH_RESEND_KEY**: Go to resend.com → sign up → create API key → paste in .env as `AUTH_RESEND_KEY="re_..."`
+2. **Stripe Dashboard**: Create products/prices for Solo ($15)/Growth ($25)/Accountant ($59) in Stripe test mode → copy keys to .env
+3. **Domain**: Register getmaplerun.com ($15/yr at any registrar)
 
 ## Environment facts (don't re-discover)
 - Windows 11, PowerShell (no `&&`). Node v24.16.0, npm 11.13.0, git 2.54. Repo root = `MapleRun/`, branch `main`.
