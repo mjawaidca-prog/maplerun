@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Download, Printer } from "lucide-react";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -47,15 +47,24 @@ export default async function PayStubPage({ params }: Props) {
           <ArrowLeft className="h-4 w-4" />
           Back to pay run
         </Link>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          onClick={() => window.print()}
-        >
-          <Printer className="h-4 w-4" />
-          Print
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/payroll/${payRunId}/stub/${itemId}/pdf`}
+            className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            PDF
+          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => window.print()}
+          >
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
+        </div>
       </div>
 
       {/* Pay stub */}

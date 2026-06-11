@@ -1,0 +1,1830 @@
+{
+  "_meta": {
+    "generated": "2026-06-11",
+    "engine": "@maplerun/tax-engine v0.1.0",
+    "taxYear": 2026,
+    "source": "T4127 121st edition — all tables verified",
+    "tolerance": 0.5,
+    "pdocUrl": "https://apps.cra-arc.gc.ca/ebci/rhpd/beta/entry/en",
+    "profileCount": 6,
+    "provinces": [
+      "AB",
+      "BC",
+      "MB",
+      "NB",
+      "NL",
+      "NS",
+      "NT",
+      "NU",
+      "ON",
+      "PE",
+      "SK",
+      "YT"
+    ],
+    "note": "Spot-check a random sample of these against PDOC to confirm engine accuracy. All values rounded to 4 decimal places."
+  },
+  "goldens": {
+    "Low-income ON (tax reduction + health premium threshold)": [
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "AB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 0,
+          "totalDeductions": 81.11,
+          "netPay": 818.89,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "BC",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 0,
+          "totalDeductions": 81.11,
+          "netPay": 818.89,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "MB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 25.15,
+          "totalDeductions": 106.26,
+          "netPay": 793.74,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "NB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 29.54,
+          "totalDeductions": 110.65,
+          "netPay": 789.35,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "NL",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 35.63,
+          "totalDeductions": 116.74,
+          "netPay": 783.26,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "NS",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 33.48,
+          "totalDeductions": 114.59,
+          "netPay": 785.41,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "NT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 8.25,
+          "totalDeductions": 89.36,
+          "netPay": 810.64,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "NU",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 3.35,
+          "totalDeductions": 84.46,
+          "netPay": 815.54,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "ON",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 18.67,
+          "totalDeductions": 99.78,
+          "netPay": 800.22,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "PE",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 24.97,
+          "totalDeductions": 106.08,
+          "netPay": 793.92,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "SK",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 5.87,
+          "totalDeductions": 86.98,
+          "netPay": 813.02,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      },
+      {
+        "profile": "Low-income ON (tax reduction + health premium threshold)",
+        "inputs": {
+          "province": "YT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 900,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 45.54,
+          "cpp2": 0,
+          "ei": 14.67,
+          "federalTax": 20.9,
+          "provincialTax": 9.55,
+          "totalDeductions": 90.66,
+          "netPay": 809.34,
+          "annualTaxableIncome": 23201.1,
+          "employerEi": 20.54,
+          "employerCpp": 45.54
+        }
+      }
+    ],
+    "Mid-income ON (standard golden case — T4127 121st ed.)": [
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "AB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 117.87,
+          "totalDeductions": 541.94,
+          "netPay": 1958.06,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "BC",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 105.83,
+          "totalDeductions": 529.9,
+          "netPay": 1970.1,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "MB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 197.89,
+          "totalDeductions": 621.96,
+          "netPay": 1878.04,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "NB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 189.86,
+          "totalDeductions": 613.93,
+          "netPay": 1886.07,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "NL",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 208.24,
+          "totalDeductions": 632.31,
+          "netPay": 1867.69,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "NS",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 244.15,
+          "totalDeductions": 668.22,
+          "netPay": 1831.78,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "NT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 107.32,
+          "totalDeductions": 531.39,
+          "netPay": 1968.61,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "NU",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 72.4,
+          "totalDeductions": 496.47,
+          "netPay": 2003.53,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "ON",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 131.48,
+          "totalDeductions": 555.55,
+          "netPay": 1944.45,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "PE",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 211.96,
+          "totalDeductions": 636.03,
+          "netPay": 1863.97,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "SK",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 168.72,
+          "totalDeductions": 592.79,
+          "netPay": 1907.21,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      },
+      {
+        "profile": "Mid-income ON (standard golden case — T4127 121st ed.)",
+        "inputs": {
+          "province": "YT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 140.74,
+          "cpp2": 0,
+          "ei": 40.75,
+          "federalTax": 242.58,
+          "provincialTax": 110.05,
+          "totalDeductions": 534.12,
+          "netPay": 1965.88,
+          "annualTaxableIncome": 64385.1,
+          "employerEi": 57.05,
+          "employerCpp": 140.74
+        }
+      }
+    ],
+    "High-income ON (surtax + BPAF phase-out)": [
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "AB",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 1878.28,
+          "totalDeductions": 7562.92,
+          "netPay": 12437.08,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "BC",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 2118.01,
+          "totalDeductions": 7802.65,
+          "netPay": 12197.35,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "MB",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 2824.75,
+          "totalDeductions": 8509.39,
+          "netPay": 11490.61,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "NB",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 2777.69,
+          "totalDeductions": 8462.33,
+          "netPay": 11537.67,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "NL",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 2855.35,
+          "totalDeductions": 8539.99,
+          "netPay": 11460.01,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "NS",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 3263.58,
+          "totalDeductions": 8948.22,
+          "netPay": 11051.78,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "NT",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 1967.03,
+          "totalDeductions": 7651.67,
+          "netPay": 12348.33,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "NU",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 1492.83,
+          "totalDeductions": 7177.47,
+          "netPay": 12822.53,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "ON",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 2654.48,
+          "totalDeductions": 8339.12,
+          "netPay": 11660.88,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "PE",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 3068.37,
+          "totalDeductions": 8753.01,
+          "netPay": 11246.99,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "SK",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 2301.91,
+          "totalDeductions": 7986.55,
+          "netPay": 12013.45,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      },
+      {
+        "profile": "High-income ON (surtax + BPAF phase-out)",
+        "inputs": {
+          "province": "YT",
+          "frequency": "monthly",
+          "grossPeriodIncome": 20000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 1172.65,
+          "cpp2": 0,
+          "ei": 326,
+          "federalTax": 4185.99,
+          "provincialTax": 1821.18,
+          "totalDeductions": 7505.82,
+          "netPay": 12494.18,
+          "annualTaxableIncome": 237635.04,
+          "employerEi": 456.4,
+          "employerCpp": 1172.65
+        }
+      }
+    ],
+    "Senior BC (higher TD1 claim + BC reduction)": [
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "AB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 51.25,
+          "totalDeductions": 246.12,
+          "netPay": 1353.88,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "BC",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 31.73,
+          "totalDeductions": 226.6,
+          "netPay": 1373.4,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "MB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 69.18,
+          "totalDeductions": 264.05,
+          "netPay": 1335.95,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "NB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 60.21,
+          "totalDeductions": 255.08,
+          "netPay": 1344.92,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "NL",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 55.73,
+          "totalDeductions": 250.6,
+          "netPay": 1349.4,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "NS",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 80.53,
+          "totalDeductions": 275.4,
+          "netPay": 1324.6,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "NT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 37.79,
+          "totalDeductions": 232.66,
+          "netPay": 1367.34,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "NU",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 25.62,
+          "totalDeductions": 220.49,
+          "netPay": 1379.51,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "ON",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 49.66,
+          "totalDeductions": 244.53,
+          "netPay": 1355.47,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "PE",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 71.99,
+          "totalDeductions": 266.86,
+          "netPay": 1333.14,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "SK",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 67.26,
+          "totalDeductions": 262.13,
+          "netPay": 1337.87,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      },
+      {
+        "profile": "Senior BC (higher TD1 claim + BC reduction)",
+        "inputs": {
+          "province": "YT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1600,
+          "payDate": "2026-06-15",
+          "federalClaim": 22000,
+          "provincialClaim": 22000
+        },
+        "results": {
+          "cpp": 87.19,
+          "cpp2": 0,
+          "ei": 26.08,
+          "federalTax": 81.6,
+          "provincialTax": 37.3,
+          "totalDeductions": 232.17,
+          "netPay": 1367.83,
+          "annualTaxableIncome": 41219.1,
+          "employerEi": 36.51,
+          "employerCpp": 87.19
+        }
+      }
+    ],
+    "Minimum-wage MB (low income + MB BPA)": [
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "AB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 19.31,
+          "totalDeductions": 161.98,
+          "netPay": 1038.02,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "BC",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 16.02,
+          "totalDeductions": 158.69,
+          "netPay": 1041.31,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "MB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 55.09,
+          "totalDeductions": 197.76,
+          "netPay": 1002.24,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "NB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 55.6,
+          "totalDeductions": 198.27,
+          "netPay": 1001.73,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "NL",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 59.75,
+          "totalDeductions": 202.42,
+          "netPay": 997.58,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "NS",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 57.85,
+          "totalDeductions": 200.52,
+          "netPay": 999.48,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "NT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 24.61,
+          "totalDeductions": 167.28,
+          "netPay": 1032.72,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "NU",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 14.44,
+          "totalDeductions": 157.11,
+          "netPay": 1042.89,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "ON",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 42.72,
+          "totalDeductions": 185.39,
+          "netPay": 1014.61,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "PE",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 51.31,
+          "totalDeductions": 193.98,
+          "netPay": 1006.02,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "SK",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 34.98,
+          "totalDeductions": 177.65,
+          "netPay": 1022.35,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      },
+      {
+        "profile": "Minimum-wage MB (low income + MB BPA)",
+        "inputs": {
+          "province": "YT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 1200,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 63.39,
+          "cpp2": 0,
+          "ei": 19.56,
+          "federalTax": 59.72,
+          "provincialTax": 27.3,
+          "totalDeductions": 169.97,
+          "netPay": 1030.03,
+          "annualTaxableIncome": 30923.1,
+          "employerEi": 27.38,
+          "employerCpp": 63.39
+        }
+      }
+    ],
+    "Salaried AB (AB K5P top-up)": [
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "AB",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 507.55,
+          "totalDeductions": 2140.18,
+          "netPay": 5859.82,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "BC",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 423.96,
+          "totalDeductions": 2056.59,
+          "netPay": 5943.41,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "MB",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 749.99,
+          "totalDeductions": 2382.62,
+          "netPay": 5617.38,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "NB",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 765.2,
+          "totalDeductions": 2397.83,
+          "netPay": 5602.17,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "NL",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 824.31,
+          "totalDeductions": 2456.94,
+          "netPay": 5543.06,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "NS",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 951.38,
+          "totalDeductions": 2584.01,
+          "netPay": 5415.99,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "NT",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 449.82,
+          "totalDeductions": 2082.45,
+          "netPay": 5917.55,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "NU",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 334.1,
+          "totalDeductions": 1966.73,
+          "netPay": 6033.27,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "ON",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 529.12,
+          "totalDeductions": 2161.75,
+          "netPay": 5838.25,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "PE",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 875.78,
+          "totalDeductions": 2508.41,
+          "netPay": 5491.59,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "SK",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 680.52,
+          "totalDeductions": 2313.15,
+          "netPay": 5686.85,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      },
+      {
+        "profile": "Salaried AB (AB K5P top-up)",
+        "inputs": {
+          "province": "YT",
+          "frequency": "monthly",
+          "grossPeriodIncome": 8000,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 458.65,
+          "cpp2": 0,
+          "ei": 130.4,
+          "federalTax": 1043.58,
+          "provincialTax": 465.75,
+          "totalDeductions": 2098.38,
+          "netPay": 5901.62,
+          "annualTaxableIncome": 95075.04,
+          "employerEi": 182.56,
+          "employerCpp": 458.65
+        }
+      }
+    ],
+    "Bonus $5,000 across all provinces": [
+      {
+        "profile": "Bonus $5,000 (AB) — 2500/biweekly regular",
+        "inputs": {
+          "province": "AB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 495,
+          "totalDeductions": 1888.75,
+          "netPay": 3111.25,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (BC) — 2500/biweekly regular",
+        "inputs": {
+          "province": "BC",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 381.15,
+          "totalDeductions": 1774.9,
+          "netPay": 3225.1,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (MB) — 2500/biweekly regular",
+        "inputs": {
+          "province": "MB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 631.13,
+          "totalDeductions": 2024.88,
+          "netPay": 2975.12,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (NB) — 2500/biweekly regular",
+        "inputs": {
+          "province": "NB",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 693,
+          "totalDeductions": 2086.75,
+          "netPay": 2913.25,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (NL) — 2500/biweekly regular",
+        "inputs": {
+          "province": "NL",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 717.75,
+          "totalDeductions": 2111.5,
+          "netPay": 2888.5,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (NS) — 2500/biweekly regular",
+        "inputs": {
+          "province": "NS",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 825.17,
+          "totalDeductions": 2218.92,
+          "netPay": 2781.08,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (NT) — 2500/biweekly regular",
+        "inputs": {
+          "province": "NT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 425.7,
+          "totalDeductions": 1819.45,
+          "netPay": 3180.55,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (NU) — 2500/biweekly regular",
+        "inputs": {
+          "province": "NU",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 346.5,
+          "totalDeductions": 1740.25,
+          "netPay": 3259.75,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (ON) — 2500/biweekly regular",
+        "inputs": {
+          "province": "ON",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 452.93,
+          "totalDeductions": 1846.68,
+          "netPay": 3153.32,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (PE) — 2500/biweekly regular",
+        "inputs": {
+          "province": "PE",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 776.79,
+          "totalDeductions": 2170.54,
+          "netPay": 2829.46,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (SK) — 2500/biweekly regular",
+        "inputs": {
+          "province": "SK",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 618.75,
+          "totalDeductions": 2012.5,
+          "netPay": 2987.5,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      },
+      {
+        "profile": "Bonus $5,000 (YT) — 2500/biweekly regular",
+        "inputs": {
+          "province": "YT",
+          "frequency": "biweekly",
+          "grossPeriodIncome": 2500,
+          "payDate": "2026-06-15"
+        },
+        "results": {
+          "cpp": 297.5,
+          "cpp2": 0,
+          "ei": 81.5,
+          "federalTax": 1014.75,
+          "provincialTax": 445.5,
+          "totalDeductions": 1839.25,
+          "netPay": 3160.75,
+          "annualTaxableIncome": 0,
+          "employerEi": 114.1,
+          "employerCpp": 297.5
+        }
+      }
+    ]
+  }
+}

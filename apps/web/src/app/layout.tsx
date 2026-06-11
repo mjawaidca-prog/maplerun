@@ -15,7 +15,26 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MapleRun — Canadian Payroll, Done in Minutes",
   description:
-    "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, and produce pay stubs in minutes.",
+    "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, and produce pay stubs in minutes. Supports all provinces and territories. 2026 T4127 tax tables.",
+  keywords: [
+    "Canadian payroll",
+    "payroll software",
+    "small business payroll",
+    "CRA payroll deductions",
+    "T4127",
+    "pay stub",
+    "T4",
+    "remittance",
+    "PD7A",
+    "MapleRun",
+  ],
+  openGraph: {
+    title: "MapleRun — Canadian Payroll, Done in Minutes",
+    description:
+      "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, produce pay stubs in minutes.",
+    type: "website",
+    locale: "en_CA",
+  },
 };
 
 export default function RootLayout({

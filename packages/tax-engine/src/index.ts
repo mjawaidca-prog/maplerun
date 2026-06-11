@@ -1,6 +1,12 @@
 export * from './types';
 export { roundCent, clamp } from './money';
-export { getTables, TABLES_2026 } from './data/index';
+export { getTables, TABLES_2026, TABLES_2026_JULY } from './data/index';
+export {
+  VACATION_PAY_STANDARDS,
+  getVacationPayRate,
+  calcVacationPay,
+} from './data/vacation-pay';
+export type { VacationPayTier, VacationPayStandard } from './data/vacation-pay';
 export { QPP_2026, QPIP_2026, QC_FEDERAL_ABATEMENT } from './data/2026/quebec';
 export { calculatePay } from './calc/pay-run';
 export { calculateBonus, type BonusInput, type BonusResult } from './calc/bonus';

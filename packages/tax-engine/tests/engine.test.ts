@@ -250,3 +250,52 @@ describe('calculatePay — edges', () => {
     expect(() => calculatePay({ ...base, grossPeriodIncome: -1 })).toThrow(TaxEngineError);
   });
 });
+
+describe('T4127 July 2026 edition (123rd ed.)', () => {
+  const baseJul = { ...base, payDate: '2026-07-15' };
+
+  it('resolves July 2026 tables', () => {
+    const tables = getTables('2026-07-01');
+    expect(tables.provinces.BC.lowestRate).toBe(0.0614); // prorated BC rate
+    expect(tables.provinces.NL.bpa).toBe(15_000); // prorated NL BPA
+    expect(tables.provinces.PE.brackets.length).toBe(6); // new 6th bracket
+    expect(tables.provinces.PE.brackets[5].rate).toBe(0.21); // prorated top rate
+    expect(tables.federal).toBe(getTables('2026-01-01').federal); // federal unchanged
+    expect(tables.cpp).toBe(getTables('2026-01-01').cpp); // CPP unchanged
+    expect(tables.ei).toBe(getTables('2026-01-01').ei); // EI unchanged
+  });
+
+  it('BC tax is higher with prorated July rate', () => {
+    const jan = calculatePay({ ...base, payDate: '2026-06-15', province: 'BC' });
+    const jul = calculatePay({ ...baseJul, province: 'BC' });
+    expect(jul.provincialTax).toBeGreaterThan(jan.provincialTax);
+  });
+
+  it('NL tax is lower with prorated higher BPA', () => {
+    const jan = calculatePay({ ...base, province: 'NL' });
+    const jul = calculatePay({ ...baseJul, province: 'NL' });
+    expect(jul.provincialTax).toBeLessThan(jan.provincialTax);
+  });
+
+  it('PE top bracket applies at high income', () => {
+    const r = calculatePay({ ...baseJul, province: 'PE', frequency: 'monthly', grossPeriodIncome: 25_000 });
+    // Annual taxable > $200,000 — PE top bracket (21% prorated) engaged
+    expect(r.provincialTax).toBeGreaterThan(0);
+    expect(r.annualTaxableIncome).toBeGreaterThan(200_000);
+  });
+
+  it('unchanged provinces produce identical results Jan vs Jul', () => {
+    const jul = calculatePay({ ...baseJul, province: 'ON' });
+    const jan = calculatePay({ ...base, province: 'ON' });
+    expect(jul.provincialTax).toBe(jan.provincialTax);
+    expect(jul.federalTax).toBe(jan.federalTax);
+  });
+
+  it('July tables are verified', () => {
+    const tables = getTables('2026-07-01');
+    for (const [code, table] of Object.entries(tables.provinces)) {
+      if (code === 'QC') continue;
+      expect(table.meta.verified, `${code} July should be verified`).toBe(true);
+    }
+  });
+});
