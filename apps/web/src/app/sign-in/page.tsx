@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,11 +15,14 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-export default function SignInPage() {
+function SignInForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/app";
+  const hasGoogle = process.env.NEXT_PUBLIC_GOOGLE_ENABLED === "true";
 
   async function handleEmailSignIn(e: React.FormEvent) {
     e.preventDefault();
@@ -29,7 +33,7 @@ export default function SignInPage() {
       const result = await signIn("resend", {
         email,
         redirect: false,
-        callbackUrl: "/app",
+        callbackUrl,
       });
 
       if (result?.error) {
@@ -43,10 +47,6 @@ export default function SignInPage() {
       setLoading(false);
     }
   }
-
-  const hasGoogle =
-    typeof window !== "undefined" &&
-    process.env.NEXT_PUBLIC_GOOGLE_ENABLED === "true";
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background">
@@ -128,7 +128,7 @@ export default function SignInPage() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => signIn("google", { callbackUrl: "/app" })}
+                  onClick={() => signIn("google", { callbackUrl })}
                 >
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                     <path
@@ -160,5 +160,13 @@ export default function SignInPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInForm />
+    </Suspense>
   );
 }

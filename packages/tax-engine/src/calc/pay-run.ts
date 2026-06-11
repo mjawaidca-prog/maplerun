@@ -2,6 +2,7 @@ import {
   PERIODS_PER_YEAR,
   TaxEngineError,
   ZERO_YTD,
+  type FederalTable,
   type PayInput,
   type PayResult,
 } from '../types';
@@ -168,7 +169,7 @@ export function calculatePay(input: PayInput): PayResult {
 /** Compute annual federal tax T3 inline (avoids circular imports). */
 function computeFederalTax(
   A: number,
-  fed: typeof import('../types').FederalTable,
+  fed: FederalTable,
   annualDeductions: number,
   annualCppCredit: number,
   annualEiCredit: number,
