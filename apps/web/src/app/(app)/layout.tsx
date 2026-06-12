@@ -56,6 +56,13 @@ export default async function AppLayout({
           ))}
         </nav>
 
+        {/* New company */}
+        <div className="px-2 pb-2">
+          <Link href="/onboarding" className="flex items-center gap-2.5 px-3 py-2.5 rounded-[9px] text-sm font-medium text-[#A8A29E] hover:bg-[#292524] hover:text-[#E7E5E4] transition-colors">
+            <span className="text-base">＋</span> New company
+          </Link>
+        </div>
+
         {/* Footer */}
         <div className="border-t border-[#292524] pt-4 mt-auto space-y-3">
           {/* Plan badge */}
