@@ -5,7 +5,7 @@ import { getT4Report } from "@/lib/actions/t4";
 import { StubPrintButton } from "@/components/stub-actions";
 import Link from "next/link";
 
-function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
+function fmtCAD(n: number): string { return `$${(n ?? 0).toFixed(2)}`; }
 
 export default async function T4SummaryPage() {
   const year = 2026;
@@ -63,7 +63,7 @@ export default async function T4SummaryPage() {
             <div className="px-5 py-4 border-b border-[#F0EFED] flex justify-between items-center"><span className="text-[15px] font-bold">{report.companyName}</span></div>
             <div className="grid grid-cols-4 gap-3.5 p-5">
               {[["Box 14 · Employment income",report.totals.box14],["Box 16 · CPP",report.totals.box16],["Box 16A · CPP2",report.totals.box16A],["Box 18 · EI",report.totals.box18],["Box 22 · Income tax",report.totals.box22],["Box 24 · EI earnings",report.totals.box24],["Box 26 · Pensionable",report.totals.box26],["Employer remitted","—"]].map(([label,value])=>(
-                <div key={label as string}><p className="text-[11px] text-[#A8A29E] uppercase tracking-[0.05em]"><b className="text-[#1C1917] font-bold">{label as string}</b></p><p className="text-base font-bold mt-1.5 font-mono tabular-nums">{fmtCAD(value as number)}</p></div>
+                <div key={label as string}><p className="text-[11px] text-[#A8A29E] uppercase tracking-[0.05em]"><b className="text-[#1C1917] font-bold">{label as string}</b></p><p className="text-base font-bold mt-1.5 font-mono tabular-nums">{typeof value === "number" ? fmtCAD(value) : value}</p></div>
               ))}
             </div>
           </div>
