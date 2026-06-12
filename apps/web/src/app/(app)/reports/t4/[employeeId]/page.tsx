@@ -4,8 +4,9 @@
 
 import { getT4Report } from "@/lib/actions/t4";
 import { requireCompany } from "@/lib/session";
+import { StubPrintButton } from "@/components/stub-actions";
 import Link from "next/link";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
@@ -25,9 +26,7 @@ export default async function T4SlipPage({ params }: Props) {
         <Link href="/reports/t4" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back to T4 list
         </Link>
-        <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-[10px] border border-input bg-white px-3.5 py-2 text-sm font-medium hover:bg-accent">
-          <Printer className="h-4 w-4" /> Print
-        </button>
+        <StubPrintButton />
       </div>
 
       <div className="rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.10)] border border-[#E7E5E4] bg-white print:shadow-none print:rounded-none print:border-0">

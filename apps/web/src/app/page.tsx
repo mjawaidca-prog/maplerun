@@ -17,7 +17,7 @@ export default function Home() {
           <a href="#pricing" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Pricing</a>
           <a href="#calculator" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Calculator</a>
           <Link href="/sign-in" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Sign in</Link>
-          <Link href="/onboarding" className="inline-flex items-center gap-2 px-[18px] py-2.5 rounded-[10px] bg-[#B3261E] text-white text-sm font-semibold no-underline hover:bg-[#8F1D17] transition-colors">
+          <Link href="/sign-in" className="inline-flex items-center gap-2 px-[18px] py-2.5 rounded-[10px] bg-[#B3261E] text-white text-sm font-semibold no-underline hover:bg-[#8F1D17] transition-colors">
             Try it free →
           </Link>
         </div>
@@ -36,7 +36,7 @@ export default function Home() {
             Run CPP, EI, and tax-accurate payroll in minutes. Pay stubs and T4s your employees and accountant will actually trust.
           </p>
           <div className="flex gap-3 justify-center mt-[30px]">
-            <Link href="/onboarding" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline hover:bg-[#8F1D17]">
+            <Link href="/sign-in" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline hover:bg-[#8F1D17]">
               Try it free
             </Link>
             <a href="#calculator" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] border border-[#D6D3D1] bg-white text-[#1C1917] font-semibold no-underline hover:bg-gray-50">
@@ -115,7 +115,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <Link
-                  href="/onboarding"
+                  href="/sign-in"
                   className={`text-center py-2.5 px-[18px] rounded-[10px] text-sm font-semibold no-underline ${
                     plan.hot
                       ? "bg-[#B3261E] text-white"
@@ -167,7 +167,7 @@ export default function Home() {
               <p className="text-sm text-[#A8A29E] mt-2.5 leading-relaxed">
                 Enter a gross amount and province — MapleRun shows the exact CPP, EI, and tax split before you ever create an account.
               </p>
-              <Link href="/onboarding" className="inline-flex mt-[22px] px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline">
+              <Link href="/sign-in" className="inline-flex mt-[22px] px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline">
                 Try the full product →
               </Link>
             </div>
