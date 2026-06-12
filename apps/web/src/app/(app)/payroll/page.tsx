@@ -39,7 +39,7 @@ export default async function PayrollHistoryPage() {
             {["Pay date","Pay period","Employees","Gross","Net","Status",""].map(h=><div key={h} className={`text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em] ${["Gross","Net"].includes(h)?"text-right":""}`}>{h}</div>)}
           </div>
           {runs.map(run=>(
-            <Link key={run.id} href={`/payroll/${run.id}`} className="grid grid-cols-[1.3fr_1.4fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-[15px] border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
+            <Link key={run.id} href={run.status === "DRAFT" ? "/payroll/new" : `/payroll/${run.id}`} className="grid grid-cols-[1.3fr_1.4fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-[15px] border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
               <div className="text-sm font-semibold">{run.payDate}</div>
               <div className="text-[13px] text-[#57534E]">{run.payGroup.name} · {run.payGroup.frequency.toLowerCase()}</div>
               <div className="text-[13px] font-mono tabular-nums">{run.itemCount}</div>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Navigation & Flows</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;color:#1c1917;background:#f5f5f4;font-size:14px;line-height:1.5}
+.mono{font-family:'Geist Mono',monospace}
+/* Layout */
+.top{background:#1c1917;color:#fff;padding:28px 52px 24px}
+.top-logo{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:800;letter-spacing:-.02em}
+.top-title{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
+.top-sub{font-size:14px;color:#a8a29e;margin-top:6px;max-width:700px;line-height:1.55}
+.top-meta{display:flex;gap:20px;margin-top:18px}
+.top-chip{font-size:11px;font-weight:700;letter-spacing:.04em;background:#292524;color:#e7e5e4;border-radius:20px;padding:5px 12px}
+.wrap{max-width:1120px;margin:0 auto;padding:40px 52px 80px}
+/* Sections */
+.section{margin-bottom:48px}
+.sec-head{margin-bottom:18px;display:flex;align-items:baseline;gap:12px}
+.sec-title{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.sec-sub{font-size:13px;color:#78716c}
+/* Route table */
+.route-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.route-table thead tr{background:#1c1917;color:#fff}
+.route-table th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.route-table td{padding:11px 16px;border-bottom:1px solid #f0efed;vertical-align:top}
+.route-table tr:last-child td{border-bottom:none}
+.route-table tr:hover td{background:#fafaf9}
+.rtag{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.04em;border-radius:12px;padding:2px 7px;white-space:nowrap}
+.rtag.pub{background:#fef3c7;color:#92400e}
+.rtag.auth{background:#dbeafe;color:#1e40af}
+.rtag.acct{background:#fef2f2;color:#B3261E}
+.rtag.new{background:#dcfce7;color:#15803d}
+code{font-family:'Geist Mono',monospace;font-size:12px;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:5px;padding:2px 6px;color:#1c1917}
+/* Journey flows */
+.journeys{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.journey{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.journey-title{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:9px}
+.j-icon{font-size:18px}
+.journey-sub{font-size:12px;color:#78716c;margin-bottom:16px}
+.flow{display:flex;flex-direction:column;gap:0}
+.fstep{display:flex;align-items:flex-start;gap:10px}
+.fstep-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.fstep-dot{width:10px;height:10px;border-radius:50%;background:#B3261E;flex-shrink:0;margin-top:5px}
+.fstep-dot.start{background:#1c1917}
+.fstep-dot.end{background:#16a34a}
+.fstep-dot.warn{background:#f59e0b}
+.fstep-dot.gate{background:#7c3aed}
+.fstep-connector{width:2px;flex:1;background:#e7e5e4;min-height:14px}
+.fstep-content{padding-bottom:12px;flex:1}
+.fstep-screen{font-size:13px;font-weight:700}
+.fstep-note{font-size:12px;color:#78716c;margin-top:2px}
+.fstep-branch{margin-top:6px;padding:8px 10px;background:#fafaf9;border:1px solid #e7e5e4;border-radius:8px;font-size:12px;color:#57534e}
+.fstep-branch b{color:#1c1917}
+/* Connections table */
+.conn-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.conn-table thead tr{background:#fafaf9}
+.conn-table th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#78716c;border-bottom:1px solid #e7e5e4}
+.conn-table td{padding:11px 16px;border-bottom:1px solid #f0efed;vertical-align:top;font-size:13px}
+.conn-table tr:last-child td{border-bottom:none}
+.conn-table tr:hover td{background:#fafaf9}
+.conn-table td:first-child{font-weight:700;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.02em;border-radius:20px;padding:2px 8px;margin:2px 3px 2px 0;white-space:nowrap}
+.pill.to{background:#fef2f2;color:#991b1b}
+.pill.from{background:#f0fdf4;color:#15803d}
+.pill.cond{background:#fffbeb;color:#92400e}
+.pill.gate{background:#f5f3ff;color:#7c3aed}
+/* Guards */
+.guards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.guard{background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.guard-title{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.guard-list{list-style:none;padding:0}
+.guard-list li{font-size:12.5px;color:#57534e;line-height:1.7;display:flex;gap:8px}
+.guard-list li::before{content:"•";color:#a8a29e;flex-shrink:0}
+/* Timesheets */
+.ts-note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:#1e40af;line-height:1.6}
+.ts-note b{color:#1e40af}
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:#57534e}
+.ld{width:10px;height:10px;border-radius:50%}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-logo"><span style="font-size:22px">🍁</span> MapleRun</div>
+  <div class="top-title">Navigation &amp; Flows</div>
+  <div class="top-sub">How every screen is linked. Covers URL routes, user journeys, per-screen entry/exit connections, auth guards, plan gates, and timesheet paths. Hand this to the developer alongside <code style="background:#292524;border-color:#44403c;color:#e7e5e4">screens/</code> and the component files.</div>
+  <div class="top-meta">
+    <span class="top-chip">27 screens</span>
+    <span class="top-chip">4 user journeys</span>
+    <span class="top-chip">2 plan gates</span>
+    <span class="top-chip">Next.js App Router</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- 1. ROUTE MAP -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">1. Route map</div>
+      <div class="sec-sub">Every URL, its source file, auth requirement, and design file</div>
+    </div>
+    <table class="route-table">
+      <thead>
+        <tr>
+          <th>URL</th>
+          <th>Auth</th>
+          <th>Source file</th>
+          <th>Design file</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>/</code></td><td><span class="rtag pub">public</span></td><td><code>app/page.tsx</code></td><td><code>screens/landing-desktop.html</code></td><td>Marketing / conversion</td></tr>
+        <tr><td><code>/sign-in</code></td><td><span class="rtag pub">public</span></td><td><code>app/sign-in/page.tsx</code></td><td><code>screens/sign-in.html</code></td><td>Magic link + Google OAuth</td></tr>
+        <tr><td><code>/verify-request</code></td><td><span class="rtag pub">public</span></td><td><code>app/verify-request/page.tsx</code></td><td><code>screens/verify-request.html</code></td><td>Server-side "check email" fallback</td></tr>
+        <tr><td><code>/onboarding</code></td><td><span class="rtag auth">session</span></td><td><code>app/onboarding/page.tsx</code></td><td><code>screens/onboarding.html</code></td><td>Redirect here if no company yet</td></tr>
+        <tr><td><code>/app</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/app/page.tsx</code></td><td><code>screens/dashboard.html</code></td><td>Sidebar layout root</td></tr>
+        <tr><td><code>/employees</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/employees/page.tsx</code></td><td><code>screens/employee-list.html</code></td><td>Directory + search</td></tr>
+        <tr><td><code>/employees/new</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/employees/new/page.tsx</code></td><td><code>screens/employee-form.html</code></td><td>Creates TD1 + YTD ledger on save</td></tr>
+        <tr><td><code>/employees/[id]</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/employees/[id]/page.tsx</code></td><td><code>screens/employee-detail.html</code></td><td>View/edit + TD1 + YTD ledger tabs</td></tr>
+        <tr><td><code>/payroll</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/payroll/page.tsx</code></td><td><code>screens/payroll-history.html</code></td><td>List of all pay runs</td></tr>
+        <tr><td><code>/payroll/new</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/payroll/new/page.tsx</code></td><td><code>screens/wizard-step1.html</code> → step2 → step3</td><td>3-step wizard; wizard state in memory</td></tr>
+        <tr><td><code>/payroll/new?sheet=1</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/payroll/new/page.tsx</code></td><td><code>screens/timesheet-entry.html</code></td><td>Hourly path; query param or separate route</td></tr>
+        <tr><td><code>/payroll/new/import</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/payroll/new/import/page.tsx</code></td><td><code>screens/timesheet-import.html</code></td><td>CSV → column map → review → prefills wizard step 1</td></tr>
+        <tr><td><code>/payroll/[id]</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/payroll/[id]/page.tsx</code></td><td><code>screens/payrun-detail.html</code></td><td>Finalized run detail</td></tr>
+        <tr><td><code>/payroll/[id]/stub/[itemId]</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/payroll/[id]/stub/[itemId]/page.tsx</code></td><td><code>screens/paystub-light.html</code></td><td>Individual pay stub; also PDF route</td></tr>
+        <tr><td><code>/reports</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/reports/page.tsx</code></td><td><code>screens/reports-dashboard.html</code></td><td>ROE + journal cards gated</td></tr>
+        <tr><td><code>/reports/t4</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/reports/t4/page.tsx</code></td><td><code>screens/t4-summary.html</code></td><td>All-employee T4 summary</td></tr>
+        <tr><td><code>/reports/t4/[employeeId]</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/reports/t4/[employeeId]/page.tsx</code></td><td><code>screens/t4-slip.html</code></td><td>Individual T4 slip; also PDF route</td></tr>
+        <tr><td><code>/reports/roe</code></td><td><span class="rtag acct">Accountant plan</span></td><td><code>app/(app)/reports/roe/page.tsx</code></td><td><code>screens/roe-list.html</code></td><td>Gated: redirect to upgrade-modal if Growth/Solo</td></tr>
+        <tr><td><code>/reports/roe/[id]</code></td><td><span class="rtag acct">Accountant plan</span></td><td><code>app/(app)/reports/roe/[id]/page.tsx</code></td><td><code>screens/roe-detail.html</code></td><td>Box 15 period table + export</td></tr>
+        <tr><td><code>/company</code></td><td><span class="rtag auth">session + company</span></td><td><code>app/(app)/company/page.tsx</code></td><td><code>screens/company-settings.html</code></td><td>Profile / Payroll / Billing tabs</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. USER JOURNEYS -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">2. User journeys</div>
+      <div class="sec-sub">Step-by-step paths through the product for each user type</div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="ld" style="background:#1c1917"></div>Start</div>
+      <div class="legend-item"><div class="ld" style="background:#B3261E"></div>Step</div>
+      <div class="legend-item"><div class="ld" style="background:#16a34a"></div>End / success</div>
+      <div class="legend-item"><div class="ld" style="background:#f59e0b"></div>Conditional branch</div>
+      <div class="legend-item"><div class="ld" style="background:#7c3aed"></div>Plan gate</div>
+    </div>
+    <div class="journeys">
+
+      <!-- Journey A: New User -->
+      <div class="journey">
+        <div class="journey-title"><span class="j-icon">🆕</span> New user — first payroll</div>
+        <div class="journey-sub">First visit through first finalized pay run</div>
+        <div class="flow">
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot start"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Landing <code>/</code></div><div class="fstep-note">Clicks "Try it free"</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Sign in <code>/sign-in</code></div><div class="fstep-note">Enters email → magic link sent</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Verify request <code>/verify-request</code></div><div class="fstep-note">Confirmation page; user opens email link</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Onboarding <code>/onboarding</code></div><div class="fstep-note">Company name, province, pay frequency</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Dashboard <code>/app</code></div><div class="fstep-note">Empty state: "Add your first employee"</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Add employee <code>/employees/new</code></div><div class="fstep-note">Repeat for each employee; auto-generates TD1 + ledger</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Wizard step 1 <code>/payroll/new</code></div><div class="fstep-note">Set pay period, enter gross amounts (or hours)</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Wizard step 2 — preview</div><div class="fstep-note">Review deductions; warnings shown inline</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot end"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Wizard step 3 — success</div><div class="fstep-note">Redirects to payroll history; stubs ready</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journey B: Returning user — hourly payroll -->
+      <div class="journey">
+        <div class="journey-title"><span class="j-icon">⏱️</span> Returning user — hourly pay run</div>
+        <div class="journey-sub">Employer with hourly staff entering or importing time</div>
+        <div class="flow">
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot start"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Dashboard or Payroll history</div><div class="fstep-note">Clicks "Run payroll"</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot warn"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content">
+              <div class="fstep-screen">Branch: how are hours entered?</div>
+              <div class="fstep-branch"><b>Manual →</b> Timesheet entry <code>/payroll/new?sheet=1</code></div>
+              <div class="fstep-branch"><b>CSV →</b> Timesheet import <code>/payroll/new/import</code> → column mapping → review → auto-fills step 1</div>
+            </div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Wizard step 1 <code>/payroll/new</code></div><div class="fstep-note">Gross pre-filled from rate × hours; editable</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Wizard step 2 — preview</div><div class="fstep-note">OT and stat shown in per-employee breakdown</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot end"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Wizard step 3 — success → Payroll history</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journey C: Viewing a pay stub -->
+      <div class="journey">
+        <div class="journey-title"><span class="j-icon">📄</span> View / share a pay stub</div>
+        <div class="journey-sub">After a run is finalized</div>
+        <div class="flow">
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot start"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Payroll history <code>/payroll</code></div><div class="fstep-note">Clicks finalized run row</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Pay run detail <code>/payroll/[id]</code></div><div class="fstep-note">Totals + per-employee table; "Stub →" per row</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot end"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Pay stub <code>/payroll/[id]/stub/[itemId]</code></div><div class="fstep-note">Print / download PDF / email to employee</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journey D: Accountant — year-end -->
+      <div class="journey">
+        <div class="journey-title"><span class="j-icon">🧾</span> Accountant — year-end filings</div>
+        <div class="journey-sub">Accountant plan · T4s + ROEs + journals</div>
+        <div class="flow">
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot start"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Reports dashboard <code>/reports</code></div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot warn"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content">
+              <div class="fstep-screen">Branch: which report?</div>
+              <div class="fstep-branch"><b>T4 slips →</b> T4 summary <code>/reports/t4</code> → individual slip <code>/reports/t4/[id]</code> → PDF</div>
+              <div class="fstep-branch"><b>PD7A →</b> Company settings <code>/company</code> (remittance card)</div>
+              <div class="fstep-branch"><b>ROE →</b> <span style="color:#7c3aed;font-weight:600">plan check</span> → ROE list → ROE detail → Service Canada export</div>
+              <div class="fstep-branch"><b>Payroll journal →</b> <span style="color:#7c3aed;font-weight:600">plan check</span> → export CSV</div>
+            </div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot gate"></div><div class="fstep-connector"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Plan gate — ROE / Journal</div><div class="fstep-note">If plan &lt; Accountant → Upgrade modal overlay; no route change</div></div>
+          </div>
+          <div class="fstep">
+            <div class="fstep-line"><div class="fstep-dot end"></div></div>
+            <div class="fstep-content"><div class="fstep-screen">Upgrade modal → select plan → stripe → redirect back</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3. PER-SCREEN CONNECTIONS -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">3. Per-screen connections</div>
+      <div class="sec-sub">Exactly where each screen is reachable from, and where it leads</div>
+    </div>
+    <table class="conn-table">
+      <thead>
+        <tr>
+          <th>Screen</th>
+          <th>Arrives from</th>
+          <th>Links / actions lead to</th>
+          <th>Conditional</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Landing <code>/</code></td>
+          <td><span class="pill from">direct URL</span><span class="pill from">sign out</span></td>
+          <td><span class="pill to">Sign in</span><span class="pill to">Sign in (pricing CTAs)</span><span class="pill to">Calculator (anchor)</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Sign in <code>/sign-in</code></td>
+          <td><span class="pill from">Landing CTA</span><span class="pill from">any auth guard</span></td>
+          <td><span class="pill to">Verify request</span></td>
+          <td><span class="pill cond">Has session + company → redirect /app</span><span class="pill cond">Has session, no company → /onboarding</span></td>
+        </tr>
+        <tr>
+          <td>Verify request <code>/verify-request</code></td>
+          <td><span class="pill from">Sign in (after send)</span></td>
+          <td><span class="pill to">Sign in (wrong email)</span></td>
+          <td><span class="pill cond">Email link click → /onboarding or /app</span></td>
+        </tr>
+        <tr>
+          <td>Onboarding <code>/onboarding</code></td>
+          <td><span class="pill from">Magic link (new user)</span><span class="pill from">Auth guard (no company)</span></td>
+          <td><span class="pill to">Dashboard (on save)</span></td>
+          <td><span class="pill cond">Already has company → redirect /app</span></td>
+        </tr>
+        <tr>
+          <td>Dashboard <code>/app</code></td>
+          <td><span class="pill from">Onboarding</span><span class="pill from">Sign in (returning)</span><span class="pill from">Sidebar</span><span class="pill from">Wizard step 3</span></td>
+          <td><span class="pill to">Add employee</span><span class="pill to">Wizard step 1</span><span class="pill to">Reports</span><span class="pill to">Pay run detail (recent runs)</span></td>
+          <td><span class="pill cond">0 employees → empty state CTA</span></td>
+        </tr>
+        <tr>
+          <td>Employee list <code>/employees</code></td>
+          <td><span class="pill from">Sidebar</span><span class="pill from">Dashboard quick action</span></td>
+          <td><span class="pill to">Add employee</span><span class="pill to">Employee detail (row click)</span></td>
+          <td><span class="pill cond">0 employees → empty state</span></td>
+        </tr>
+        <tr>
+          <td>Employee form <code>/employees/new</code></td>
+          <td><span class="pill from">Employee list</span><span class="pill from">Dashboard quick action</span></td>
+          <td><span class="pill to">Employee list (save or cancel)</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Employee detail <code>/employees/[id]</code></td>
+          <td><span class="pill from">Employee list (row)</span></td>
+          <td><span class="pill to">Employee form (Edit)</span><span class="pill to">Pay stub (latest)</span><span class="pill to">TD1 update (tab)</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Payroll history <code>/payroll</code></td>
+          <td><span class="pill from">Sidebar</span><span class="pill from">Wizard step 3</span><span class="pill from">Dashboard (recent runs)</span></td>
+          <td><span class="pill to">Wizard step 1 (Run payroll)</span><span class="pill to">Pay run detail (row)</span></td>
+          <td><span class="pill cond">DRAFT row → Wizard step 1</span><span class="pill cond">FINALIZED row → Pay run detail</span></td>
+        </tr>
+        <tr>
+          <td>Timesheet entry</td>
+          <td><span class="pill from">Wizard step 1 (hourly mode)</span><span class="pill from">Payroll history</span></td>
+          <td><span class="pill to">Wizard step 2 (Calculate deductions)</span><span class="pill to">Timesheet import (Import CSV)</span><span class="pill to">Payroll history (Save draft)</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Timesheet import</td>
+          <td><span class="pill from">Timesheet entry</span></td>
+          <td><span class="pill to">Timesheet entry (prefilled gross)</span><span class="pill to">Timesheet entry (Cancel)</span></td>
+          <td><span class="pill cond">Unmatched rows → must resolve before import</span></td>
+        </tr>
+        <tr>
+          <td>Wizard step 1 <code>/payroll/new</code></td>
+          <td><span class="pill from">Payroll history</span><span class="pill from">Dashboard</span><span class="pill from">Timesheet entry</span></td>
+          <td><span class="pill to">Wizard step 2 (Calculate)</span><span class="pill to">Timesheet entry (hourly toggle)</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Wizard step 2 — preview</td>
+          <td><span class="pill from">Wizard step 1</span></td>
+          <td><span class="pill to">Wizard step 3 (Finalize)</span><span class="pill to">Wizard step 1 (Back to edit)</span></td>
+          <td><span class="pill cond">Warnings shown inline; don't block finalize</span></td>
+        </tr>
+        <tr>
+          <td>Wizard step 3 — success</td>
+          <td><span class="pill from">Wizard step 2 (Finalize)</span></td>
+          <td><span class="pill to">Payroll history</span><span class="pill to">Pay run detail (View pay run)</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Pay run detail <code>/payroll/[id]</code></td>
+          <td><span class="pill from">Payroll history</span><span class="pill from">Wizard step 3</span><span class="pill from">Dashboard</span></td>
+          <td><span class="pill to">Pay stub (Stub →)</span><span class="pill to">CSV export</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Pay stub <code>/payroll/[id]/stub/[itemId]</code></td>
+          <td><span class="pill from">Pay run detail</span><span class="pill from">Employee detail</span></td>
+          <td><span class="pill to">Print / PDF download</span></td>
+          <td><span class="pill cond">Dark variant: separate route or query param</span></td>
+        </tr>
+        <tr>
+          <td>Reports dashboard <code>/reports</code></td>
+          <td><span class="pill from">Sidebar</span><span class="pill from">Dashboard quick action</span></td>
+          <td><span class="pill to">T4 summary</span><span class="pill to">Company (PD7A)</span><span class="pill to">ROE list (Accountant)</span><span class="pill to">Upgrade modal (if gated)</span></td>
+          <td><span class="pill cond">ROE / Journal → plan check first</span></td>
+        </tr>
+        <tr>
+          <td>Upgrade modal</td>
+          <td><span class="pill from">Reports dashboard (locked card)</span></td>
+          <td><span class="pill to">Stripe checkout (Upgrade)</span><span class="pill to">Reports dashboard (Maybe later / ×)</span></td>
+          <td><span class="pill cond">Overlay: shown over Reports dashboard, no route change</span></td>
+        </tr>
+        <tr>
+          <td>T4 summary <code>/reports/t4</code></td>
+          <td><span class="pill from">Reports dashboard</span></td>
+          <td><span class="pill to">T4 slip (row click)</span><span class="pill to">Export all PDF</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>T4 slip <code>/reports/t4/[employeeId]</code></td>
+          <td><span class="pill from">T4 summary</span></td>
+          <td><span class="pill to">Print / PDF download</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>ROE list <code>/reports/roe</code></td>
+          <td><span class="pill from">Reports dashboard (Accountant plan)</span></td>
+          <td><span class="pill to">ROE detail (row)</span><span class="pill to">New ROE</span></td>
+          <td><span class="pill gate">Redirects to upgrade modal if &lt; Accountant</span></td>
+        </tr>
+        <tr>
+          <td>ROE detail <code>/reports/roe/[id]</code></td>
+          <td><span class="pill from">ROE list</span></td>
+          <td><span class="pill to">Export for Service Canada</span><span class="pill to">ROE list (Back)</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Company settings <code>/company</code></td>
+          <td><span class="pill from">Sidebar</span><span class="pill from">Reports (PD7A link)</span></td>
+          <td><span class="pill to">Profile / Payroll / Billing tabs (in-page)</span></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. AUTH GUARDS & ROUTING RULES -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">4. Auth guards &amp; routing rules</div>
+      <div class="sec-sub">Server-side middleware logic — implement in <code>middleware.ts</code></div>
+    </div>
+    <div class="guards">
+      <div class="guard">
+        <div class="guard-title">🔒 Auth guard</div>
+        <ul class="guard-list">
+          <li>Any <code>/app/*</code>, <code>/employees/*</code>, <code>/payroll/*</code>, <code>/reports/*</code>, <code>/company</code> requires a valid session</li>
+          <li>No session → redirect to <code>/sign-in?callbackUrl=…</code></li>
+          <li>After successful sign-in, redirect to <code>callbackUrl</code> or <code>/app</code></li>
+        </ul>
+      </div>
+      <div class="guard">
+        <div class="guard-title">🏢 Company guard</div>
+        <ul class="guard-list">
+          <li>All app pages also require a company record linked to the session</li>
+          <li>Session exists but no company → redirect to <code>/onboarding</code></li>
+          <li><code>/onboarding</code> itself: if company already exists → redirect to <code>/app</code></li>
+        </ul>
+      </div>
+      <div class="guard">
+        <div class="guard-title">🔒 Plan gate</div>
+        <ul class="guard-list">
+          <li><code>/reports/roe</code> and <code>/reports/roe/[id]</code> require <code>plan === 'accountant'</code></li>
+          <li>Payroll journal export: same guard</li>
+          <li>Gate triggered → show upgrade modal as overlay (not a redirect); URL does not change</li>
+          <li>Upgrade modal close → return to reports dashboard</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. TIMESHEET FLOWS -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">5. Timesheet integration</div>
+      <div class="sec-sub">New paths for hourly staff — how they feed into the wizard</div>
+    </div>
+    <div class="ts-note">
+      ℹ️ <b>The existing wizard assumes salary (flat gross amount per employee).</b> The timesheet system computes gross from <b>rate × hours</b> and pre-fills Wizard step 1. The wizard is unchanged — it just receives computed gross values instead of manually typed ones. Hourly and salaried employees can coexist in the same pay run.
+    </div>
+    <table class="conn-table">
+      <thead><tr><th>Path</th><th>Entry</th><th>Data flow</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Manual hours entry</td>
+          <td>Wizard step 1 → "Hourly" mode toggle, or direct from sidebar</td>
+          <td>User types reg/OT/stat/vac hours per employee; rate comes from employee profile</td>
+          <td>Gross per employee pre-filled into Wizard step 1 → normal CPP/EI/tax calculation</td>
+        </tr>
+        <tr>
+          <td>CSV import</td>
+          <td>Timesheet entry → "Import CSV" button → <code>/payroll/new/import</code></td>
+          <td>Upload → auto-map columns (employee name, reg_hours, ot, stat_hrs, vac) → review + fix unmatched names → confirm</td>
+          <td>Same as manual: gross pre-filled into Wizard step 1</td>
+        </tr>
+        <tr>
+          <td>Mixed run</td>
+          <td>Any entry point</td>
+          <td>Salaried employees keep their flat gross; hourly employees get rate × hours gross. All calculated together in preview step.</td>
+          <td>Single preview screen shows all employees regardless of type</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. SIDEBAR NAV -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">6. Sidebar navigation</div>
+      <div class="sec-sub">Present on all authenticated app screens; highlights active route</div>
+    </div>
+    <table class="conn-table">
+      <thead><tr><th>Nav item</th><th>Route</th><th>Active when URL starts with</th></tr></thead>
+      <tbody>
+        <tr><td>🏠 Dashboard</td><td><code>/app</code></td><td><code>/app</code></td></tr>
+        <tr><td>👥 Employees</td><td><code>/employees</code></td><td><code>/employees</code></td></tr>
+        <tr><td>💵 Payroll</td><td><code>/payroll</code></td><td><code>/payroll</code></td></tr>
+        <tr><td>📊 Reports</td><td><code>/reports</code></td><td><code>/reports</code></td></tr>
+        <tr><td>🏢 Company</td><td><code>/company</code></td><td><code>/company</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

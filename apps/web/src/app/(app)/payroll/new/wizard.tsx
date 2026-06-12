@@ -52,25 +52,40 @@ function fmtCAD(n: number): string {
 
 type Step = "input" | "preview" | "finalizing";
 
+// ─── sessionStorage key ───────────────────────────────────────────────────
+const STORAGE_KEY = "maplerun-wizard";
+
+function saveWizardState(state: { payGroupId?: string; payDate?: string; grossAmounts?: Record<string,string> }) {
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+}
+function loadWizardState() {
+  try { const v = sessionStorage.getItem(STORAGE_KEY); return v ? JSON.parse(v) : null; } catch { return null; }
+}
+function clearWizardState() { try { sessionStorage.removeItem(STORAGE_KEY); } catch {} }
+
 // ─── Component ─────────────────────────────────────────────────────────────────
 
 export function PayRunWizard({ payGroups, employees, previewAction, finalizeAction }: Props) {
   const router = useRouter();
+  const saved = typeof window !== "undefined" ? loadWizardState() : null;
   const [step, setStep] = useState<Step>("input");
   const [isPending, startTransition] = useTransition();
 
-  // Step 1 state
-  const [payGroupId, setPayGroupId] = useState("");
-  const [payDate, setPayDate] = useState(
-    new Date().toISOString().slice(0, 10)
-  );
+  // Step 1 state — restore from sessionStorage if available
+  const [payGroupId, setPayGroupId] = useState(saved?.payGroupId ?? "");
+  const [payDate, setPayDate] = useState(saved?.payDate ?? new Date().toISOString().slice(0, 10));
   const [grossAmounts, setGrossAmounts] = useState<Record<string, string>>(
-    Object.fromEntries(employees.map((e) => [e.id, ""]))
+    saved?.grossAmounts ?? Object.fromEntries(employees.map((e) => [e.id, ""]))
   );
   const [error, setError] = useState<string | null>(null);
 
   // Step 2 state
   const [preview, setPreview] = useState<PayRunPreview | null>(null);
+
+  // Persist step 1 fields on change
+  function updatePayGroupId(v: string) { setPayGroupId(v); saveWizardState({ payGroupId: v, payDate, grossAmounts }); }
+  function updatePayDate(v: string) { setPayDate(v); saveWizardState({ payGroupId, payDate: v, grossAmounts }); }
+  function updateGrossAmounts(v: Record<string,string>) { setGrossAmounts(v); saveWizardState({ payGroupId, payDate, grossAmounts: v }); }
 
   // ── Step 1 → Step 2 ──────────────────────────────────────────────────────
 
@@ -124,6 +139,7 @@ export function PayRunWizard({ payGroups, employees, previewAction, finalizeActi
 
     startTransition(async () => {
       try {
+        clearWizardState();
         await finalizeAction(formData);
         // Redirect happens server-side; fallback:
         router.push("/payroll");
@@ -165,7 +181,7 @@ export function PayRunWizard({ payGroups, employees, previewAction, finalizeActi
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Pay group</Label>
-                  <Select value={payGroupId} onValueChange={(v) => setPayGroupId(v ?? "")}>
+                  <Select value={payGroupId} onValueChange={(v) => updatePayGroupId(v ?? "")}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select pay group…" />
                     </SelectTrigger>
@@ -184,7 +200,7 @@ export function PayRunWizard({ payGroups, employees, previewAction, finalizeActi
                     id="payDate"
                     type="date"
                     value={payDate}
-                    onChange={(e) => setPayDate(e.target.value)}
+                    onChange={(e) => updatePayDate(e.target.value)}
                   />
                 </div>
               </div>
@@ -225,12 +241,10 @@ export function PayRunWizard({ payGroups, employees, previewAction, finalizeActi
                           placeholder="0.00"
                           className="pl-7 tabular-nums"
                           value={grossAmounts[emp.id] ?? ""}
-                          onChange={(e) =>
-                            setGrossAmounts((prev) => ({
-                              ...prev,
-                              [emp.id]: e.target.value,
-                            }))
-                          }
+                          onChange={(e) => {
+                            const next = { ...grossAmounts, [emp.id]: e.target.value };
+                            updateGrossAmounts(next);
+                          }}
                         />
                       </div>
                     </div>

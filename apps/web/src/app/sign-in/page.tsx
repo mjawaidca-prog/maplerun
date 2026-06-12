@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,14 @@ function SignInForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/app";
   const hasGoogle = process.env.NEXT_PUBLIC_GOOGLE_ENABLED === "true";
+  const { data: session, status: sessionStatus } = useSession();
+
+  // Already signed in — redirect
+  if (sessionStatus === "authenticated" && session?.user) {
+    const dest = session.user.companyId ? "/app" : "/onboarding";
+    if (typeof window !== "undefined") { window.location.href = dest; return null; }
+    return null;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); if (loading) return;

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Screen Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;color:#1c1917;background:#f5f5f4}
+.mono{font-family:'Geist Mono',monospace}
+.top{background:#1c1917;color:#fff;padding:30px 48px}
+.top .logo{display:flex;align-items:center;gap:9px;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.top h1{font-size:15px;font-weight:600;color:#a8a29e;margin-top:8px}
+.top .meta{font-size:13px;color:#78716c;margin-top:14px;line-height:1.6;max-width:680px}
+.top .meta b{color:#e7e5e4}
+.wrap{max-width:1180px;margin:0 auto;padding:36px 48px 80px}
+.section{margin-bottom:40px}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+.sec-t{font-size:13px;font-weight:700;color:#1c1917;text-transform:uppercase;letter-spacing:.07em}
+.sec-c{font-size:12px;color:#a8a29e}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);text-decoration:none;color:inherit;display:block;transition:border-color .12s,transform .12s}
+.card:hover{border-color:#B3261E;transform:translateY(-2px)}
+.thumb{height:188px;background:#fafaf9;border-bottom:1px solid #f0efed;overflow:hidden;position:relative}
+.thumb iframe{position:absolute;top:0;left:0;width:1300px;height:1300px;border:0;transform:scale(.215);transform-origin:top left;pointer-events:none}
+.thumb.narrow iframe{width:600px;transform:scale(.466)}
+.thumb.phone iframe{width:430px;transform:scale(.65)}
+.cap{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cap-t{font-size:14px;font-weight:700}
+.cap-f{font-size:11px;color:#a8a29e}
+.tag{font-size:10px;font-weight:700;letter-spacing:.04em;border-radius:20px;padding:3px 8px;flex-shrink:0}
+.tag.done{background:#dcfce7;color:#15803d}
+.tag.doc{background:#fef2f2;color:#B3261E}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo"><span style="font-size:24px">🍁</span> MapleRun</div>
+  <h1>Screen library · design handoff</h1>
+  <div class="meta">27 high-fidelity screens rebuilt to the MapleRun design system (<b>tokens.md</b> · <b>components.md</b>). Each is a self-contained HTML file under <b class="mono">screens/</b> — open any to view full size, or hand the folder back to code. Maple red <b class="mono">#B3261E</b> · Inter + Geist Mono · light + print-ready.</div>
+</div>
+<div class="wrap">
+
+  <div class="section">
+    <div class="sec-h"><span class="sec-t">Marketing</span><span class="sec-c">conversion · public</span></div>
+    <div class="grid">
+      <a class="card" href="screens/landing-desktop.html" target="_blank"><div class="thumb"><iframe src="screens/landing-desktop.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Landing — desktop</div><div class="cap-f mono">landing-desktop.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/landing-mobile.html" target="_blank"><div class="thumb phone"><iframe src="screens/landing-mobile.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Landing — mobile</div><div class="cap-f mono">landing-mobile.html</div></div><span class="tag done">NEW</span></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-h"><span class="sec-t">Auth &amp; setup</span><span class="sec-c">onboarding</span></div>
+    <div class="grid">
+      <a class="card" href="screens/sign-in.html" target="_blank"><div class="thumb narrow"><iframe src="screens/sign-in.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Sign in</div><div class="cap-f mono">sign-in.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/onboarding.html" target="_blank"><div class="thumb narrow"><iframe src="screens/onboarding.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Onboarding</div><div class="cap-f mono">onboarding.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/verify-request.html" target="_blank"><div class="thumb narrow"><iframe src="screens/verify-request.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Verify request</div><div class="cap-f mono">verify-request.html</div></div><span class="tag done">NEW</span></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-h"><span class="sec-t">App</span><span class="sec-c">authenticated shell</span></div>
+    <div class="grid">
+      <a class="card" href="screens/dashboard.html" target="_blank"><div class="thumb"><iframe src="screens/dashboard.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Dashboard</div><div class="cap-f mono">dashboard.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/employee-list.html" target="_blank"><div class="thumb"><iframe src="screens/employee-list.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Employees — list</div><div class="cap-f mono">employee-list.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/employee-detail.html" target="_blank"><div class="thumb"><iframe src="screens/employee-detail.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Employees — detail</div><div class="cap-f mono">employee-detail.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/employee-form.html" target="_blank"><div class="thumb"><iframe src="screens/employee-form.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Employees — add</div><div class="cap-f mono">employee-form.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/company-settings.html" target="_blank"><div class="thumb"><iframe src="screens/company-settings.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Company settings</div><div class="cap-f mono">company-settings.html</div></div><span class="tag done">NEW</span></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-h"><span class="sec-t">Payroll</span><span class="sec-c">core workflow</span></div>
+    <div class="grid">
+      <a class="card" href="screens/payroll-history.html" target="_blank"><div class="thumb"><iframe src="screens/payroll-history.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Payroll history</div><div class="cap-f mono">payroll-history.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/timesheet-entry.html" target="_blank"><div class="thumb"><iframe src="screens/timesheet-entry.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Timesheet entry</div><div class="cap-f mono">timesheet-entry.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/timesheet-import.html" target="_blank"><div class="thumb"><iframe src="screens/timesheet-import.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Timesheet import</div><div class="cap-f mono">timesheet-import.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/wizard-step1.html" target="_blank"><div class="thumb"><iframe src="screens/wizard-step1.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Wizard · 1 Input</div><div class="cap-f mono">wizard-step1.html</div></div><span class="tag doc">BASE</span></div></a>
+      <a class="card" href="screens/wizard-step2.html" target="_blank"><div class="thumb"><iframe src="screens/wizard-step2.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Wizard · 2 Preview</div><div class="cap-f mono">wizard-step2.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/wizard-step3.html" target="_blank"><div class="thumb"><iframe src="screens/wizard-step3.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Wizard · 3 Finalize</div><div class="cap-f mono">wizard-step3.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/payrun-detail.html" target="_blank"><div class="thumb"><iframe src="screens/payrun-detail.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Pay run detail</div><div class="cap-f mono">payrun-detail.html</div></div><span class="tag done">NEW</span></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-h"><span class="sec-t">Reports &amp; documents</span><span class="sec-c">print / email quality</span></div>
+    <div class="grid">
+      <a class="card" href="screens/reports-dashboard.html" target="_blank"><div class="thumb"><iframe src="screens/reports-dashboard.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Reports dashboard</div><div class="cap-f mono">reports-dashboard.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/upgrade-modal.html" target="_blank"><div class="thumb"><iframe src="screens/upgrade-modal.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Upgrade modal</div><div class="cap-f mono">upgrade-modal.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/t4-summary.html" target="_blank"><div class="thumb"><iframe src="screens/t4-summary.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">T4 summary</div><div class="cap-f mono">t4-summary.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/t4-slip.html" target="_blank"><div class="thumb"><iframe src="screens/t4-slip.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">T4 slip</div><div class="cap-f mono">t4-slip.html</div></div><span class="tag doc">BASE</span></div></a>
+      <a class="card" href="screens/paystub-light.html" target="_blank"><div class="thumb"><iframe src="screens/paystub-light.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Pay stub — light</div><div class="cap-f mono">paystub-light.html</div></div><span class="tag doc">BASE</span></div></a>
+      <a class="card" href="screens/paystub-dark.html" target="_blank"><div class="thumb"><iframe src="screens/paystub-dark.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">Pay stub — dark</div><div class="cap-f mono">paystub-dark.html</div></div><span class="tag doc">BASE</span></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-h"><span class="sec-t">Records of Employment</span><span class="sec-c">Accountant plan · Service Canada</span></div>
+    <div class="grid">
+      <a class="card" href="screens/roe-list.html" target="_blank"><div class="thumb"><iframe src="screens/roe-list.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">ROE — list</div><div class="cap-f mono">roe-list.html</div></div><span class="tag done">NEW</span></div></a>
+      <a class="card" href="screens/roe-detail.html" target="_blank"><div class="thumb"><iframe src="screens/roe-detail.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">ROE — detail</div><div class="cap-f mono">roe-detail.html</div></div><span class="tag done">NEW</span></div></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-h"><span class="sec-t">States</span><span class="sec-c">empty · loading · error</span></div>
+    <div class="grid">
+      <a class="card" href="screens/states.html" target="_blank"><div class="thumb"><iframe src="screens/states.html" scrolling="no"></iframe></div><div class="cap"><div><div class="cap-t">System states</div><div class="cap-f mono">states.html</div></div><span class="tag done">NEW</span></div></a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

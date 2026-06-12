@@ -22,6 +22,8 @@ export default function OnboardingPage() {
 
   if (status === "loading") return <div className="min-h-screen flex items-center justify-center"><p className="text-[#A8A29E]">Loading…</p></div>;
   if (!session?.user) { router.push("/sign-in"); return null; }
+  // If user already has a company, redirect to /app
+  if (session.user.companyId) { router.push("/app"); return null; }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); if (submitting) return;
