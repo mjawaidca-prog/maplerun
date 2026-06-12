@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MapleRun — Pay Stub (Dark)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#0c0a09;padding:40px;display:flex;justify-content:center}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.stub{width:816px;background:#1c1917;border-radius:16px;overflow:hidden;box-shadow:0 4px 30px rgba(0,0,0,.5);border:1px solid #292524}
+.stub-header{background:linear-gradient(135deg,#7f211b,#3f100d);color:#fff;padding:32px 40px;display:flex;justify-content:space-between;align-items:flex-start}
+.stub-logo{display:flex;align-items:center;gap:10px}
+.stub-logo-name{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.stub-company{margin-top:6px;font-size:13px;opacity:.85}
+.stub-meta{text-align:right}
+.stub-meta-label{font-size:13px;font-weight:600;letter-spacing:.18em;opacity:.85}
+.stub-meta-value{font-size:13px;opacity:.9;margin-top:4px}
+.stub-employee{padding:28px 40px 20px;border-bottom:1px solid #292524;display:flex;justify-content:space-between}
+.emp-label{font-size:12px;color:#78716c;text-transform:uppercase;letter-spacing:.08em}
+.emp-name{font-size:18px;font-weight:700;color:#fafaf9;margin-top:2px}
+.emp-sub{font-size:13px;color:#a8a29e}
+.stub-grid{padding:24px 40px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.section-label{font-size:12px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.earnings-card{background:#0f2a17;border:1px solid #166534;border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center}
+.earnings-label{font-size:14px;color:#4ade80;font-weight:500}
+.earnings-value{font-size:20px;font-weight:600;color:#4ade80}
+.ledger{border:1px solid #292524;border-radius:12px;overflow:hidden}
+.ledger-row{display:flex;justify-content:space-between;padding:9px 14px;font-size:13px}
+.ledger-row.alt{background:#1c1917}
+.ledger-row.total{font-weight:700;border-top:2px solid #292524;padding:11px 14px}
+.ledger-row span:first-child{color:#a8a29e}
+.ledger-row.total span:first-child{color:#fafaf9}
+.ledger-row span:last-child{color:#e7e5e4}
+.net-band{margin:4px 40px 24px;background:linear-gradient(135deg,#2a1110,#3f1413);border:1px solid #7f211b;border-radius:14px;padding:20px 28px;display:flex;justify-content:space-between;align-items:center}
+.net-label{font-size:12px;font-weight:700;color:#fca5a5;text-transform:uppercase;letter-spacing:.08em}
+.net-sub{font-size:12px;color:#f87171;opacity:.8;margin-top:3px}
+.net-value{font-size:38px;font-weight:700;color:#E56A5C;letter-spacing:-.02em}
+.stub-footer{padding:16px 40px 32px;border-top:1px solid #292524;display:flex;justify-content:space-between;align-items:center}
+.stub-footer span{font-size:11px;color:#78716c}
+.stub-footer span:last-child{text-align:right;max-width:380px}
+</style>
+</head>
+<body>
+<div class="stub">
+  <div class="stub-header">
+    <div>
+      <div class="stub-logo">
+        <span style="font-size:30px">🍁</span>
+        <span class="stub-logo-name">MapleRun</span>
+      </div>
+      <div class="stub-company">Northwind Carpentry Ltd.</div>
+    </div>
+    <div class="stub-meta">
+      <div class="stub-meta-label">PAY STUB</div>
+      <div class="stub-meta-value">Pay Date · Jan 31, 2026</div>
+      <div class="stub-meta-value">Biweekly</div>
+    </div>
+  </div>
+  <div class="stub-employee">
+    <div>
+      <div class="emp-label">Employee</div>
+      <div class="emp-name">Sarah Tremblay</div>
+      <div class="emp-sub">Ontario · SIN •••-•••-321</div>
+    </div>
+    <div style="text-align:right">
+      <div class="emp-label">Pay Period</div>
+      <div style="font-size:14px;font-weight:600;color:#fafaf9;margin-top:2px">Jan 18 – Jan 31, 2026</div>
+    </div>
+  </div>
+  <div class="stub-grid">
+    <div>
+      <div class="section-label">Earnings</div>
+      <div class="earnings-card">
+        <span class="earnings-label">Gross Pay</span>
+        <span class="earnings-value mono">$2,884.62</span>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Deductions</div>
+      <div class="ledger">
+        <div class="ledger-row"><span>CPP</span><span class="mono">$166.36</span></div>
+        <div class="ledger-row alt"><span>CPP2</span><span class="mono">$0.00</span></div>
+        <div class="ledger-row"><span>EI</span><span class="mono">$46.93</span></div>
+        <div class="ledger-row alt"><span>Federal Tax</span><span class="mono">$286.41</span></div>
+        <div class="ledger-row"><span>Provincial Tax</span><span class="mono">$112.78</span></div>
+        <div class="ledger-row total"><span>Total Deductions</span><span class="mono" style="color:#E56A5C">$612.48</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="net-band">
+    <div>
+      <div class="net-label">Net Pay</div>
+      <div class="net-sub">Deposited to account •••• 4821</div>
+    </div>
+    <div class="net-value mono">$2,272.14</div>
+  </div>
+  <div class="stub-grid">
+    <div>
+      <div class="section-label">Employer Costs</div>
+      <div class="ledger">
+        <div class="ledger-row"><span>CPP Match</span><span class="mono">$166.36</span></div>
+        <div class="ledger-row alt"><span>CPP2 Match</span><span class="mono">$0.00</span></div>
+        <div class="ledger-row"><span>EI (1.4×)</span><span class="mono">$65.70</span></div>
+        <div class="ledger-row total"><span>Total</span><span class="mono">$232.06</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Year to Date · 2026</div>
+      <div class="ledger">
+        <div class="ledger-row"><span>Pensionable</span><span class="mono">$5,769.24</span></div>
+        <div class="ledger-row alt"><span>Insurable</span><span class="mono">$5,769.24</span></div>
+        <div class="ledger-row"><span>CPP</span><span class="mono">$332.72</span></div>
+        <div class="ledger-row alt"><span>EI</span><span class="mono">$93.86</span></div>
+        <div class="ledger-row"><span>CPP2</span><span class="mono">$0.00</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="stub-footer">
+    <span>Generated by 🍁 MapleRun</span>
+    <span>For your records. Amounts per CRA payroll guidelines. Not an official CRA document.</span>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Check your email</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;color:#1c1917;min-height:100vh;background:linear-gradient(180deg,#fff,#fef6f5);display:flex;align-items:center;justify-content:center;padding:32px}
+.wrap{width:100%;max-width:420px;text-align:center}
+.brand{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:28px}
+.brand-name{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:40px 32px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.icon{width:64px;height:64px;border-radius:16px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 20px}
+.title{font-size:20px;font-weight:800;letter-spacing:-.01em}
+.sub{font-size:14px;color:#78716c;margin-top:10px;line-height:1.55}
+.sub b{color:#1c1917}
+.note{display:flex;gap:9px;text-align:left;background:#fafaf9;border:1px solid #e7e5e4;border-radius:10px;padding:13px 15px;margin-top:24px;font-size:12.5px;color:#78716c;line-height:1.5}
+.resend{margin-top:22px;font-size:13px;color:#78716c}
+.resend a{color:#B3261E;text-decoration:none;font-weight:600}
+.back{display:inline-block;margin-top:24px;font-size:13px;color:#78716c;text-decoration:none}
+.back:hover{color:#1c1917}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span style="font-size:26px">🍁</span><span class="brand-name">MapleRun</span></div>
+  <div class="card">
+    <div class="icon">📬</div>
+    <div class="title">Check your email</div>
+    <div class="sub">A sign-in link is on its way to <b>marcus@northwind.ca</b>. Click it to finish signing in — the link expires in 15 minutes and can only be used once.</div>
+    <div class="note">🔒 Didn't request this? You can safely ignore this page — no one can access your account without the link.</div>
+    <div class="resend">Didn't get it? <a href="#">Resend link</a> · check spam</div>
+  </div>
+  <a class="back" href="sign-in.html">← Use a different email</a>
+</div>
+</body>
+</html>

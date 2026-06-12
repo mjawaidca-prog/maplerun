@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Pay Run Wizard: Step 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 24px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:2px;font-size:14px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+.main{flex:1;padding:36px 48px 120px;max-width:900px}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:4px}
+.page-title{font-size:28px;font-weight:800;color:#1c1917;letter-spacing:-.02em;margin-bottom:28px}
+.stepper{display:flex;align-items:center;max-width:440px;margin:0 auto 32px}
+.step{display:flex;align-items:center}
+.step.grow{flex:1}
+.step-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.step-dot.active{background:#B3261E;color:#fff}
+.step-dot.done{background:#16a34a;color:#fff}
+.step-dot.pending{background:#e7e5e4;color:#a8a29e}
+.step-name{font-size:13px;font-weight:600;margin-left:9px}
+.step-name.active,.step-name.done{color:#1c1917}
+.step-name.pending{color:#a8a29e}
+.step-line{flex:1;height:2px;margin:0 12px}
+.step-line.done{background:#16a34a}
+.step-line.pending{background:#e7e5e4}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#e7e5e4;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;margin-bottom:14px}
+.sm{background:#fff;padding:16px 18px}
+.sm-label{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em}
+.sm-value{font-size:21px;font-weight:700;margin-top:6px}
+.sm.net{background:linear-gradient(135deg,#fef2f2,#fee2e2)}
+.sm.net .sm-label{color:#991b1b}
+.sm.net .sm-value{color:#B3261E}
+.breakdown{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:#e7e5e4;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;margin-bottom:28px}
+.bd{background:#fff;padding:14px 16px}
+.bd-label{font-size:11px;font-weight:600;color:#78716c;text-transform:uppercase;letter-spacing:.04em}
+.bd-value{font-size:15px;font-weight:600;margin-top:5px}
+.alert{display:flex;gap:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:13px 16px;margin-bottom:20px}
+.alert-icon{font-size:16px;line-height:1.3}
+.alert-title{font-size:13px;font-weight:700;color:#92400e}
+.alert-text{font-size:13px;color:#92400e;margin-top:2px;line-height:1.45}
+.col-title{font-size:13px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.emp-card{background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:16px 18px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.emp-card.warn{border-color:#fde68a}
+.emp-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.emp{display:flex;align-items:center;gap:12px}
+.emp-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.emp-name{font-size:14px;font-weight:700}
+.emp-sub{font-size:12px;color:#a8a29e}
+.emp-net{text-align:right}
+.emp-net-label{font-size:11px;color:#a8a29e;text-transform:uppercase;letter-spacing:.05em}
+.emp-net-value{font-size:18px;font-weight:700;color:#B3261E}
+.deduct{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;border-top:1px solid #f0efed;padding-top:12px}
+.dd{}
+.dd-l{font-size:11px;color:#a8a29e}
+.dd-v{font-size:13px;font-weight:500;margin-top:3px}
+.warn-inline{font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 11px;margin-top:12px;display:flex;gap:8px;align-items:flex-start}
+.actionbar{position:fixed;left:220px;right:0;bottom:0;background:#fff;border-top:1px solid #e7e5e4;box-shadow:0 -2px 12px rgba(0,0,0,.06);padding:14px 48px;display:flex;justify-content:space-between;align-items:center}
+.ab-total{font-size:13px;color:#a8a29e}
+.ab-total b{font-size:17px;color:#1c1917;margin-left:8px}
+.ab-btns{display:flex;gap:12px}
+.btn-primary{padding:11px 22px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+.btn-outline{padding:11px 22px;border-radius:10px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><span style="font-size:22px">🍁</span><span class="sidebar-logo-name">MapleRun</span></div>
+  <a class="nav-item" href="dashboard.html">🏠 Dashboard</a>
+  <a class="nav-item" href="employee-list.html">👥 Employees</a>
+  <a class="nav-item active" href="payroll-history.html">💵 Payroll</a>
+  <a class="nav-item" href="reports-dashboard.html">📊 Reports</a>
+  <a class="nav-item" href="company-settings.html">🏢 Company</a>
+  <div class="sidebar-foot">
+    <span class="plan-badge"><span class="dot"></span>Growth plan</span>
+    <div class="user-row"><div class="user-avatar">M</div><div><div class="user-name">Marcus Reid</div><div class="user-sub">Sign out</div></div></div>
+  </div>
+</aside>
+<main class="main">
+  <div class="breadcrumb">Payroll › New pay run</div>
+  <div class="page-title">Run payroll</div>
+  <div class="stepper">
+    <div class="step grow">
+      <div class="step-dot done">✓</div>
+      <span class="step-name done">Input</span>
+      <div class="step-line done"></div>
+    </div>
+    <div class="step grow">
+      <div class="step-dot active">2</div>
+      <span class="step-name active">Preview</span>
+      <div class="step-line pending"></div>
+    </div>
+    <div class="step">
+      <div class="step-dot pending">3</div>
+      <span class="step-name pending">Finalize</span>
+    </div>
+  </div>
+
+  <div class="col-title">Run summary</div>
+  <div class="summary">
+    <div class="sm"><div class="sm-label">Gross</div><div class="sm-value mono">$8,884.62</div></div>
+    <div class="sm"><div class="sm-label">Deductions</div><div class="sm-value mono">$1,970.42</div></div>
+    <div class="sm net"><div class="sm-label">Net pay</div><div class="sm-value mono">$6,914.20</div></div>
+    <div class="sm"><div class="sm-label">Employer cost</div><div class="sm-value mono">$9,602.30</div></div>
+  </div>
+  <div class="breakdown">
+    <div class="bd"><div class="bd-label">CPP</div><div class="bd-value mono">$512.44</div></div>
+    <div class="bd"><div class="bd-label">CPP2</div><div class="bd-value mono">$0.00</div></div>
+    <div class="bd"><div class="bd-label">EI</div><div class="bd-value mono">$144.54</div></div>
+    <div class="bd"><div class="bd-label">Federal tax</div><div class="bd-value mono">$882.20</div></div>
+    <div class="bd"><div class="bd-label">Prov. tax</div><div class="bd-value mono">$346.34</div></div>
+    <div class="bd"><div class="bd-label">EI employer</div><div class="bd-value mono">$202.36</div></div>
+  </div>
+
+  <div class="alert">
+    <div class="alert-icon">⚠️</div>
+    <div>
+      <div class="alert-title">1 warning before you finalize</div>
+      <div class="alert-text">David Chen is approaching the 2026 CPP2 threshold. Review his pensionable earnings below before continuing.</div>
+    </div>
+  </div>
+
+  <div class="col-title">Per-employee breakdown</div>
+
+  <div class="emp-card">
+    <div class="emp-top">
+      <div class="emp"><div class="emp-avatar">S</div><div><div class="emp-name">Sarah Tremblay</div><div class="emp-sub">Ontario · Biweekly · Gross $2,884.62</div></div></div>
+      <div class="emp-net"><div class="emp-net-label">Net pay</div><div class="emp-net-value mono">$2,272.14</div></div>
+    </div>
+    <div class="deduct">
+      <div class="dd"><div class="dd-l">CPP</div><div class="dd-v mono">$166.36</div></div>
+      <div class="dd"><div class="dd-l">CPP2</div><div class="dd-v mono">$0.00</div></div>
+      <div class="dd"><div class="dd-l">EI</div><div class="dd-v mono">$46.93</div></div>
+      <div class="dd"><div class="dd-l">Fed tax</div><div class="dd-v mono">$286.41</div></div>
+      <div class="dd"><div class="dd-l">Prov tax</div><div class="dd-v mono">$112.78</div></div>
+      <div class="dd"><div class="dd-l">Total</div><div class="dd-v mono">$612.48</div></div>
+    </div>
+  </div>
+
+  <div class="emp-card warn">
+    <div class="emp-top">
+      <div class="emp"><div class="emp-avatar">D</div><div><div class="emp-name">David Chen</div><div class="emp-sub">Ontario · Biweekly · Gross $3,100.00</div></div></div>
+      <div class="emp-net"><div class="emp-net-label">Net pay</div><div class="emp-net-value mono">$2,397.90</div></div>
+    </div>
+    <div class="deduct">
+      <div class="dd"><div class="dd-l">CPP</div><div class="dd-v mono">$178.84</div></div>
+      <div class="dd"><div class="dd-l">CPP2</div><div class="dd-v mono">$0.00</div></div>
+      <div class="dd"><div class="dd-l">EI</div><div class="dd-v mono">$50.44</div></div>
+      <div class="dd"><div class="dd-l">Fed tax</div><div class="dd-v mono">$312.90</div></div>
+      <div class="dd"><div class="dd-l">Prov tax</div><div class="dd-v mono">$159.92</div></div>
+      <div class="dd"><div class="dd-l">Total</div><div class="dd-v mono">$702.10</div></div>
+    </div>
+    <div class="warn-inline"><span>⚠️</span><span>YTD pensionable will reach $69,100 after this run — CPP2 begins at $71,300. No CPP2 owed yet.</span></div>
+  </div>
+
+  <div class="emp-card">
+    <div class="emp-top">
+      <div class="emp"><div class="emp-avatar">A</div><div><div class="emp-name">Amara Okonkwo</div><div class="emp-sub">Ontario · Biweekly · Gross $2,900.00</div></div></div>
+      <div class="emp-net"><div class="emp-net-label">Net pay</div><div class="emp-net-value mono">$2,244.16</div></div>
+    </div>
+    <div class="deduct">
+      <div class="dd"><div class="dd-l">CPP</div><div class="dd-v mono">$167.24</div></div>
+      <div class="dd"><div class="dd-l">CPP2</div><div class="dd-v mono">$0.00</div></div>
+      <div class="dd"><div class="dd-l">EI</div><div class="dd-v mono">$47.17</div></div>
+      <div class="dd"><div class="dd-l">Fed tax</div><div class="dd-v mono">$288.90</div></div>
+      <div class="dd"><div class="dd-l">Prov tax</div><div class="dd-v mono">$115.53</div></div>
+      <div class="dd"><div class="dd-l">Total</div><div class="dd-v mono">$655.84</div></div>
+    </div>
+  </div>
+</main>
+<div class="actionbar">
+  <div class="ab-total">Net to deposit<b class="mono">$6,914.20</b></div>
+  <div class="ab-btns">
+    <a class="btn-outline" href="wizard-step1.html">← Back to edit</a>
+    <a class="btn-primary" href="wizard-step3.html">Finalize pay run</a>
+  </div>
+</div>
+</body>
+</html>

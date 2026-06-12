@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;color:#1c1917;background:#e7e5e4;padding:24px;display:flex;justify-content:center}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.phone{width:375px;background:#fff;border-radius:28px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.statusbar{height:30px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:12px;font-weight:600}
+.statusbar .mono{font-size:13px}
+/* nav */
+.mnav{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #f0efed}
+.logo{display:flex;align-items:center;gap:7px;font-size:16px;font-weight:800;letter-spacing:-.02em}
+.burger{font-size:18px;color:#57534e}
+/* hero */
+.hero{background:linear-gradient(180deg,#fff,#fef6f5);padding:34px 22px 36px;text-align:center}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#B3261E;background:#fef2f2;border:1px solid #fecaca;border-radius:20px;padding:5px 11px;margin-bottom:16px}
+.h1{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.h1 em{font-style:normal;color:#B3261E}
+.lede{font-size:14.5px;color:#57534e;margin-top:14px;line-height:1.55}
+.cta{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.btn-primary{padding:13px;border-radius:11px;border:none;background:#B3261E;color:#fff;font-size:15px;font-weight:600;font-family:inherit;text-decoration:none;text-align:center}
+.btn-outline{padding:13px;border-radius:11px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:15px;font-weight:600;font-family:inherit;text-decoration:none;text-align:center}
+.trust{font-size:12px;color:#a8a29e;margin-top:14px}
+/* features */
+.sec{padding:30px 22px}
+.sec-eyebrow{font-size:11px;font-weight:700;color:#B3261E;text-transform:uppercase;letter-spacing:.07em;text-align:center}
+.sec-title{font-size:22px;font-weight:800;letter-spacing:-.02em;text-align:center;margin-top:8px;margin-bottom:22px}
+.feat{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #f0efed}
+.feat:last-child{border-bottom:none}
+.feat-icon{width:40px;height:40px;border-radius:10px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.feat-t{font-size:14.5px;font-weight:700}
+.feat-d{font-size:13px;color:#78716c;margin-top:3px;line-height:1.5}
+/* pricing */
+.price{border:1px solid #e7e5e4;border-radius:14px;padding:20px;margin-bottom:14px}
+.price.hot{border:2px solid #B3261E;box-shadow:0 8px 24px rgba(179,38,30,.12);position:relative}
+.hot-pill{position:absolute;top:-11px;left:20px;font-size:10px;font-weight:700;letter-spacing:.05em;background:#B3261E;color:#fff;border-radius:20px;padding:4px 11px}
+.price-name{font-size:14px;font-weight:700}
+.price-amt{font-size:32px;font-weight:800;letter-spacing:-.02em;margin-top:8px}
+.price-amt span{font-size:13px;font-weight:500;color:#a8a29e}
+.price-tag{font-size:12.5px;color:#78716c;margin-top:3px}
+.price-feats{list-style:none;margin:14px 0 16px;padding:0}
+.price-feats li{font-size:13px;color:#44403c;line-height:1.7;display:flex;gap:8px}
+.price-feats li::before{content:"✓";color:#16a34a;font-weight:700}
+/* calc */
+.calc-card{background:#1c1917;border-radius:16px;padding:18px;margin-top:6px}
+.calc-card .inner{background:#fff;border-radius:11px;padding:16px}
+.calc-input{display:flex;justify-content:space-between;align-items:center;border:1px solid #d6d3d1;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px}
+.calc-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;border-bottom:1px solid #f0efed}
+.calc-row span:first-child{color:#57534e}
+.calc-row.net{border-bottom:none;border-top:2px solid #e7e5e4;margin-top:3px;padding-top:10px;font-weight:700}
+.calc-row.net .mono{color:#B3261E;font-size:16px}
+.calc-h{font-size:14px;font-weight:700;color:#fff;margin-bottom:12px;text-align:center}
+/* footer */
+.footer{border-top:1px solid #e7e5e4;padding:24px 22px;text-align:center}
+.footer .logo{justify-content:center}
+.footer-note{font-size:11px;color:#a8a29e;margin-top:14px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span class="mono">9:41</span><span>📶 🔋</span></div>
+  <div class="mnav">
+    <div class="logo"><span style="font-size:19px">🍁</span> MapleRun</div>
+    <div class="burger">☰</div>
+  </div>
+
+  <section class="hero">
+    <span class="pill">🍁 For Canadian small business</span>
+    <h1 class="h1">Payroll like a <em>bank statement</em>, not a spreadsheet.</h1>
+    <p class="lede">CPP, EI, and tax-accurate payroll in minutes — with stubs and T4s your team will trust.</p>
+    <div class="cta">
+      <a class="btn-primary" href="onboarding.html">Try it free</a>
+      <a class="btn-outline" href="#">Quick calculator</a>
+    </div>
+    <div class="trust">No credit card · CRA-aligned tables</div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-eyebrow">All in one place</div>
+    <div class="sec-title">Built for real payroll</div>
+    <div class="feat"><div class="feat-icon">🧮</div><div><div class="feat-t">Accurate calculations</div><div class="feat-d">Current-year CRA tables, every run.</div></div></div>
+    <div class="feat"><div class="feat-icon">📄</div><div><div class="feat-t">Pay stubs &amp; T4s</div><div class="feat-d">Bank-quality docs to print or email.</div></div></div>
+    <div class="feat"><div class="feat-icon">🛡️</div><div><div class="feat-t">Guided &amp; safe</div><div class="feat-d">Preview everything before you finalize.</div></div></div>
+    <div class="feat"><div class="feat-icon">⚡</div><div><div class="feat-t">Minutes, not hours</div><div class="feat-d">A three-step wizard, gross to net.</div></div></div>
+  </section>
+
+  <section class="sec" style="background:#fafaf9">
+    <div class="sec-eyebrow">Simple pricing</div>
+    <div class="sec-title">One plan per team size</div>
+    <div class="price">
+      <div class="price-name">Solo</div>
+      <div class="price-amt">$15<span> /mo</span></div>
+      <div class="price-tag">1 employee</div>
+      <ul class="price-feats"><li>Unlimited pay runs</li><li>Pay stubs &amp; T4 slips</li></ul>
+    </div>
+    <div class="price hot">
+      <span class="hot-pill">MOST POPULAR</span>
+      <div class="price-name">Growth</div>
+      <div class="price-amt">$25<span> /mo</span></div>
+      <div class="price-tag">Up to 10 employees</div>
+      <ul class="price-feats"><li>Everything in Solo</li><li>Multiple pay groups</li><li>PD7A remittance</li></ul>
+    </div>
+    <div class="price">
+      <div class="price-name">Accountant</div>
+      <div class="price-amt">$59<span> /mo</span></div>
+      <div class="price-tag">Unlimited employees</div>
+      <ul class="price-feats"><li>ROE generation</li><li>Payroll journals</li></ul>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="calc-card">
+      <div class="calc-h">See a paycheque in real time</div>
+      <div class="inner">
+        <div class="calc-input"><span>Gross (biweekly)</span><b class="mono">$2,884.62</b></div>
+        <div class="calc-row"><span>CPP</span><span class="mono">$166.36</span></div>
+        <div class="calc-row"><span>EI</span><span class="mono">$46.93</span></div>
+        <div class="calc-row"><span>Federal tax</span><span class="mono">$286.41</span></div>
+        <div class="calc-row"><span>Provincial tax</span><span class="mono">$112.78</span></div>
+        <div class="calc-row net"><span>Net pay</span><span class="mono">$2,272.14</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="logo"><span style="font-size:19px">🍁</span> MapleRun</div>
+    <div class="footer-note">© 2026 MapleRun. CRA-aligned, not an official CRA service.</div>
+  </footer>
+</div>
+</body>
+</html>

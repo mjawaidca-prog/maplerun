@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Set up company</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;color:#1c1917;min-height:100vh;background:linear-gradient(180deg,#fff,#fef6f5);display:flex;align-items:center;justify-content:center;padding:32px}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.wrap{width:100%;max-width:460px}
+.brand{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:8px}
+.brand-name{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.lead{text-align:center;font-size:14px;color:#78716c;margin-bottom:8px}
+.progress{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:24px}
+.pdot{width:7px;height:7px;border-radius:50%;background:#e7e5e4}
+.pdot.on{background:#B3261E;width:22px;border-radius:20px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:28px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.card-title{font-size:19px;font-weight:800;letter-spacing:-.01em}
+.card-sub{font-size:13px;color:#78716c;margin-top:4px;margin-bottom:20px}
+label{font-size:13px;font-weight:600;color:#44403c;display:block;margin-bottom:6px}
+label .req{color:#B3261E}
+.field{margin-bottom:16px}
+.inp{width:100%;border:1px solid #d6d3d1;border-radius:8px;padding:11px 13px;font-size:14px;color:#1c1917;background:#fff;font-family:inherit}
+.slug{display:flex;align-items:center;border:1px solid #d6d3d1;border-radius:8px;overflow:hidden}
+.slug-pre{padding:11px 12px;background:#fafaf9;color:#a8a29e;font-size:14px;border-right:1px solid #e7e5e4}
+.slug input{flex:1;border:none;padding:11px 12px;font-size:14px;font-family:'Geist Mono',monospace;color:#1c1917;outline:none}
+.help{font-size:12px;color:#a8a29e;margin-top:6px}
+.sel{width:100%;border:1px solid #d6d3d1;border-radius:8px;padding:11px 13px;font-size:14px;color:#1c1917;background:#fff;display:flex;justify-content:space-between;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn-primary{width:100%;padding:12px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:6px}
+.foot{text-align:center;font-size:12px;color:#a8a29e;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span style="font-size:24px">🍁</span><span class="brand-name">MapleRun</span></div>
+  <div class="lead">Let's set up your company</div>
+  <div class="progress"><span class="pdot on"></span><span class="pdot"></span><span class="pdot"></span></div>
+
+  <div class="card">
+    <div class="card-title">Company details</div>
+    <div class="card-sub">You can change any of this later in Company settings.</div>
+
+    <div class="field">
+      <label>Company name <span class="req">*</span></label>
+      <input class="inp" value="Northwind Carpentry Ltd.">
+    </div>
+
+    <div class="field">
+      <label>Workspace URL <span class="req">*</span></label>
+      <div class="slug"><span class="slug-pre">maplerun.ca/</span><input value="northwind"></div>
+      <div class="help">Letters, numbers and hyphens only.</div>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>Default province <span class="req">*</span></label>
+        <div class="sel">Ontario (ON) <span style="color:#a8a29e">▾</span></div>
+      </div>
+      <div class="field">
+        <label>Pay frequency <span class="req">*</span></label>
+        <div class="sel">Biweekly <span style="color:#a8a29e">▾</span></div>
+      </div>
+    </div>
+
+    <button class="btn-primary">Create company →</button>
+  </div>
+
+  <div class="foot">Signed in as marcus@northwind.ca</div>
+</div>
+</body>
+</html>

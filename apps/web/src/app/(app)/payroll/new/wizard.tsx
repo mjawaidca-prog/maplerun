@@ -138,13 +138,13 @@ export function PayRunWizard({ payGroups, employees, previewAction, finalizeActi
 
   return (
     <div className="space-y-6">
-      {/* Step indicator */}
-      <div className="flex items-center gap-4 text-sm">
-        <StepBadge number={1} label="Enter pay" active={step === "input"} done={step !== "input"} />
-        <Separator className="flex-1 max-w-8" />
-        <StepBadge number={2} label="Preview" active={step === "preview"} done={step === "finalizing"} />
-        <Separator className="flex-1 max-w-8" />
-        <StepBadge number={3} label="Finalize" active={step === "finalizing"} done={false} />
+      {/* Stepper */}
+      <div className="flex items-center max-w-[440px] mx-auto mb-8">
+        <StepDot num={1} label="Input" state={step === "input" ? "active" : "done"} />
+        <StepLine done={step !== "input"} />
+        <StepDot num={2} label="Preview" state={step === "preview" ? "active" : step === "finalizing" ? "done" : "pending"} />
+        <StepLine done={step === "finalizing"} />
+        <StepDot num={3} label="Finalize" state={step === "finalizing" ? "active" : "pending"} />
       </div>
 
       {/* Error banner */}
@@ -376,37 +376,23 @@ export function PayRunWizard({ payGroups, employees, previewAction, finalizeActi
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
-function StepBadge({
-  number,
-  label,
-  active,
-  done,
-}: {
-  number: number;
-  label: string;
-  active: boolean;
-  done: boolean;
-}) {
+function StepDot({ num, label, state }: { num: number; label: string; state: "active" | "done" | "pending" }) {
   return (
-    <div className="flex items-center gap-2">
-      <span
-        className={`inline-flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold ${
-          done
-            ? "bg-primary text-primary-foreground"
-            : active
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground"
-        }`}
-      >
-        {done ? "✓" : number}
+    <div className="flex items-center gap-2.5 flex-1">
+      <span className={`inline-flex items-center justify-center w-[30px] h-[30px] rounded-full text-[13px] font-bold flex-shrink-0 ${
+        state === "active" ? "bg-[#B3261E] text-white" :
+        state === "done" ? "bg-[#16A34A] text-white" :
+        "bg-[#E7E5E4] text-[#A8A29E]"
+      }`}>
+        {state === "done" ? "✓" : num}
       </span>
-      <span
-        className={`text-sm ${active ? "font-medium text-foreground" : "text-muted-foreground"}`}
-      >
-        {label}
-      </span>
+      <span className={`text-[13px] font-semibold ${state === "pending" ? "text-[#A8A29E]" : "text-[#1C1917]"}`}>{label}</span>
     </div>
   );
+}
+
+function StepLine({ done }: { done: boolean }) {
+  return <div className={`flex-1 h-0.5 mx-3 ${done ? "bg-[#16A34A]" : "bg-[#E7E5E4]"}`} />;
 }
 
 function Stat({

@@ -1,0 +1,28 @@
+design/
+├── README.md          ← design principles + this index
+├── tokens.md          ← all colors, type, spacing, radius, shadows
+├── components.md      ← button/input/card/table/badge/modal specs
+├── screens/
+│   ├── paystub-desktop.png      (light pay stub)
+│   ├── paystub-dark.png         (dark pay stub)
+│   ├── t4slip-desktop.png       (with masked SIN)
+│   ├── landing-desktop.png
+│   ├── landing-mobile.png
+│   ├── wizard-step1.png         (input)
+│   ├── wizard-step2.png         (preview + warning)
+│   ├── wizard-step3.png         (success)
+│   ├── dashboard.png
+│   ├── employee-list.png
+│   ├── employee-form.png
+│   ├── reports-dashboard.png    (with gated card)
+│   ├── upgrade-modal.png
+│   ├── signin.png
+│   ├── onboarding.png
+│   ├── payroll-history.png
+│   ├── payrun-detail.png
+│   ├── t4-summary.png
+│   └── company-settings.png
+└── states/
+    ├── empty-state.png
+    ├── loading-state.png
+    └── error-state.png

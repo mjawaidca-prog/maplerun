@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Add Employee</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 24px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:2px;font-size:14px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+.main{flex:1;padding:36px 48px 120px;max-width:760px}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:4px}
+.page-title{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:24px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.num-chip{width:28px;height:28px;border-radius:8px;background:#fef2f2;color:#B3261E;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.card-title{font-size:16px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.field{margin-bottom:4px}
+.field.full{grid-column:1/-1}
+label{font-size:13px;font-weight:600;color:#44403c;display:block;margin-bottom:6px}
+label .req{color:#B3261E}
+.inp{width:100%;border:1px solid #d6d3d1;border-radius:8px;padding:10px 12px;font-size:14px;color:#1c1917;background:#fff;font-family:inherit}
+.inp.ph{color:#a8a29e}
+.sel{width:100%;border:1px solid #d6d3d1;border-radius:8px;padding:10px 12px;font-size:14px;color:#1c1917;background:#fff;display:flex;justify-content:space-between;align-items:center}
+.help{font-size:12px;color:#a8a29e;margin-top:6px}
+.actionbar{position:fixed;left:220px;right:0;bottom:0;background:#fff;border-top:1px solid #e7e5e4;box-shadow:0 -2px 12px rgba(0,0,0,.06);padding:14px 48px;display:flex;justify-content:flex-end;gap:12px;align-items:center}
+.btn-primary{padding:11px 22px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-outline{padding:11px 22px;border-radius:10px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+.spacer{flex:1;font-size:13px;color:#a8a29e}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><span style="font-size:22px">🍁</span><span class="sidebar-logo-name">MapleRun</span></div>
+  <a class="nav-item" href="dashboard.html">🏠 Dashboard</a>
+  <a class="nav-item active" href="employee-list.html">👥 Employees</a>
+  <a class="nav-item" href="payroll-history.html">💵 Payroll</a>
+  <a class="nav-item" href="reports-dashboard.html">📊 Reports</a>
+  <a class="nav-item" href="company-settings.html">🏢 Company</a>
+  <div class="sidebar-foot">
+    <span class="plan-badge"><span class="dot"></span>Growth plan</span>
+    <div class="user-row"><div class="user-avatar">M</div><div><div class="user-name">Marcus Reid</div><div class="user-sub">Sign out</div></div></div>
+  </div>
+</aside>
+<main class="main">
+  <div class="breadcrumb">Employees › Add employee</div>
+  <div class="page-title">Add employee</div>
+
+  <div class="card">
+    <div class="card-head"><div class="num-chip">1</div><div class="card-title">Personal information</div></div>
+    <div class="grid2">
+      <div class="field"><label>First name <span class="req">*</span></label><input class="inp" value="Jordan"></div>
+      <div class="field"><label>Last name <span class="req">*</span></label><input class="inp" value="Lévesque"></div>
+      <div class="field"><label>Social insurance number <span class="req">*</span></label><input class="inp mono" value="•••-•••-558"><div class="help">Stored encrypted. Masked everywhere except payroll filings.</div></div>
+      <div class="field"><label>Date of birth</label><input class="inp ph" value="1991-04-12"></div>
+      <div class="field"><label>Email</label><input class="inp" value="jordan@northwind.ca"></div>
+      <div class="field"><label>Phone</label><input class="inp ph" value="(416) 555‑0142"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="num-chip">2</div><div class="card-title">Address</div></div>
+    <div class="grid2">
+      <div class="field full"><label>Address line 1</label><input class="inp" value="218 Birchwood Ave"></div>
+      <div class="field"><label>City</label><input class="inp" value="Toronto"></div>
+      <div class="field"><label>Province</label><div class="sel">Ontario (ON) <span style="color:#a8a29e">▾</span></div></div>
+      <div class="field"><label>Postal code</label><input class="inp mono" value="M6H 2T9"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="num-chip">3</div><div class="card-title">Payroll settings</div></div>
+    <div class="grid2">
+      <div class="field"><label>Pay group <span class="req">*</span></label><div class="sel">Biweekly · All staff <span style="color:#a8a29e">▾</span></div></div>
+      <div class="field"><label>Start date</label><input class="inp ph" value="2026-02-02"></div>
+      <div class="field full"><div class="help" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:11px 14px;border-radius:8px;margin-top:2px">ℹ️ Creating this employee auto-generates a federal &amp; provincial TD1 and a 2026 YTD ledger.</div></div>
+    </div>
+  </div>
+</main>
+<div class="actionbar">
+  <div class="spacer">All fields with <span style="color:#B3261E">*</span> are required.</div>
+  <a class="btn-outline" href="employee-list.html">Cancel</a>
+  <button class="btn-primary">Create employee</button>
+</div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — States</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;color:#1c1917;padding:40px}
+.head{max-width:1080px;margin:0 auto 24px}
+.head h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.head p{font-size:14px;color:#78716c;margin-top:5px}
+.grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.label{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.panel{background:#fff;border:1px solid #e7e5e4;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 24px}
+/* empty */
+.empty-icon{width:56px;height:56px;border-radius:14px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:16px}
+.t-title{font-size:16px;font-weight:700}
+.t-sub{font-size:13px;color:#78716c;margin-top:6px;line-height:1.5;max-width:230px}
+.btn-primary{padding:10px 18px;border-radius:9px;border:none;background:#B3261E;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:16px;text-decoration:none}
+/* loading */
+.spinner{width:38px;height:38px;border-radius:50%;border:3px solid #f0efed;border-top-color:#B3261E;animation:spin .8s linear infinite;margin-bottom:18px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skeleton{width:100%;max-width:230px;margin-top:8px}
+.sk{height:11px;border-radius:6px;background:linear-gradient(90deg,#f0efed,#e7e5e4,#f0efed);background-size:200% 100%;animation:sh 1.3s ease-in-out infinite;margin-bottom:9px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk.w70{width:70%}
+.sk.w40{width:40%}
+/* error */
+.err-icon{width:56px;height:56px;border-radius:14px;background:#fef2f2;border:1px solid #fecaca;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:16px}
+.err-code{font-family:'Geist Mono',monospace;font-size:12px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:3px 8px;margin-top:14px}
+.btn-outline{padding:10px 18px;border-radius:9px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:16px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="head">
+  <h1>System states</h1>
+  <p>Reusable empty, loading, and error treatments — same shell, same spacing, brand-consistent.</p>
+</div>
+<div class="grid">
+  <div>
+    <div class="label">Empty state</div>
+    <div class="panel">
+      <div class="empty-icon">👥</div>
+      <div class="t-title">No employees yet</div>
+      <div class="t-sub">Add your first employee to start running payroll and generating pay stubs.</div>
+      <a class="btn-primary" href="employee-form.html">＋ Add your first employee</a>
+    </div>
+  </div>
+  <div>
+    <div class="label">Loading state</div>
+    <div class="panel">
+      <div class="spinner"></div>
+      <div class="t-title">Calculating deductions…</div>
+      <div class="t-sub">Running CPP, EI, and tax tables for 3 employees.</div>
+      <div class="skeleton">
+        <div class="sk"></div>
+        <div class="sk w70"></div>
+        <div class="sk w40"></div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="label">Error state</div>
+    <div class="panel">
+      <div class="err-icon">⚠️</div>
+      <div class="t-title">Something went wrong</div>
+      <div class="t-sub">We couldn't finalize this pay run. Your draft is saved — no amounts were posted.</div>
+      <div class="err-code">ERR_PAYRUN_500</div>
+      <a class="btn-outline" href="#">Try again</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

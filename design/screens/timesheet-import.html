@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Import Timesheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 24px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:2px;font-size:14px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+.main{flex:1;padding:36px 48px 110px;max-width:920px}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:4px}
+.page-title{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:24px}
+.steps{display:flex;gap:10px;margin-bottom:26px}
+.istep{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:#a8a29e}
+.istep .n{width:24px;height:24px;border-radius:50%;background:#e7e5e4;color:#a8a29e;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.istep.done .n{background:#16a34a;color:#fff}
+.istep.done{color:#1c1917}
+.istep.on .n{background:#B3261E;color:#fff}
+.istep.on{color:#1c1917}
+.istep .bar{width:30px;height:2px;background:#e7e5e4}
+.col-title{font-size:13px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:20px}
+.card-body{padding:20px 22px}
+/* uploaded file row */
+.file{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid #e7e5e4;border-radius:11px;background:#fafaf9}
+.file-icon{width:42px;height:42px;border-radius:10px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.file-name{font-size:14px;font-weight:700}
+.file-meta{font-size:12px;color:#a8a29e;margin-top:2px}
+.file-ok{margin-left:auto;font-size:12px;font-weight:700;color:#15803d;background:#dcfce7;border-radius:20px;padding:4px 11px}
+.replace{font-size:13px;color:#B3261E;font-weight:600;cursor:pointer;margin-left:14px}
+/* mapping */
+.map-row{display:grid;grid-template-columns:1.2fr 30px 1.4fr 1fr;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #f0efed}
+.map-row:last-child{border-bottom:none}
+.map-src{font-size:13px}
+.map-src .col{font-family:'Geist Mono',monospace;font-weight:600;font-size:13px}
+.map-src .sample{font-size:11px;color:#a8a29e;margin-top:2px}
+.map-arrow{color:#c0bcb8;text-align:center}
+.sel{border:1px solid #d6d3d1;border-radius:8px;padding:9px 11px;font-size:13px;color:#1c1917;background:#fff;display:flex;justify-content:space-between;align-items:center}
+.sel.auto{border-color:#bbf7d0;background:#f0fdf4}
+.map-flag{font-size:11px;font-weight:600;color:#15803d}
+.map-flag.skip{color:#a8a29e}
+/* review */
+.rev-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #f0efed}
+.rev-stats{display:flex;gap:18px}
+.rstat{font-size:13px;color:#57534e}
+.rstat b{font-weight:700}
+.rstat.ok b{color:#15803d}
+.rstat.warn b{color:#92400e}
+.thead{display:grid;grid-template-columns:1.6fr 0.8fr 0.8fr 0.8fr 1fr;gap:10px;padding:11px 20px;background:#fafaf9;border-bottom:1px solid #e7e5e4}
+.th{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em}
+.th.r{text-align:right}
+.rrow{display:grid;grid-template-columns:1.6fr 0.8fr 0.8fr 0.8fr 1fr;gap:10px;padding:12px 20px;border-bottom:1px solid #f0efed;align-items:center}
+.rrow:last-child{border-bottom:none}
+.rrow.warn{background:#fffbeb}
+.r-emp{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.match{font-size:11px;font-weight:700;color:#15803d}
+.match.no{color:#92400e}
+.r-cell{font-size:13px;text-align:right}
+.warn-tag{font-size:11px;color:#92400e;background:#fef3c7;border-radius:6px;padding:3px 8px;display:inline-block}
+.actionbar{position:fixed;left:220px;right:0;bottom:0;background:#fff;border-top:1px solid #e7e5e4;box-shadow:0 -2px 12px rgba(0,0,0,.06);padding:14px 48px;display:flex;justify-content:space-between;align-items:center}
+.ab-l{font-size:13px;color:#a8a29e}
+.ab-r{display:flex;gap:12px}
+.btn-outline{padding:11px 20px;border-radius:10px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+.btn-primary{padding:11px 22px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><span style="font-size:22px">🍁</span><span class="sidebar-logo-name">MapleRun</span></div>
+  <a class="nav-item" href="dashboard.html">🏠 Dashboard</a>
+  <a class="nav-item" href="employee-list.html">👥 Employees</a>
+  <a class="nav-item active" href="payroll-history.html">💵 Payroll</a>
+  <a class="nav-item" href="reports-dashboard.html">📊 Reports</a>
+  <a class="nav-item" href="company-settings.html">🏢 Company</a>
+  <div class="sidebar-foot">
+    <span class="plan-badge"><span class="dot"></span>Growth plan</span>
+    <div class="user-row"><div class="user-avatar">M</div><div><div class="user-name">Marcus Reid</div><div class="user-sub">Sign out</div></div></div>
+  </div>
+</aside>
+<main class="main">
+  <div class="breadcrumb"><a href="timesheet-entry.html" style="color:#a8a29e;text-decoration:none">Timesheet</a> › Import</div>
+  <div class="page-title">Import timesheet</div>
+
+  <div class="steps">
+    <div class="istep done"><span class="n">✓</span> Upload</div>
+    <div class="bar" style="align-self:center;width:30px;height:2px;background:#e7e5e4"></div>
+    <div class="istep on"><span class="n">2</span> Map columns</div>
+    <div class="bar" style="align-self:center;width:30px;height:2px;background:#e7e5e4"></div>
+    <div class="istep"><span class="n">3</span> Review</div>
+  </div>
+
+  <div class="col-title">File</div>
+  <div class="card"><div class="card-body" style="padding:16px 18px">
+    <div class="file">
+      <div class="file-icon">📄</div>
+      <div><div class="file-name">site-crew-jan18-31.csv</div><div class="file-meta">3 data rows · 6 columns · detected header row</div></div>
+      <span class="file-ok">✓ Parsed</span>
+      <span class="replace">Replace</span>
+    </div>
+  </div></div>
+
+  <div class="col-title">Map columns</div>
+  <div class="card"><div class="card-body">
+    <div class="map-row">
+      <div class="map-src"><div class="col">employee</div><div class="sample">e.g. "Riley Boudreau"</div></div>
+      <div class="map-arrow">→</div>
+      <div class="sel auto">Employee (match by name) <span style="color:#a8a29e">▾</span></div>
+      <div class="map-flag">auto-matched</div>
+    </div>
+    <div class="map-row">
+      <div class="map-src"><div class="col">reg_hours</div><div class="sample">e.g. "80"</div></div>
+      <div class="map-arrow">→</div>
+      <div class="sel auto">Regular hours <span style="color:#a8a29e">▾</span></div>
+      <div class="map-flag">auto-matched</div>
+    </div>
+    <div class="map-row">
+      <div class="map-src"><div class="col">ot</div><div class="sample">e.g. "6.5"</div></div>
+      <div class="map-arrow">→</div>
+      <div class="sel auto">Overtime hours (×1.5) <span style="color:#a8a29e">▾</span></div>
+      <div class="map-flag">auto-matched</div>
+    </div>
+    <div class="map-row">
+      <div class="map-src"><div class="col">stat_hrs</div><div class="sample">e.g. "8"</div></div>
+      <div class="map-arrow">→</div>
+      <div class="sel">Statutory hours <span style="color:#a8a29e">▾</span></div>
+      <div class="map-flag">mapped</div>
+    </div>
+    <div class="map-row">
+      <div class="map-src"><div class="col">vac</div><div class="sample">e.g. "0"</div></div>
+      <div class="map-arrow">→</div>
+      <div class="sel">Vacation hours <span style="color:#a8a29e">▾</span></div>
+      <div class="map-flag">mapped</div>
+    </div>
+    <div class="map-row">
+      <div class="map-src"><div class="col">notes</div><div class="sample">e.g. "covered Sat shift"</div></div>
+      <div class="map-arrow">→</div>
+      <div class="sel" style="color:#a8a29e">Don't import <span>▾</span></div>
+      <div class="map-flag skip">skipped</div>
+    </div>
+  </div></div>
+
+  <div class="col-title">Preview &amp; review</div>
+  <div class="card">
+    <div class="rev-head">
+      <div class="rev-stats">
+        <div class="rstat ok">✓ <b>2</b> matched</div>
+        <div class="rstat warn">⚠ <b>1</b> needs attention</div>
+      </div>
+      <div style="font-size:12px;color:#a8a29e">Rates pulled from each employee's profile</div>
+    </div>
+    <div class="thead">
+      <div class="th">Employee</div>
+      <div class="th r">Reg</div>
+      <div class="th r">OT</div>
+      <div class="th r">Stat</div>
+      <div class="th r">Status</div>
+    </div>
+    <div class="rrow">
+      <div class="r-emp">Riley Boudreau <span class="match">✓ matched</span></div>
+      <div class="r-cell mono">80.0</div>
+      <div class="r-cell mono">6.5</div>
+      <div class="r-cell mono">0.0</div>
+      <div class="r-cell" style="text-align:right"><span style="font-size:12px;color:#15803d;font-weight:600">Ready</span></div>
+    </div>
+    <div class="rrow">
+      <div class="r-emp">Tomas Novak <span class="match">✓ matched</span></div>
+      <div class="r-cell mono">80.0</div>
+      <div class="r-cell mono">0.0</div>
+      <div class="r-cell mono">8.0</div>
+      <div class="r-cell" style="text-align:right"><span style="font-size:12px;color:#15803d;font-weight:600">Ready</span></div>
+    </div>
+    <div class="rrow warn">
+      <div class="r-emp">G. Liu <span class="match no">⚠ no exact match</span></div>
+      <div class="r-cell mono">72.0</div>
+      <div class="r-cell mono">0.0</div>
+      <div class="r-cell mono">0.0</div>
+      <div class="r-cell" style="text-align:right"><span class="warn-tag">Pick employee</span></div>
+    </div>
+  </div>
+</main>
+<div class="actionbar">
+  <div class="ab-l">2 of 3 rows ready to import</div>
+  <div class="ab-r">
+    <a class="btn-outline" href="timesheet-entry.html">Cancel</a>
+    <a class="btn-primary" href="timesheet-entry.html">Import 2 timesheets →</a>
+  </div>
+</div>
+</body>
+</html>

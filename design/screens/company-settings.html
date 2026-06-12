@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Company</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 24px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:2px;font-size:14px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+.main{flex:1;padding:36px 48px;max-width:1000px}
+.page-title{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.page-sub{font-size:14px;color:#78716c;margin-top:5px;margin-bottom:20px}
+.tabs{display:flex;gap:24px;border-bottom:1px solid #e7e5e4;margin-bottom:24px}
+.tab{font-size:14px;font-weight:600;color:#a8a29e;padding-bottom:12px;cursor:pointer;text-decoration:none;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:#B3261E;border-bottom-color:#B3261E}
+.cols{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:start}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.card-head{padding:18px 22px;border-bottom:1px solid #f0efed;display:flex;justify-content:space-between;align-items:center}
+.card-title{font-size:16px;font-weight:700}
+.card-body{padding:20px 22px}
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12px;font-weight:600;color:#78716c;display:block;margin-bottom:6px}
+.inp{width:100%;border:1px solid #d6d3d1;border-radius:8px;padding:10px 12px;font-size:14px;color:#1c1917;background:#fff;font-family:inherit}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* tax rates card */
+.rate-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:20px;padding:5px 11px}
+.ledger{border:1px solid #e7e5e4;border-radius:10px;overflow:hidden}
+.lrow{display:flex;justify-content:space-between;padding:11px 14px;font-size:13px;border-bottom:1px solid #f0efed}
+.lrow:last-child{border-bottom:none}
+.lrow.alt{background:#fafaf9}
+.lrow span:first-child{color:#57534e}
+.lrow .mono{color:#1c1917;font-weight:500}
+.src{font-size:12px;color:#a8a29e;margin-top:12px;line-height:1.5}
+.viewall{font-size:13px;color:#B3261E;font-weight:600;text-decoration:none;display:inline-block;margin-top:12px}
+.info{display:flex;gap:9px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:11px 13px;margin-top:14px;font-size:12px;color:#1e40af;line-height:1.5}
+.btn-outline{padding:9px 16px;border-radius:9px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><span style="font-size:22px">🍁</span><span class="sidebar-logo-name">MapleRun</span></div>
+  <a class="nav-item" href="dashboard.html">🏠 Dashboard</a>
+  <a class="nav-item" href="employee-list.html">👥 Employees</a>
+  <a class="nav-item" href="payroll-history.html">💵 Payroll</a>
+  <a class="nav-item" href="reports-dashboard.html">📊 Reports</a>
+  <a class="nav-item active" href="company-settings.html">🏢 Company</a>
+  <div class="sidebar-foot">
+    <span class="plan-badge"><span class="dot"></span>Growth plan</span>
+    <div class="user-row"><div class="user-avatar">M</div><div><div class="user-name">Marcus Reid</div><div class="user-sub">Sign out</div></div></div>
+  </div>
+</aside>
+<main class="main">
+  <div class="page-title">Company</div>
+  <div class="page-sub">Northwind Carpentry Ltd.</div>
+
+  <div class="tabs">
+    <a class="tab" href="#">Profile</a>
+    <a class="tab active" href="#">Payroll</a>
+    <a class="tab" href="#">Billing</a>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <div class="card-head"><div class="card-title">Company profile</div><button class="btn-outline">Edit</button></div>
+      <div class="card-body">
+        <div class="field"><label>Legal name</label><input class="inp" value="Northwind Carpentry Ltd." disabled></div>
+        <div class="grid2">
+          <div class="field"><label>CRA business number</label><input class="inp mono" value="12345 6789 RP0001" disabled></div>
+          <div class="field"><label>Default province</label><input class="inp" value="Ontario (ON)" disabled></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Pay frequency</label><input class="inp" value="Biweekly" disabled></div>
+          <div class="field"><label>Remitter type</label><input class="inp" value="Regular · monthly" disabled></div>
+        </div>
+        <div class="field" style="margin-bottom:0"><label>Address</label><input class="inp" value="44 Mill Street, Toronto, ON  M5A 3R2" disabled></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Tax rates &amp; limits</div>
+        <span class="rate-pill"><span class="dot"></span>Active rates · 2026</span>
+      </div>
+      <div class="card-body">
+        <div class="ledger">
+          <div class="lrow"><span>CPP rate / max pensionable</span><span class="mono">5.95% · $71,300</span></div>
+          <div class="lrow alt"><span>CPP2 rate / ceiling</span><span class="mono">4.00% · $81,200</span></div>
+          <div class="lrow"><span>EI rate (employee)</span><span class="mono">1.64% · $65,700</span></div>
+          <div class="lrow alt"><span>Federal basic personal amount</span><span class="mono">$16,129</span></div>
+          <div class="lrow"><span>ON basic personal amount</span><span class="mono">$12,747</span></div>
+        </div>
+        <div class="src">Source: CRA T4127 (127th edition) · last synced Jan 2, 2026.</div>
+        <a class="viewall" href="#">View all years →</a>
+        <div class="info">ℹ️ Rates update automatically each tax year. Past pay runs always keep the rates from their own year — values come from <span class="mono" style="font-weight:600">rates/&lt;year&gt;</span>, never hardcoded.</div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

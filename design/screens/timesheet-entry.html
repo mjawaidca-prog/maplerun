@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Timesheets</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 24px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:2px;font-size:14px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+.main{flex:1;padding:36px 48px 110px;max-width:1080px}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:4px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px}
+.page-title{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.page-sub{font-size:14px;color:#78716c;margin-top:5px}
+.btn-outline{padding:10px 16px;border-radius:10px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{padding:11px 22px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+.controls{display:flex;gap:12px;margin-bottom:16px;align-items:center}
+.field-input{border:1px solid #d6d3d1;border-radius:8px;padding:10px 12px;font-size:14px;color:#1c1917;background:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.seg{display:flex;border:1px solid #d6d3d1;border-radius:8px;overflow:hidden}
+.seg div{padding:9px 14px;font-size:13px;font-weight:600;color:#57534e;cursor:pointer;background:#fff}
+.seg div.on{background:#1c1917;color:#fff}
+.spacer{flex:1}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.thead{display:grid;grid-template-columns:2fr 0.9fr 0.8fr 0.8fr 0.8fr 0.9fr 1fr;gap:10px;padding:12px 20px;background:#fafaf9;border-bottom:1px solid #e7e5e4}
+.th{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em}
+.th.r{text-align:right}
+.th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#c0bcb8;font-size:10px}
+.trow{display:grid;grid-template-columns:2fr 0.9fr 0.8fr 0.8fr 0.8fr 0.9fr 1fr;gap:10px;padding:13px 20px;border-bottom:1px solid #f0efed;align-items:center}
+.trow.alt{background:#fafaf9}
+.trow:last-child{border-bottom:none}
+.emp{display:flex;align-items:center;gap:11px}
+.emp-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.emp-name{font-size:14px;font-weight:600}
+.emp-sub{font-size:12px;color:#a8a29e}
+.hin{border:1px solid #d6d3d1;border-radius:8px;padding:8px 10px;width:100%;text-align:right;font-size:14px;background:#fff;font-family:'Geist Mono',monospace}
+.hin.ot{color:#92400e}
+.rate{font-size:13px;color:#57534e;text-align:right}
+.gross{font-size:14px;font-weight:700;text-align:right}
+.tfoot{display:grid;grid-template-columns:2fr 0.9fr 0.8fr 0.8fr 0.8fr 0.9fr 1fr;gap:10px;padding:14px 20px;background:#1c1917;color:#fff;align-items:center}
+.tfoot .lbl{font-size:13px;font-weight:700}
+.tfoot .v{font-size:13px;text-align:right;font-weight:600}
+.tfoot .v.big{font-size:16px}
+.legend{display:flex;gap:18px;margin-top:14px;font-size:12px;color:#78716c}
+.legend b{color:#1c1917}
+.actionbar{position:fixed;left:220px;right:0;bottom:0;background:#fff;border-top:1px solid #e7e5e4;box-shadow:0 -2px 12px rgba(0,0,0,.06);padding:14px 48px;display:flex;justify-content:space-between;align-items:center}
+.ab-l{font-size:13px;color:#a8a29e}
+.ab-l b{font-size:17px;color:#1c1917;margin-left:8px}
+.ab-r{display:flex;gap:12px}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><span style="font-size:22px">🍁</span><span class="sidebar-logo-name">MapleRun</span></div>
+  <a class="nav-item" href="dashboard.html">🏠 Dashboard</a>
+  <a class="nav-item" href="employee-list.html">👥 Employees</a>
+  <a class="nav-item active" href="payroll-history.html">💵 Payroll</a>
+  <a class="nav-item" href="reports-dashboard.html">📊 Reports</a>
+  <a class="nav-item" href="company-settings.html">🏢 Company</a>
+  <div class="sidebar-foot">
+    <span class="plan-badge"><span class="dot"></span>Growth plan</span>
+    <div class="user-row"><div class="user-avatar">M</div><div><div class="user-name">Marcus Reid</div><div class="user-sub">Sign out</div></div></div>
+  </div>
+</aside>
+<main class="main">
+  <div class="breadcrumb">Payroll › Timesheet</div>
+  <div class="page-head">
+    <div>
+      <div class="page-title">Timesheet</div>
+      <div class="page-sub">Enter hours for hourly staff — MapleRun computes gross from rate × hours.</div>
+    </div>
+    <a class="btn-outline" href="timesheet-import.html">⤒ Import timesheet (CSV)</a>
+  </div>
+
+  <div class="controls">
+    <div class="field-input">Pay group <b style="font-weight:600">Hourly · Site crew</b> <span style="color:#a8a29e">▾</span></div>
+    <div class="field-input">Pay period <b style="font-weight:600">Jan 18 – Jan 31, 2026</b> <span style="color:#a8a29e">▾</span></div>
+    <div class="spacer"></div>
+    <div class="seg"><div class="on">Hours</div><div>Days</div></div>
+  </div>
+
+  <div class="card">
+    <div class="thead">
+      <div class="th">Employee</div>
+      <div class="th r">Rate</div>
+      <div class="th r">Regular <small>hrs</small></div>
+      <div class="th r">OT <small>×1.5</small></div>
+      <div class="th r">Stat <small>hrs</small></div>
+      <div class="th r">Vacation <small>hrs</small></div>
+      <div class="th r">Gross</div>
+    </div>
+
+    <div class="trow">
+      <div class="emp"><div class="emp-avatar">R</div><div><div class="emp-name">Riley Boudreau</div><div class="emp-sub">Ontario · Hourly</div></div></div>
+      <div class="rate mono">$32.00</div>
+      <div><input class="hin" value="80.0"></div>
+      <div><input class="hin ot" value="6.5"></div>
+      <div><input class="hin" value="0.0"></div>
+      <div><input class="hin" value="0.0"></div>
+      <div class="gross mono">$2,872.00</div>
+    </div>
+
+    <div class="trow alt">
+      <div class="emp"><div class="emp-avatar">T</div><div><div class="emp-name">Tomas Novak</div><div class="emp-sub">Ontario · Hourly</div></div></div>
+      <div class="rate mono">$28.50</div>
+      <div><input class="hin" value="80.0"></div>
+      <div><input class="hin ot" value="0.0"></div>
+      <div><input class="hin" value="8.0"></div>
+      <div><input class="hin" value="0.0"></div>
+      <div class="gross mono">$2,508.00</div>
+    </div>
+
+    <div class="trow">
+      <div class="emp"><div class="emp-avatar">G</div><div><div class="emp-name">Grace Liu</div><div class="emp-sub">Ontario · Hourly</div></div></div>
+      <div class="rate mono">$26.00</div>
+      <div><input class="hin" value="72.0"></div>
+      <div><input class="hin ot" value="0.0"></div>
+      <div><input class="hin" value="0.0"></div>
+      <div><input class="hin" value="8.0"></div>
+      <div class="gross mono">$2,080.00</div>
+    </div>
+
+    <div class="tfoot">
+      <div class="lbl">3 employees · 234.5 hrs</div>
+      <div class="v"></div>
+      <div class="v mono">232.0</div>
+      <div class="v mono">6.5</div>
+      <div class="v mono">8.0</div>
+      <div class="v mono">8.0</div>
+      <div class="v big mono">$7,460.00</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><b>Regular</b> rate × hours</span>
+    <span><b>OT</b> rate × 1.5 × hours</span>
+    <span><b>Stat</b> statutory holiday pay</span>
+    <span><b>Vacation</b> paid vacation hours</span>
+  </div>
+</main>
+<div class="actionbar">
+  <div class="ab-l">Total gross<b class="mono">$7,460.00</b></div>
+  <div class="ab-r">
+    <a class="btn-outline" href="payroll-history.html">Save draft</a>
+    <a class="btn-primary" href="wizard-step2.html">Calculate deductions →</a>
+  </div>
+</div>
+</body>
+</html>

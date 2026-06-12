@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Sign in</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;color:#1c1917;min-height:100vh;background:linear-gradient(180deg,#fff,#fef6f5);display:flex;align-items:center;justify-content:center;padding:32px}
+.wrap{width:100%;max-width:400px}
+.brand{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:8px}
+.brand-name{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.lead{text-align:center;font-size:14px;color:#78716c;margin-bottom:28px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:28px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.card-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.card-sub{font-size:13px;color:#78716c;margin-bottom:20px}
+label{font-size:13px;font-weight:600;color:#44403c;display:block;margin-bottom:6px}
+.inp{width:100%;border:1px solid #d6d3d1;border-radius:8px;padding:11px 13px;font-size:14px;color:#1c1917;background:#fff;font-family:inherit;margin-bottom:14px}
+.btn-primary{width:100%;padding:12px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#a8a29e;font-size:12px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:#e7e5e4}
+.btn-oauth{width:100%;padding:11px;border-radius:10px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:9px}
+.sent{display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;text-align:center}
+.sent-icon{font-size:26px}
+.sent-t{font-size:15px;font-weight:700;color:#15803d;margin-top:6px}
+.sent-s{font-size:13px;color:#166534;margin-top:4px;line-height:1.5}
+.linkrow{text-align:center;margin-top:14px;font-size:13px;color:#78716c}
+.linkrow a{color:#B3261E;text-decoration:none;font-weight:600}
+.foot{text-align:center;font-size:12px;color:#a8a29e;margin-top:22px;line-height:1.6}
+.foot a{color:#78716c;text-decoration:none}
+/* toggle to view sent state: add ?sent to URL handled below */
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span style="font-size:26px">🍁</span><span class="brand-name">MapleRun</span></div>
+  <div class="lead">Sign in to your payroll account</div>
+
+  <div class="card" id="form">
+    <div class="card-title">Sign in</div>
+    <div class="card-sub">We'll email you a secure magic link — no password needed.</div>
+    <label>Work email</label>
+    <input class="inp" value="marcus@northwind.ca">
+    <button class="btn-primary" onclick="document.getElementById('form').style.display='none';document.getElementById('sent').style.display='block'">Send magic link</button>
+    <div class="divider">or</div>
+    <button class="btn-oauth"><span style="font-weight:700;color:#4285F4">G</span> Continue with Google</button>
+  </div>
+
+  <div class="card" id="sent" style="display:none">
+    <div class="sent" style="display:block">
+      <div class="sent-icon">📬</div>
+      <div class="sent-t">Check your email</div>
+      <div class="sent-s">We sent a magic link to <b>marcus@northwind.ca</b>. Click it to sign in — it expires in 15 minutes.</div>
+    </div>
+    <div class="linkrow">Wrong address? <a href="#" onclick="document.getElementById('sent').style.display='none';document.getElementById('form').style.display='block';return false">Use a different email</a></div>
+  </div>
+
+  <div class="foot">By continuing you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
+</div>
+</body>
+</html>

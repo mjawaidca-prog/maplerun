@@ -1,0 +1,69 @@
+# Components
+
+## Button
+- Radius 8–11px. Primary: maple bg `#B3261E`, white text, 600.
+- Outline: `#FFF` bg, `1px #D6D3D1` border, `#1C1917` text.
+- Sizes: sm 9×16px · md 11×20px · lg 14×26px.
+- Variants: default, outline, secondary, ghost, destructive, link.
+
+## Input / Select
+- `1px #D6D3D1` border, 6–8px radius, 10–11px pad, 14px text.
+- Label 13px/600 `#44403C`, 6px gap. Required asterisk in maple.
+- Helper text 12px `#A8A29E` below field. Select shows `▾` in `#A8A29E`.
+
+## Card
+- `#FFF`, `1px #E7E5E4`, 12–14px radius, 16–24px pad, shadow `0 1px 3px rgba(0,0,0,.04)`.
+- Section card (forms): numbered maple chip 28px (`#FEF2F2` bg / maple text), title 16/700.
+
+## Badge / Status pill
+- 20px radius, 4×10px pad, 11–12px / 700, letter-spacing .03em.
+- See tokens for color pairs (DRAFT/FINALIZED/PAID/ACTIVE/role).
+
+## Table
+- Header row `#FAFAF9` bg, 11px/700 uppercase `#A8A29E` labels, `.05em`.
+- Body rows: zebra `#FAFAF9`, divider `#F0EFED`, click-row affordance (`→` or link).
+- Money columns right-aligned, Geist Mono. Optional dark "total" row (`#1C1917`, white figures).
+
+## Avatar
+- Circle 32–38px, `linear-gradient(135deg,#B3261E,#E56A5C)`, white initial 13–14px/700.
+- Inactive/secondary person: `#E7E5E4` bg, `#78716C` initial.
+
+## Stepper (wizard)
+- 30px circle dots. Active = maple bg/white. Done = `#16A34A` bg/white ✓. Pending = `#E7E5E4`/`#A8A29E`.
+- 2px connector, turns `#16A34A` when the prior step is complete.
+
+## Sidebar
+- 220px, `#1C1917` bg. Item 14px/500, 10×12px, 9px radius.
+- Active item: `#3F1413` bg, white text. Footer: plan badge + user/sign-out.
+
+## Sticky action bar
+- `#FFF`, `1px #E7E5E4`, 12px radius, 14×20px pad.
+- Bottom-pinned in forms: shadow `0 -2px 12px rgba(0,0,0,.06)`. Inline: shadow `0 1px 3px`.
+
+## Alert
+- Warning: `#FFFBEB` bg, `#FDE68A` border, `#92400E` text, icon ⚠️, 8px radius.
+- Info: `#EFF6FF` bg, `#BFDBFE` border, `#1E40AF` text, icon ℹ️.
+- Success: `#F0FDF4` bg, `#BBF7D0` border, `#15803D` text.
+
+## Modal
+- 20px radius, max-width ~780px, shadow `0 24px 60px rgba(0,0,0,.4)`, dim backdrop.
+- Header badge + title + `×`. Footer strip `#FAFAF9`, `1px #E7E5E4` top.
+- Plan comparison: highlighted col gets 2px maple ring + "RECOMMENDED" pill; current plan tagged "CURRENT" with disabled button.
+
+## Report card (Reports dashboard)
+- Icon tile 46px (`#FEF2F2`), title 16/700, desc 13px, metric row (mono).
+- Locked variant: greyed icon (`filter:grayscale(1)`), amber "🔒 Plan" badge top-right,
+  "Upgrade to unlock" button (`#FFFBEB` bg / `#FDE68A` border / `#92400E`).
+
+## Tabs
+- Active: maple text + 2px maple underline. Inactive: `#A8A29E`.
+
+## Doc components (Pay Stub / T4)
+- Pay-stub header: maple gradient, letter-spaced "PAY STUB" label.
+- T4 box: `1px #D6D3D1`, 10px radius; black number chip (`#1C1917`, white, Geist Mono 12/700, 5px).
+- Net-pay hero band: danger-tint gradient, 38px maple Geist Mono figure.
+
+## Tax-rates card (Company → Payroll) — yearly update surface
+- "Active rates · YYYY" pill: `#F0FDF4` bg, `#BBF7D0` border, green dot + `#15803D` text.
+- Read-only ledger of CPP/CPP2/EI/BPA. Source + last-synced line. "View all years →" link.
+- Info note explains auto-update per tax year. Data MUST come from `rates/[year]`, not hardcoded.

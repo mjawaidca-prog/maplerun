@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Pay Run Wizard: Step 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 24px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:2px;font-size:14px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+.main{flex:1;padding:36px 48px;max-width:900px}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:4px}
+.page-title{font-size:28px;font-weight:800;color:#1c1917;letter-spacing:-.02em;margin-bottom:28px}
+.stepper{display:flex;align-items:center;max-width:440px;margin:0 auto 40px}
+.step{display:flex;align-items:center}
+.step.grow{flex:1}
+.step-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.step-dot.done{background:#16a34a;color:#fff}
+.step-name{font-size:13px;font-weight:600;margin-left:9px;color:#1c1917}
+.step-line{flex:1;height:2px;margin:0 12px;background:#16a34a}
+.success{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:44px 40px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06);max-width:560px;margin:0 auto}
+.check{width:64px;height:64px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.check svg{width:32px;height:32px;stroke:#16a34a;stroke-width:3;fill:none}
+.s-title{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.s-sub{font-size:14px;color:#78716c;margin-top:8px;line-height:1.5}
+.s-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#e7e5e4;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;margin:28px 0}
+.ss{background:#fafaf9;padding:16px}
+.ss-l{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.05em}
+.ss-v{font-size:18px;font-weight:700;margin-top:6px}
+.next{text-align:left;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;margin-bottom:24px}
+.next-t{font-size:12px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.next li{font-size:13px;color:#166534;line-height:1.7;list-style:none;display:flex;gap:8px}
+.next li::before{content:"✓";color:#16a34a;font-weight:700}
+.s-btns{display:flex;gap:12px;justify-content:center}
+.btn-primary{padding:12px 24px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+.btn-outline{padding:12px 24px;border-radius:10px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><span style="font-size:22px">🍁</span><span class="sidebar-logo-name">MapleRun</span></div>
+  <a class="nav-item" href="dashboard.html">🏠 Dashboard</a>
+  <a class="nav-item" href="employee-list.html">👥 Employees</a>
+  <a class="nav-item active" href="payroll-history.html">💵 Payroll</a>
+  <a class="nav-item" href="reports-dashboard.html">📊 Reports</a>
+  <a class="nav-item" href="company-settings.html">🏢 Company</a>
+  <div class="sidebar-foot">
+    <span class="plan-badge"><span class="dot"></span>Growth plan</span>
+    <div class="user-row"><div class="user-avatar">M</div><div><div class="user-name">Marcus Reid</div><div class="user-sub">Sign out</div></div></div>
+  </div>
+</aside>
+<main class="main">
+  <div class="breadcrumb">Payroll › New pay run</div>
+  <div class="page-title">Run payroll</div>
+  <div class="stepper">
+    <div class="step grow"><div class="step-dot done">✓</div><span class="step-name">Input</span><div class="step-line"></div></div>
+    <div class="step grow"><div class="step-dot done">✓</div><span class="step-name">Preview</span><div class="step-line"></div></div>
+    <div class="step"><div class="step-dot done">✓</div><span class="step-name">Finalize</span></div>
+  </div>
+
+  <div class="success">
+    <div class="check"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5 11-11"/></svg></div>
+    <div class="s-title">Pay run finalized</div>
+    <div class="s-sub">Jan 31, 2026 · Biweekly · All staff. Pay stubs are ready and the ledger is updated.</div>
+
+    <div class="s-summary">
+      <div class="ss"><div class="ss-l">Employees</div><div class="ss-v mono">3</div></div>
+      <div class="ss"><div class="ss-l">Net deposited</div><div class="ss-v mono">$6,914.20</div></div>
+      <div class="ss"><div class="ss-l">Employer cost</div><div class="ss-v mono">$9,602.30</div></div>
+    </div>
+
+    <div class="next">
+      <div class="next-t">What happened</div>
+      <ul style="padding:0;margin:0">
+        <li>3 pay stubs generated and ready to download or email</li>
+        <li>2026 YTD ledgers updated for all employees</li>
+        <li>PD7A remittance balance updated for the February deadline</li>
+      </ul>
+    </div>
+
+    <div class="s-btns">
+      <a class="btn-outline" href="payroll-history.html">Back to payroll</a>
+      <a class="btn-primary" href="payrun-detail.html">View pay run</a>
+    </div>
+  </div>
+</main>
+</body>
+</html>

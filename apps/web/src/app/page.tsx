@@ -1,331 +1,218 @@
-import PaychequeCalculator from "@/components/paycheque-calculator";
-import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Calculator,
-  FileText,
-  Shield,
-  TrendingUp,
-  Users,
-  Zap,
-  Check,
-  Star,
-} from "lucide-react";
 import Link from "next/link";
 
-const features = [
-  {
-    icon: Calculator,
-    title: "CRA-Compliant Engine",
-    description:
-      "Federal and provincial income tax, CPP/CPP2, EI — calculated per T4127 (121st ed., 2026). All 13 provinces and territories.",
-  },
-  {
-    icon: Zap,
-    title: "Payroll in Minutes",
-    description:
-      "Add employees, set their TD1 claims, enter hours or salary, and run payroll. Pay stubs generated automatically.",
-  },
-  {
-    icon: FileText,
-    title: "Beautiful Pay Stubs",
-    description:
-      "Clean, printable pay stubs with earnings, deductions, YTD totals, and CRA disclaimer. Download as PDF.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Remittance & Year-End",
-    description:
-      "PD7A remittance summaries, T4-ready reporting, Record of Employment (ROE) data. Built for year-end.",
-  },
-  {
-    icon: Users,
-    title: "Multi-Admin Access",
-    description:
-      "Invite your accountant or team members with role-based permissions. Full visibility, no spreadsheet chaos.",
-  },
-  {
-    icon: Shield,
-    title: "Bank-Grade Security",
-    description:
-      "SIN and bank details encrypted at rest (AES-256-GCM). PIPEDA-compliant hosting. Your data stays in Canada.",
-  },
-];
-
-const plans = [
-  {
-    name: "Solo",
-    price: "$15",
-    per: "base",
-    employeePrice: "$3",
-    description: "Perfect for sole proprietors and single-company operators.",
-    features: [
-      "1 company",
-      "Unlimited pay runs",
-      "Pay stubs with PDF download",
-      "PD7A remittance reports",
-      "Email pay stub delivery",
-    ],
-    cta: "Start free trial",
-    highlight: false,
-  },
-  {
-    name: "Growth",
-    price: "$25",
-    per: "base",
-    employeePrice: "$3",
-    description: "For growing teams that need year-end and multi-admin.",
-    features: [
-      "Everything in Solo",
-      "T4 reporting",
-      "Record of Employment (ROE)",
-      "Data exports (CSV, PDF)",
-      "Multi-admin access",
-      "Priority support",
-    ],
-    cta: "Start free trial",
-    highlight: true,
-  },
-  {
-    name: "Accountant",
-    price: "$59",
-    per: "base",
-    employeePrice: "$2",
-    description: "Multi-company workspace for bookkeepers and accountants.",
-    features: [
-      "Everything in Growth",
-      "Multi-company workspace",
-      "Bulk pay runs",
-      "Client-ready reporting",
-      "Dedicated support",
-    ],
-    cta: "Start free trial",
-    highlight: false,
-  },
-];
-
-const testimonials = [
-  {
-    quote:
-      "MapleRun saved us hours every pay period. The CRA compliance gives me peace of mind.",
-    author: "— Coming soon from early access users",
-    stars: 5,
-  },
-  {
-    quote:
-      "Finally, Canadian payroll software that doesn't feel like it was built in 1998.",
-    author: "— Coming soon from early access users",
-    stars: 5,
-  },
-  {
-    quote:
-      "Switched from spreadsheets + PDOC. Best decision we made this year.",
-    author: "— Coming soon from early access users",
-    stars: 5,
-  },
-];
+function fmtCAD(n: number): string {
+  return `$${n.toFixed(2)}`;
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col">
+      {/* Nav */}
+      <nav className="max-w-[1120px] mx-auto w-full px-8 flex items-center justify-between py-5">
+        <Link href="/" className="flex items-center gap-2.5 text-[19px] font-extrabold tracking-tight">
+          <span className="text-[23px]">🍁</span> MapleRun
+        </Link>
+        <div className="flex items-center gap-7">
+          <a href="#features" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Features</a>
+          <a href="#pricing" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Pricing</a>
+          <a href="#calculator" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Calculator</a>
+          <Link href="/sign-in" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Sign in</Link>
+          <Link href="/onboarding" className="inline-flex items-center gap-2 px-[18px] py-2.5 rounded-[10px] bg-[#B3261E] text-white text-sm font-semibold no-underline hover:bg-[#8F1D17] transition-colors">
+            Try it free →
+          </Link>
+        </div>
+      </nav>
+
       {/* Hero */}
-      <header className="border-b border-border/40 bg-gradient-to-b from-background to-maple/5">
-        <div className="max-w-3xl mx-auto px-4 py-16 sm:py-20 text-center space-y-6">
-          <div className="inline-flex items-center gap-2 mb-2">
-            <span className="text-5xl" role="img" aria-label="Maple leaf">
-              🍁
-            </span>
-            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight">
-              MapleRun
-            </h1>
-          </div>
-          <p className="text-xl sm:text-2xl text-muted-foreground max-w-xl mx-auto leading-relaxed font-light">
-            Canadian payroll that runs itself.
+      <section className="bg-gradient-to-b from-white to-[#FEF6F5] py-[70px] pb-20 text-center">
+        <div className="max-w-[1120px] mx-auto px-8">
+          <span className="inline-flex items-center gap-[7px] text-xs font-semibold text-[#B3261E] bg-[#FEF2F2] border border-[#FECACA] rounded-full px-3.5 py-1.5 mb-[22px]">
+            🍁 Built for Canadian small business
+          </span>
+          <h1 className="text-[52px] font-extrabold leading-tight tracking-[-0.03em] max-w-[760px] mx-auto">
+            Payroll that feels like a <em className="not-italic text-[#B3261E]">bank statement</em>, not a spreadsheet.
+          </h1>
+          <p className="text-lg text-[#57534E] mt-5 max-w-[560px] mx-auto leading-relaxed">
+            Run CPP, EI, and tax-accurate payroll in minutes. Pay stubs and T4s your employees and accountant will actually trust.
           </p>
-          <p className="text-base text-muted-foreground/70 max-w-lg mx-auto">
-            Accurate CRA-compliant deductions in minutes. No accounting degree required.
-          </p>
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <Link
-              href="/sign-in"
-              className={buttonVariants({ size: "lg", className: "gap-2" })}
-            >
-              Try it free <span aria-hidden="true">→</span>
+          <div className="flex gap-3 justify-center mt-[30px]">
+            <Link href="/onboarding" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline hover:bg-[#8F1D17]">
+              Try it free
             </Link>
-            <Link
-              href="#calculator"
-              className={buttonVariants({ variant: "outline", size: "lg" })}
-            >
+            <a href="#calculator" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] border border-[#D6D3D1] bg-white text-[#1C1917] font-semibold no-underline hover:bg-gray-50">
               Quick calculator
-            </Link>
+            </a>
           </div>
-          <p className="text-xs text-muted-foreground/60">
-            Free 30-day trial &middot; No credit card &middot; All provinces & territories
+          <p className="text-[13px] text-[#A8A29E] mt-[18px]">
+            No credit card · CRA-aligned rate tables · Cancel anytime
           </p>
         </div>
-      </header>
+      </section>
 
-      {/* Feature grid */}
-      <section className="py-20 px-4 bg-background">
-        <div className="max-w-5xl mx-auto space-y-10">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl font-bold tracking-tight">
-              Everything you need to run payroll
-            </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              Built from the ground up for Canadian small businesses. No US-centric workarounds, no clutter.
-            </p>
+      {/* Features */}
+      <section id="features" className="py-[72px]">
+        <div className="max-w-[1120px] mx-auto px-8">
+          <div className="text-center max-w-[560px] mx-auto mb-11">
+            <p className="text-xs font-bold text-[#B3261E] uppercase tracking-[0.08em]">Everything in one place</p>
+            <h2 className="text-[34px] font-extrabold tracking-[-0.02em] mt-2.5">Built for the way payroll actually works</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f) => (
-              <Card key={f.title} className="border-border/40">
-                <CardHeader>
-                  <f.icon className="h-8 w-8 text-maple mb-1" />
-                  <CardTitle className="text-base">{f.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-sm leading-relaxed">
-                    {f.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+          <div className="grid grid-cols-3 gap-5">
+            {[
+              { icon: "🧮", title: "Accurate calculations", desc: "CPP, CPP2, EI, federal and provincial tax — using the current year's CRA tables, every run." },
+              { icon: "📄", title: "Pay stubs & T4s", desc: "Bank-statement-quality documents your team can download, print, or receive by email." },
+              { icon: "🛡️", title: "Guided & safe", desc: "Preview every deduction and confirm before you finalize. Drafts are saved automatically." },
+              { icon: "⚡", title: "Minutes, not hours", desc: "A three-step wizard takes a full pay run from gross amounts to net deposit." },
+              { icon: "📈", title: "Always up to date", desc: "Rate tables update each tax year. Past runs keep their original year's rates." },
+              { icon: "👥", title: "For owners & accountants", desc: "Remittances, ROEs, and journals when you need them — share access with your bookkeeper." },
+            ].map((f) => (
+              <div key={f.title} className="border border-[#E7E5E4] rounded-[14px] p-6 bg-white">
+                <div className="w-11 h-11 rounded-[11px] bg-[#FEF2F2] flex items-center justify-center text-[21px] mb-4">{f.icon}</div>
+                <h3 className="text-base font-bold">{f.title}</h3>
+                <p className="text-[13.5px] text-[#78716C] mt-1.5 leading-relaxed">{f.desc}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Pricing */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto space-y-10">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl font-bold tracking-tight">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              All prices in CAD. 30-day free trial — no credit card required.
-            </p>
+      <section id="pricing" className="py-[72px] bg-[#FAFAF9]">
+        <div className="max-w-[1120px] mx-auto px-8">
+          <div className="text-center max-w-[560px] mx-auto mb-11">
+            <p className="text-xs font-bold text-[#B3261E] uppercase tracking-[0.08em]">Simple pricing</p>
+            <h2 className="text-[34px] font-extrabold tracking-[-0.02em] mt-2.5">One plan per team size</h2>
+            <p className="text-[15px] text-[#78716C] mt-2.5">Prices in CAD. Switch or cancel anytime.</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {plans.map((plan) => (
-              <Card
+          <div className="grid grid-cols-3 gap-[18px] items-start">
+            {[
+              { name: "Solo", price: "$15", emp: "1 employee", features: ["Unlimited pay runs", "Pay stubs & T4 slips", "CRA-aligned calculations"], hot: false },
+              { name: "Growth", price: "$25", emp: "Up to 10 employees", features: ["Everything in Solo", "Multiple pay groups", "PD7A remittance"], hot: true },
+              { name: "Accountant", price: "$59", emp: "Unlimited employees", features: ["Everything in Growth", "ROE generation", "Payroll journals · multi-company"], hot: false },
+            ].map((plan) => (
+              <div
                 key={plan.name}
-                className={`relative border-border/40 ${
-                  plan.highlight
-                    ? "ring-2 ring-maple shadow-lg"
-                    : ""
+                className={`relative flex flex-col border rounded-2xl p-7 bg-white ${
+                  plan.hot
+                    ? "border-2 border-[#B3261E] shadow-[0_8px_30px_rgba(179,38,30,0.12)]"
+                    : "border-[#E7E5E4]"
                 }`}
               >
-                {plan.highlight && (
-                  <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-maple text-white border-0">
-                    Most popular
-                  </Badge>
+                {plan.hot && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold tracking-[0.05em] bg-[#B3261E] text-white rounded-full px-3 py-1.5">
+                    MOST POPULAR
+                  </span>
                 )}
-                <CardHeader>
-                  <CardTitle className="text-xl">{plan.name}</CardTitle>
-                  <div className="flex items-baseline gap-1 pt-2">
-                    <span className="text-3xl font-bold">{plan.price}</span>
-                    <span className="text-sm text-muted-foreground">/mo {plan.per}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    + {plan.employeePrice}/employee/mo
-                  </p>
-                  <CardDescription className="pt-1">{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-2 text-sm">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/sign-in"
-                    className={buttonVariants({
-                      variant: plan.highlight ? "default" : "outline",
-                      className: "w-full",
-                    })}
-                  >
-                    {plan.cta}
-                  </Link>
-                </CardContent>
-              </Card>
+                <p className="text-[15px] font-bold">{plan.name}</p>
+                <p className="text-[40px] font-extrabold tracking-[-0.02em] mt-3">
+                  {plan.price}<span className="text-sm font-medium text-[#A8A29E]"> /mo</span>
+                </p>
+                <p className="text-[13px] text-[#78716C] mt-1">{plan.emp}</p>
+                <ul className="list-none my-5 flex-1 space-y-0">
+                  {plan.features.map((f) => (
+                    <li key={f} className="text-[13.5px] text-[#44403C] leading-[1.85] flex gap-2.5">
+                      <span className="text-[#16A34A] font-bold">✓</span> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/onboarding"
+                  className={`text-center py-2.5 px-[18px] rounded-[10px] text-sm font-semibold no-underline ${
+                    plan.hot
+                      ? "bg-[#B3261E] text-white"
+                      : "border border-[#D6D3D1] bg-white text-[#1C1917]"
+                  }`}
+                >
+                  Start free
+                </Link>
+              </div>
             ))}
           </div>
-          <p className="text-center text-xs text-muted-foreground">
-            Benchmarks: Wagepoint ≈ $22.50 + $4.50/emp &middot; QuickBooks Payroll ≈ $25–30 + $6/emp &middot; ADP custom
-          </p>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 px-4 bg-background">
-        <div className="max-w-5xl mx-auto space-y-10">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl font-bold tracking-tight">
-              Trusted by Canadian businesses
-            </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              Early access is open. Here's what users are saying.
-            </p>
+      <section className="py-[72px]">
+        <div className="max-w-[1120px] mx-auto px-8">
+          <div className="text-center max-w-[560px] mx-auto mb-11">
+            <p className="text-xs font-bold text-[#B3261E] uppercase tracking-[0.08em]">Trusted by Canadian teams</p>
+            <h2 className="text-[34px] font-extrabold tracking-[-0.02em] mt-2.5">Less dread, more done</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <Card key={i} className="border-border/40">
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: t.stars }).map((_, j) => (
-                      <Star
-                        key={j}
-                        className="h-4 w-4 fill-amber-400 text-amber-400"
-                      />
-                    ))}
+          <div className="grid grid-cols-3 gap-5">
+            {[
+              { q: '"I switched from a spreadsheet and a prayer. Now payroll takes ten minutes and I actually trust the numbers."', name: "Marcus Reid", role: "Owner, Northwind Carpentry", initial: "M" },
+              { q: '"The pay stubs look like they came from a bank. My employees stopped asking me to explain their deductions."', name: "Priya Sharma", role: "Founder, Lumen Studio", initial: "P" },
+              { q: '"As the bookkeeper for six clients, the journal export and ROE tools save me a full day each month."', name: "Jean‑Luc Caron", role: "CPA, Caron Accounting", initial: "J" },
+            ].map((t) => (
+              <div key={t.name} className="border border-[#E7E5E4] rounded-[14px] p-6 bg-[#FAFAF9]">
+                <p className="text-sm text-[#1C1917] leading-relaxed">{t.q}</p>
+                <div className="flex items-center gap-[11px] mt-[18px]">
+                  <div className="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-[#B3261E] to-[#E56A5C] flex items-center justify-center text-white font-bold text-sm">{t.initial}</div>
+                  <div>
+                    <p className="text-[13px] font-bold">{t.name}</p>
+                    <p className="text-xs text-[#A8A29E]">{t.role}</p>
                   </div>
-                  <blockquote className="text-sm text-muted-foreground leading-relaxed italic">
-                    "{t.quote}"
-                  </blockquote>
-                  <p className="text-xs text-muted-foreground/70">{t.author}</p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Calculator section */}
-      <section id="calculator" className="py-16 px-4 bg-muted/30">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold tracking-tight">
-              Try our free paycheque calculator
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              See your take-home pay in seconds. No sign-up needed.
-            </p>
+      {/* Calculator */}
+      <section id="calculator" className="py-[72px]">
+        <div className="max-w-[1120px] mx-auto px-8">
+          <div className="bg-[#1C1917] rounded-[20px] p-11 grid grid-cols-[1.1fr_1fr] gap-10 items-center text-white">
+            <div>
+              <h3 className="text-[28px] font-extrabold tracking-[-0.02em]">See a paycheque in real time</h3>
+              <p className="text-sm text-[#A8A29E] mt-2.5 leading-relaxed">
+                Enter a gross amount and province — MapleRun shows the exact CPP, EI, and tax split before you ever create an account.
+              </p>
+              <Link href="/onboarding" className="inline-flex mt-[22px] px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline">
+                Try the full product →
+              </Link>
+            </div>
+            <div className="bg-white rounded-[14px] p-[22px] text-[#1C1917]">
+              <div className="flex items-center justify-between border border-[#D6D3D1] rounded-[9px] px-3.5 py-[11px] mb-3.5 text-sm">
+                <span>Gross (biweekly)</span>
+                <b className="font-mono tabular-nums">$2,884.62</b>
+              </div>
+              <div className="flex items-center justify-between border border-[#D6D3D1] rounded-[9px] px-3.5 py-[11px] mb-3.5 text-sm">
+                <span>Province</span>
+                <b>Ontario</b>
+              </div>
+              {[
+                ["CPP", "$166.36"], ["EI", "$46.93"], ["Federal tax", "$286.41"], ["Provincial tax", "$112.78"],
+              ].map(([label, value]) => (
+                <div key={label} className="flex justify-between py-[9px] text-[13px] border-b border-[#F0EFED]">
+                  <span className="text-[#57534E]">{label}</span>
+                  <span className="font-mono tabular-nums">{value}</span>
+                </div>
+              ))}
+              <div className="flex justify-between pt-3 mt-1 border-t-2 border-[#E7E5E4] font-bold">
+                <span>Net pay</span>
+                <span className="font-mono tabular-nums text-[#B3261E] text-lg">$2,272.14</span>
+              </div>
+            </div>
           </div>
-          <PaychequeCalculator />
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 py-8 px-4">
-        <div className="max-w-3xl mx-auto text-center text-xs text-muted-foreground space-y-1">
-          <p>
-            MapleRun &copy; {new Date().getFullYear()} &mdash; Built for Canadian small businesses.
-          </p>
-          <p>
-            Tax data sourced from CRA T4127 (121st ed., Jan 2026). Estimates only &mdash; always verify with{" "}
-            <a
-              href="https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/payroll-deductions-online-calculator.html"
-              className="underline underline-offset-2 hover:text-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              CRA PDOC
-            </a>
-            .
+      <footer className="border-t border-[#E7E5E4] py-9 mt-6">
+        <div className="max-w-[1120px] mx-auto px-8">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2.5 text-[17px] font-extrabold tracking-tight">
+              <span className="text-[21px]">🍁</span> MapleRun
+            </div>
+            <div className="flex gap-[22px]">
+              <a href="#features" className="text-[13px] text-[#78716C] no-underline">Features</a>
+              <a href="#pricing" className="text-[13px] text-[#78716C] no-underline">Pricing</a>
+              <a href="#" className="text-[13px] text-[#78716C] no-underline">Security</a>
+              <Link href="/sign-in" className="text-[13px] text-[#78716C] no-underline">Sign in</Link>
+            </div>
+          </div>
+          <p className="text-xs text-[#A8A29E] mt-[18px] leading-relaxed max-w-[620px]">
+            © {new Date().getFullYear()} MapleRun. Calculations follow CRA payroll guidelines and are provided for convenience. MapleRun is not affiliated with the Canada Revenue Agency, and its outputs are not official CRA documents. Verify all remittances and filings against your CRA account.
           </p>
         </div>
       </footer>

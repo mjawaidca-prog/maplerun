@@ -1,0 +1,82 @@
+# Design Tokens
+
+## Color — Brand
+| Token | Light | Dark |
+|---|---|---|
+| maple | `#B3261E` | `#E56A5C` |
+| maple-deep (gradient end) | `#8F1D17` | `#3F1413` |
+| maple-foreground | `#FFFFFF` | `#1A0A08` |
+| sidebar-active bg | `#3F1413` | `#3F1413` |
+
+## Color — Neutrals (stone)
+| Role | Light | Dark |
+|---|---|---|
+| page bg | `#F5F5F4` | `#0C0A09` |
+| surface / card | `#FFFFFF` | `#1C1917` |
+| text primary | `#1C1917` | `#FAFAF9` |
+| text secondary | `#57534E` / `#44403C` | `#A8A29E` |
+| text muted | `#78716C` | `#78716C` |
+| text faint | `#A8A29E` | `#57534E` |
+| border | `#E7E5E4` | `#292524` |
+| divider | `#F0EFED` | `#292524` |
+| zebra row | `#FAFAF9` | `#1C1917` |
+| input border | `#D6D3D1` | `#44403C` |
+
+## Color — Semantic
+| Role | Text | BG | Border |
+|---|---|---|---|
+| success / earnings | `#15803D` | `#F0FDF4` | `#BBF7D0` |
+| warning | `#92400E` | `#FFFBEB` / `#FEF3C7` | `#FDE68A` |
+| info | `#1E40AF` | `#EFF6FF` | `#BFDBFE` |
+| danger tint (net band) | `#991B1B` | `#FEF2F2`→`#FEE2E2` | `#FECACA` |
+| status DRAFT | `#92400E` | `#FEF3C7` | — |
+| status FINALIZED / ACTIVE | `#15803D` | `#DCFCE7` | — |
+| status PAID | `#1D4ED8` | `#DBEAFE` | — |
+| role pill | `#57534E` | `#F0EFED` | — |
+| dark earnings green | `#4ADE80` | `#0F2A17` | `#166534` |
+
+## Typography
+- Fonts: **Inter** (UI), **Geist Mono** (all money/figures, `font-variant-numeric: tabular-nums`)
+- Money is ALWAYS Geist Mono, tabular-nums, right-aligned.
+
+| Element | Size / Weight | Tracking |
+|---|---|---|
+| Landing hero H1 | 52px / 800 (mobile 34px) | -0.03em |
+| Page H1 | 28px / 800 | -0.02em |
+| Section H2 | 34px / 800 | -0.02em |
+| Card title | 16px / 700 | — |
+| Body | 13–14px / 400–500 | — |
+| Label (uppercase) | 11–12px / 700 | 0.05–0.08em |
+| Net-pay hero figure | 38px / 700 Geist Mono | -0.02em |
+| Stat / summary figure | 20–30px / 700 Geist Mono | — |
+
+## Spacing scale
+`4 · 8 · 12 · 16 · 24 · 32 · 40 · 48` (px)
+- Card padding: 16–24px · Page padding: 36×48px · Grid gap: 12–24px
+- Ledger rows: 9px (11px for totals)
+
+## Radius
+| Element | Value |
+|---|---|
+| outer doc (pay stub / T4) | 16px |
+| card | 12–14px |
+| modal | 20px |
+| button | 8–11px |
+| input | 6–8px |
+| pill / badge | 20px |
+| number chip (T4) | 5px |
+
+## Shadow
+| Use | Value |
+|---|---|
+| card | `0 1px 3px rgba(0,0,0,.04)` |
+| elevated doc | `0 4px 24px rgba(0,0,0,.10)` |
+| maple glow (highlighted pricing) | `0 8px 30px rgba(179,38,30,.12)` |
+| modal | `0 24px 60px rgba(0,0,0,.4)` |
+| sticky bar (top edge) | `0 -2px 12px rgba(0,0,0,.06)` |
+
+## Gradients
+- Hero bg: `linear-gradient(180deg,#FFF,#FEF6F5)`
+- Maple header / banner: `linear-gradient(135deg,#B3261E,#8F1D17)`
+- Net-pay band (light): `linear-gradient(135deg,#FEF2F2,#FEE2E2)`
+- Avatar: `linear-gradient(135deg,#B3261E,#E56A5C)`

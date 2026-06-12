@@ -1,195 +1,57 @@
 /**
- * PDF pay stub document using @react-pdf/renderer.
- * Server-side renderable — no browser needed.
+ * PDF pay stub — premium bank-statement design via @react-pdf/renderer.
  */
 
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-} from "@react-pdf/renderer";
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
-  page: {
-    padding: 48,
-    fontFamily: "Helvetica",
-    fontSize: 11,
-    lineHeight: 1.5,
-    color: "#1a1a1a",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 16,
-  },
-  companyName: {
-    fontSize: 18,
-    fontFamily: "Helvetica-Bold",
-  },
-  stubLabel: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
-  },
-  employeeInfo: {
-    textAlign: "right",
-    fontSize: 10,
-  },
-  employeeName: {
-    fontFamily: "Helvetica-Bold",
-    fontSize: 11,
-  },
-  muted: {
-    color: "#666",
-  },
-  divider: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e5e5",
-    marginVertical: 12,
-  },
-  sectionTitle: {
-    fontFamily: "Helvetica-Bold",
-    fontSize: 10,
-    textTransform: "uppercase",
-    color: "#666",
-    letterSpacing: 1,
-    marginBottom: 8,
-  },
-  columns: {
-    flexDirection: "row",
-    gap: 48,
-  },
-  column: {
-    flex: 1,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 3,
-  },
-  rowLabel: {
-    color: "#555",
-  },
-  rowValue: {
-    fontFamily: "Helvetica",
-  },
-  rowBold: {
-    fontFamily: "Helvetica-Bold",
-  },
-  netPayBox: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: "#f0f7f4",
-    borderRadius: 6,
-    marginVertical: 8,
-  },
-  netPayLabel: {
-    fontSize: 14,
-    fontFamily: "Helvetica-Bold",
-  },
-  netPayValue: {
-    fontSize: 24,
-    fontFamily: "Helvetica-Bold",
-    color: "#166534",
-  },
-  ytdGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 4,
-  },
-  ytdItem: {
-    width: "30%",
-    paddingVertical: 4,
-  },
-  ytdLabel: {
-    fontSize: 8,
-    color: "#888",
-  },
-  ytdValue: {
-    fontFamily: "Helvetica-Bold",
-    fontSize: 10,
-  },
-  footer: {
-    position: "absolute",
-    bottom: 36,
-    left: 48,
-    right: 48,
-    textAlign: "center",
-    fontSize: 8,
-    color: "#999",
-  },
-  footerLine: {
-    marginBottom: 4,
-  },
+  page: { padding: 0, fontFamily: "Helvetica", fontSize: 10, lineHeight: 1.4, color: "#1C1917" },
+  header: { background: "linear-gradient(135deg, #B3261E, #8F1D17)", color: "#FFF", padding: "28 36", flexDirection: "row", justifyContent: "space-between" },
+  headerLogo: { flexDirection: "row", alignItems: "center", gap: 8 },
+  headerName: { fontSize: 20, fontFamily: "Helvetica-Bold", color: "#FFF" },
+  headerLabel: { fontSize: 12, fontFamily: "Helvetica-Bold", letterSpacing: 3, opacity: 0.85 },
+  headerValue: { fontSize: 11, opacity: 0.9, marginTop: 2 },
+  empRow: { padding: "22 36 16", borderBottom: "1 solid #E7E5E4", flexDirection: "row", justifyContent: "space-between" },
+  empLabel: { fontSize: 10, color: "#A8A29E", textTransform: "uppercase", letterSpacing: 1.5 },
+  empName: { fontSize: 16, fontFamily: "Helvetica-Bold", marginTop: 1 },
+  empSub: { fontSize: 11, color: "#78716C" },
+  grid: { padding: "20 36", flexDirection: "row", gap: 20 },
+  col: { flex: 1 },
+  sectionTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#78716C", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 8 },
+  earningsCard: { backgroundColor: "#F0FDF4", border: "1 solid #BBF7D0", borderRadius: 10, padding: 14, flexDirection: "row", justifyContent: "space-between" },
+  earningsLabel: { fontSize: 12, color: "#15803D" },
+  earningsValue: { fontSize: 18, fontFamily: "Helvetica-Bold", color: "#15803D" },
+  ledger: { border: "1 solid #E7E5E4", borderRadius: 10, overflow: "hidden" },
+  ledgerRow: { flexDirection: "row", justifyContent: "space-between", padding: "8 12", fontSize: 11 },
+  ledgerRowAlt: { backgroundColor: "#FAFAF9" },
+  ledgerTotal: { borderTop: "2 solid #E7E5E4", fontFamily: "Helvetica-Bold", padding: "10 12" },
+  ledgerLabel: { color: "#57534E" },
+  netBand: { margin: "4 36 20", background: "#FEF2F2", border: "1 solid #FECACA", borderRadius: 12, padding: "18 24", flexDirection: "row", justifyContent: "space-between" },
+  netLabel: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#991B1B", textTransform: "uppercase", letterSpacing: 1.5 },
+  netSub: { fontSize: 10, color: "#B91C1C", opacity: 0.8, marginTop: 1 },
+  netValue: { fontSize: 34, fontFamily: "Helvetica-Bold", color: "#B3261E" },
+  footer: { padding: "14 36 28", borderTop: "1 solid #E7E5E4", flexDirection: "row", justifyContent: "space-between" },
+  footerText: { fontSize: 9, color: "#A8A29E" },
 });
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
 
-function fmtCAD(n: number): string {
-  return `$${n.toFixed(2)}`;
-}
-
-function Row({
-  label,
-  value,
-  bold,
-}: {
-  label: string;
-  value: string;
-  bold?: boolean;
-}) {
-  const labelStyle = bold ? [styles.rowLabel, styles.rowBold] : styles.rowLabel;
-  const valueStyle = bold ? [styles.rowValue, styles.rowBold] : styles.rowValue;
+function LedgerRow({ label, value, alt, total }: { label: string; value: string; alt?: boolean; total?: boolean }) {
   return (
-    <View style={styles.row}>
-      <Text style={labelStyle}>{label}</Text>
-      <Text style={valueStyle}>{value}</Text>
+    <View style={total ? [styles.ledgerRow, styles.ledgerTotal] : alt ? [styles.ledgerRow, styles.ledgerRowAlt] : styles.ledgerRow}>
+      <Text style={[styles.ledgerLabel, total ? { color: "#1C1917" } as const : {} as const]}>{label}</Text>
+      <Text style={{ fontFamily: "Courier", color: total ? "#B3261E" : undefined }}>{value}</Text>
     </View>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Props
-// ---------------------------------------------------------------------------
-
 export interface PayStubPdfData {
-  companyName: string;
-  employeeName: string;
-  payDate: string;
-  payGroup: string;
-  gross: number;
-  cpp: number;
-  cpp2: number;
-  ei: number;
-  federalTax: number;
-  provincialTax: number;
-  totalDeductions: number;
-  netPay: number;
-  ytdPensionable: number;
-  ytdCpp: number;
-  ytdCpp2: number;
-  ytdInsurable: number;
-  ytdEi: number;
-  employerCpp: number;
-  employerCpp2: number;
-  employerEi: number;
-  employerTotal: number;
+  companyName: string; employeeName: string; payDate: string; payGroup: string;
+  gross: number; cpp: number; cpp2: number; ei: number; federalTax: number; provincialTax: number;
+  totalDeductions: number; netPay: number;
+  ytdPensionable: number; ytdCpp: number; ytdCpp2: number; ytdInsurable: number; ytdEi: number;
+  employerCpp: number; employerCpp2: number; employerEi: number; employerTotal: number;
 }
-
-// ---------------------------------------------------------------------------
-// Document
-// ---------------------------------------------------------------------------
 
 export function PayStubPdf({ data }: { data: PayStubPdfData }) {
   return (
@@ -198,130 +60,90 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.companyName}>
-              🍁 {data.companyName}
-            </Text>
-            <Text style={styles.stubLabel}>Pay Stub</Text>
+            <View style={styles.headerLogo}>
+              <Text>🍁</Text>
+              <Text style={styles.headerName}>{data.companyName}</Text>
+            </View>
+            <Text style={{ fontSize: 11, opacity: 0.85, marginTop: 4 }}>{data.companyName}</Text>
           </View>
-          <View style={styles.employeeInfo}>
-            <Text style={styles.employeeName}>{data.employeeName}</Text>
-            <Text style={styles.muted}>Pay date: {data.payDate}</Text>
-            <Text style={styles.muted}>{data.payGroup}</Text>
+          <View style={{ alignItems: "flex-end" }}>
+            <Text style={styles.headerLabel}>PAY STUB</Text>
+            <Text style={styles.headerValue}>Pay Date · {data.payDate}</Text>
+            <Text style={styles.headerValue}>{data.payGroup}</Text>
           </View>
         </View>
 
-        <View style={styles.divider} />
+        {/* Employee */}
+        <View style={styles.empRow}>
+          <View>
+            <Text style={styles.empLabel}>Employee</Text>
+            <Text style={styles.empName}>{data.employeeName}</Text>
+            <Text style={styles.empSub}>SIN •••-•••-•••</Text>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Text style={styles.empLabel}>Pay Period</Text>
+            <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 1 }}>{data.payDate}</Text>
+          </View>
+        </View>
 
-        {/* Earnings & Deductions */}
-        <View style={styles.columns}>
-          <View style={styles.column}>
+        {/* Grid */}
+        <View style={styles.grid}>
+          <View style={styles.col}>
             <Text style={styles.sectionTitle}>Earnings</Text>
-            <Row label="Gross pay" value={fmtCAD(data.gross)} bold />
+            <View style={styles.earningsCard}>
+              <Text style={styles.earningsLabel}>Gross Pay</Text>
+              <Text style={styles.earningsValue}>{fmtCAD(data.gross)}</Text>
+            </View>
           </View>
-
-          <View style={styles.column}>
+          <View style={styles.col}>
             <Text style={styles.sectionTitle}>Deductions</Text>
-            <Row label="CPP / QPP" value={fmtCAD(data.cpp)} />
-            <Row label="CPP2 enhancement" value={fmtCAD(data.cpp2)} />
-            <Row label="EI premiums" value={fmtCAD(data.ei)} />
-            <Row label="Federal income tax" value={fmtCAD(data.federalTax)} />
-            <Row
-              label="Provincial income tax"
-              value={fmtCAD(data.provincialTax)}
-            />
-            <View style={styles.divider} />
-            <Row
-              label="Total deductions"
-              value={fmtCAD(data.totalDeductions)}
-              bold
-            />
+            <View style={styles.ledger}>
+              <LedgerRow label="CPP" value={fmtCAD(data.cpp)} />
+              <LedgerRow label="CPP2" value={fmtCAD(data.cpp2)} alt />
+              <LedgerRow label="EI" value={fmtCAD(data.ei)} />
+              <LedgerRow label="Federal Tax" value={fmtCAD(data.federalTax)} alt />
+              <LedgerRow label="Provincial Tax" value={fmtCAD(data.provincialTax)} />
+              <LedgerRow label="Total Deductions" value={fmtCAD(data.totalDeductions)} total />
+            </View>
           </View>
         </View>
 
-        <View style={styles.divider} />
-
-        {/* Net pay */}
-        <View style={styles.netPayBox}>
-          <Text style={styles.netPayLabel}>Net Pay</Text>
-          <Text style={styles.netPayValue}>{fmtCAD(data.netPay)}</Text>
+        {/* Net Pay */}
+        <View style={styles.netBand}>
+          <View>
+            <Text style={styles.netLabel}>Net Pay</Text>
+            <Text style={styles.netSub}>Take-home amount</Text>
+          </View>
+          <Text style={styles.netValue}>{fmtCAD(data.netPay)}</Text>
         </View>
 
-        <View style={styles.divider} />
-
-        {/* YTD summary */}
-        <Text style={styles.sectionTitle}>Year-to-Date (2026)</Text>
-        <View style={styles.ytdGrid}>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>Pensionable earnings</Text>
-            <Text style={styles.ytdValue}>
-              {fmtCAD(data.ytdPensionable)}
-            </Text>
+        {/* Employer + YTD */}
+        <View style={styles.grid}>
+          <View style={styles.col}>
+            <Text style={styles.sectionTitle}>Employer Costs</Text>
+            <View style={styles.ledger}>
+              <LedgerRow label="CPP Match" value={fmtCAD(data.employerCpp)} />
+              <LedgerRow label="CPP2 Match" value={fmtCAD(data.employerCpp2)} alt />
+              <LedgerRow label="EI (1.4×)" value={fmtCAD(data.employerEi)} />
+              <LedgerRow label="Total" value={fmtCAD(data.employerTotal)} total />
+            </View>
           </View>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>CPP contributed</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdCpp)}</Text>
-          </View>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>CPP2 contributed</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdCpp2)}</Text>
-          </View>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>Insurable earnings</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdInsurable)}</Text>
-          </View>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>EI contributed</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdEi)}</Text>
-          </View>
-        </View>
-
-        {/* YTD summary */}
-        <Text style={styles.sectionTitle}>Year-to-Date (2026)</Text>
-        <View style={styles.ytdGrid}>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>Pensionable earnings</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdPensionable)}</Text>
-          </View>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>CPP contributed</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdCpp)}</Text>
-          </View>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>CPP2 contributed</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdCpp2)}</Text>
-          </View>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>Insurable earnings</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdInsurable)}</Text>
-          </View>
-          <View style={styles.ytdItem}>
-            <Text style={styles.ytdLabel}>EI contributed</Text>
-            <Text style={styles.ytdValue}>{fmtCAD(data.ytdEi)}</Text>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* Employer costs */}
-        <Text style={styles.sectionTitle}>Employer Costs</Text>
-        <View style={styles.columns}>
-          <View style={styles.column}>
-            <Row label="CPP (employer match)" value={fmtCAD(data.employerCpp)} />
-            <Row label="CPP2 (employer)" value={fmtCAD(data.employerCpp2)} />
-            <Row label="EI (1.4× employee)" value={fmtCAD(data.employerEi)} />
-            <View style={styles.divider} />
-            <Row label="Total employer cost" value={fmtCAD(data.employerTotal)} bold />
+          <View style={styles.col}>
+            <Text style={styles.sectionTitle}>Year to Date · 2026</Text>
+            <View style={styles.ledger}>
+              <LedgerRow label="Pensionable" value={fmtCAD(data.ytdPensionable)} />
+              <LedgerRow label="Insurable" value={fmtCAD(data.ytdInsurable)} alt />
+              <LedgerRow label="CPP" value={fmtCAD(data.ytdCpp)} />
+              <LedgerRow label="EI" value={fmtCAD(data.ytdEi)} alt />
+              <LedgerRow label="CPP2" value={fmtCAD(data.ytdCpp2)} />
+            </View>
           </View>
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerLine}>
-            Generated by MapleRun — Canadian payroll software.
-          </Text>
-          <Text style={styles.footerLine}>
-            This is not an official CRA document. Retain for your records.
-          </Text>
+          <Text style={styles.footerText}>Generated by 🍁 MapleRun</Text>
+          <Text style={styles.footerText}>For your records. Not an official CRA document.</Text>
         </View>
       </Page>
     </Document>

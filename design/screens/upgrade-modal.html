@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Upgrade</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;color:#1c1917;min-height:100vh;background:#f5f5f4}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.backdrop{position:fixed;inset:0;background:rgba(28,25,23,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:32px}
+.modal{width:100%;max-width:780px;background:#fff;border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.4);overflow:hidden}
+.m-head{padding:26px 30px 20px;border-bottom:1px solid #e7e5e4;display:flex;justify-content:space-between;align-items:flex-start}
+.m-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;background:#fef2f2;color:#B3261E;border-radius:20px;padding:5px 11px;margin-bottom:12px}
+.m-title{font-size:21px;font-weight:800;letter-spacing:-.02em}
+.m-sub{font-size:14px;color:#78716c;margin-top:6px}
+.m-close{width:32px;height:32px;border-radius:8px;border:1px solid #e7e5e4;background:#fff;color:#78716c;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1}
+.plans{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:24px 30px}
+.plan{border:1px solid #e7e5e4;border-radius:14px;padding:20px 18px;position:relative;display:flex;flex-direction:column}
+.plan.reco{border:2px solid #B3261E;box-shadow:0 8px 30px rgba(179,38,30,.12)}
+.reco-pill{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;letter-spacing:.05em;background:#B3261E;color:#fff;border-radius:20px;padding:4px 11px;white-space:nowrap}
+.plan-name{font-size:14px;font-weight:700}
+.plan-price{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:10px}
+.plan-price span{font-size:13px;font-weight:500;color:#a8a29e}
+.plan-tag{font-size:12px;color:#78716c;margin-top:4px}
+.plan-feats{list-style:none;margin:16px 0 18px;padding:0;flex:1}
+.plan-feats li{font-size:13px;color:#44403c;line-height:1.7;display:flex;gap:8px}
+.plan-feats li::before{content:"✓";color:#16a34a;font-weight:700}
+.plan-feats li.off{color:#c0bcb8}
+.plan-feats li.off::before{content:"–";color:#d6d3d1}
+.plan-btn{display:block;text-align:center;padding:11px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;font-family:inherit;border:1px solid #d6d3d1;background:#fff;color:#1c1917;cursor:pointer}
+.plan-btn.primary{background:#B3261E;color:#fff;border:none}
+.plan-btn.current{background:#f0efed;color:#a8a29e;border:none;cursor:default}
+.current-tag{font-size:10px;font-weight:700;letter-spacing:.05em;color:#57534e;background:#f0efed;border-radius:20px;padding:3px 9px;position:absolute;top:18px;right:16px}
+.m-foot{background:#fafaf9;border-top:1px solid #e7e5e4;padding:16px 30px;display:flex;justify-content:space-between;align-items:center}
+.m-foot-note{font-size:12px;color:#a8a29e}
+.btn-text{font-size:13px;font-weight:600;color:#78716c;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="backdrop">
+  <div class="modal">
+    <div class="m-head">
+      <div>
+        <span class="m-badge">🔒 Accountant feature</span>
+        <div class="m-title">Unlock ROE &amp; payroll journals</div>
+        <div class="m-sub">Record of Employment and journal exports are part of the Accountant plan.</div>
+      </div>
+      <a href="reports-dashboard.html" class="m-close">×</a>
+    </div>
+
+    <div class="plans">
+      <div class="plan">
+        <span class="current-tag">CURRENT</span>
+        <div class="plan-name">Solo</div>
+        <div class="plan-price">$15<span> /mo</span></div>
+        <div class="plan-tag">1 employee</div>
+        <ul class="plan-feats">
+          <li>Unlimited pay runs</li>
+          <li>Pay stubs &amp; T4 slips</li>
+          <li class="off">ROE generation</li>
+          <li class="off">Payroll journals</li>
+        </ul>
+        <button class="plan-btn current">Current plan</button>
+      </div>
+
+      <div class="plan reco">
+        <span class="reco-pill">RECOMMENDED</span>
+        <div class="plan-name">Growth</div>
+        <div class="plan-price">$25<span> /mo</span></div>
+        <div class="plan-tag">Up to 10 employees</div>
+        <ul class="plan-feats">
+          <li>Everything in Solo</li>
+          <li>Multiple pay groups</li>
+          <li>PD7A remittance</li>
+          <li class="off">Payroll journals</li>
+        </ul>
+        <button class="plan-btn primary">Upgrade to Growth</button>
+      </div>
+
+      <div class="plan">
+        <div class="plan-name">Accountant</div>
+        <div class="plan-price">$59<span> /mo</span></div>
+        <div class="plan-tag">Unlimited employees</div>
+        <ul class="plan-feats">
+          <li>Everything in Growth</li>
+          <li>ROE generation</li>
+          <li>Payroll journals</li>
+          <li>Multi-company</li>
+        </ul>
+        <button class="plan-btn primary">Upgrade to Accountant</button>
+      </div>
+    </div>
+
+    <div class="m-foot">
+      <div class="m-foot-note">Plans change instantly · cancel anytime · prices in CAD</div>
+      <a href="reports-dashboard.html" class="btn-text">Maybe later</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

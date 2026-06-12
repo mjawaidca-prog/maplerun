@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Record of Employment</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 24px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:2px;font-size:14px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+.main{flex:1;padding:36px 48px;max-width:920px}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:6px}
+.breadcrumb a{color:#a8a29e;text-decoration:none}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:12px}
+.page-sub{font-size:14px;color:#78716c;margin-top:5px}
+.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:700;letter-spacing:.03em;border-radius:20px;padding:4px 11px}
+.b-issued{background:#dcfce7;color:#15803d}
+.head-actions{display:flex;gap:10px}
+.btn-outline{padding:10px 16px;border-radius:10px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+.btn-primary{padding:10px 18px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+/* ROE form-like document */
+.doc{background:#fff;border:1px solid #e7e5e4;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.doc-band{background:#fafaf9;border-bottom:1px solid #e7e5e4;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.doc-band .t{font-size:14px;font-weight:700}
+.doc-band .s{font-size:12px;color:#a8a29e;margin-top:2px}
+.section{padding:20px 24px;border-bottom:1px solid #f0efed}
+.section:last-child{border-bottom:none}
+.sec-label{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.box-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#e7e5e4;border:1px solid #e7e5e4;border-radius:10px;overflow:hidden}
+.box{background:#fff;padding:13px 15px}
+.box .num{font-size:10px;font-weight:700;color:#B3261E;font-family:'Geist Mono',monospace}
+.box .lbl{font-size:11px;color:#a8a29e;margin-top:2px;line-height:1.3}
+.box .val{font-size:14px;font-weight:600;margin-top:7px}
+.box.wide{grid-column:span 2}
+/* pay periods table */
+.pp-head{display:grid;grid-template-columns:50px 1.4fr 1fr 1fr;gap:10px;padding:10px 0;border-bottom:1px solid #e7e5e4}
+.pp-h{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em}
+.pp-h.r{text-align:right}
+.pp-row{display:grid;grid-template-columns:50px 1.4fr 1fr 1fr;gap:10px;padding:9px 0;border-bottom:1px solid #f7f6f4;font-size:13px;align-items:center}
+.pp-row .pp-n{color:#a8a29e;font-family:'Geist Mono',monospace;font-size:12px}
+.pp-row .r{text-align:right}
+.pp-tot{display:grid;grid-template-columns:50px 1.4fr 1fr 1fr;gap:10px;padding:11px 0 0;font-size:13px;font-weight:700}
+.pp-tot .r{text-align:right}
+.note{display:flex;gap:9px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 15px;margin-top:16px;font-size:12.5px;color:#1e40af;line-height:1.5}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><span style="font-size:22px">🍁</span><span class="sidebar-logo-name">MapleRun</span></div>
+  <a class="nav-item" href="dashboard.html">🏠 Dashboard</a>
+  <a class="nav-item" href="employee-list.html">👥 Employees</a>
+  <a class="nav-item" href="payroll-history.html">💵 Payroll</a>
+  <a class="nav-item active" href="reports-dashboard.html">📊 Reports</a>
+  <a class="nav-item" href="company-settings.html">🏢 Company</a>
+  <div class="sidebar-foot">
+    <span class="plan-badge"><span class="dot"></span>Accountant plan</span>
+    <div class="user-row"><div class="user-avatar">M</div><div><div class="user-name">Marcus Reid</div><div class="user-sub">Sign out</div></div></div>
+  </div>
+</aside>
+<main class="main">
+  <div class="breadcrumb"><a href="reports-dashboard.html">Reports</a> › <a href="roe-list.html">ROEs</a> › Kevin Park</div>
+  <div class="page-head">
+    <div>
+      <div class="page-title">Record of Employment <span class="badge b-issued">ISSUED</span></div>
+      <div class="page-sub">Kevin Park · Serial W12 0048 221 · issued Jan 12, 2026</div>
+    </div>
+    <div class="head-actions">
+      <a class="btn-outline" href="roe-list.html">Back</a>
+      <a class="btn-primary" href="#">⤓ Export for Service Canada</a>
+    </div>
+  </div>
+
+  <div class="doc">
+    <div class="doc-band">
+      <div><div class="t">Northwind Carpentry Ltd.</div><div class="s">CRA BN 12345 6789 RP0001 · 44 Mill Street, Toronto ON M5A 3R2</div></div>
+      <div style="text-align:right"><div class="t mono">ROE · 2026</div><div class="s">Service Canada format</div></div>
+    </div>
+
+    <div class="section">
+      <div class="sec-label">Employee &amp; period</div>
+      <div class="box-grid">
+        <div class="box wide"><div class="num">Box 1–9</div><div class="lbl">Employee</div><div class="val">Kevin Park</div></div>
+        <div class="box"><div class="num">Box 10</div><div class="lbl">First day worked</div><div class="val mono">2023-05-15</div></div>
+        <div class="box"><div class="num">Box 11</div><div class="lbl">Last day for which paid</div><div class="val mono">2026-01-09</div></div>
+        <div class="box"><div class="num">Box 14</div><div class="lbl">Expected recall</div><div class="val">Unknown</div></div>
+        <div class="box"><div class="num">Box 16</div><div class="lbl">Reason for issuing</div><div class="val">A — Shortage of work</div></div>
+        <div class="box"><div class="num">Box 12</div><div class="lbl">Final pay period end</div><div class="val mono">2026-01-09</div></div>
+        <div class="box"><div class="num">Box 17</div><div class="lbl">Vacation pay</div><div class="val mono">$1,284.40</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-label">Box 15 — insurable earnings &amp; hours</div>
+      <div class="box-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="box"><div class="num">Box 15A</div><div class="lbl">Total insurable hours</div><div class="val mono">1,144.0</div></div>
+        <div class="box"><div class="num">Box 15B</div><div class="lbl">Total insurable earnings</div><div class="val mono">$38,920.00</div></div>
+        <div class="box"><div class="num">Box 15C</div><div class="lbl">Pay periods reported</div><div class="val mono">14</div></div>
+      </div>
+      <div class="pp-head"><div class="pp-h">PP</div><div class="pp-h">Period ending</div><div class="pp-h r">Insurable $</div><div class="pp-h r">Hours</div></div>
+      <div class="pp-row"><div class="pp-n">P1</div><div>Jan 9, 2026</div><div class="r mono">$2,780.00</div><div class="r mono">81.5</div></div>
+      <div class="pp-row"><div class="pp-n">P2</div><div>Dec 26, 2025</div><div class="r mono">$2,640.00</div><div class="r mono">80.0</div></div>
+      <div class="pp-row"><div class="pp-n">P3</div><div>Dec 12, 2025</div><div class="r mono">$2,890.00</div><div class="r mono">88.0</div></div>
+      <div class="pp-row"><div class="pp-n">P4</div><div>Nov 28, 2025</div><div class="r mono">$2,780.00</div><div class="r mono">81.5</div></div>
+      <div class="pp-row"><div class="pp-n">…</div><div style="color:#a8a29e">10 earlier periods</div><div class="r mono" style="color:#a8a29e">$27,830.00</div><div class="r mono" style="color:#a8a29e">813.0</div></div>
+      <div class="pp-tot"><div></div><div>Total reported</div><div class="r mono">$38,920.00</div><div class="r mono">1,144.0</div></div>
+      <div class="note">ℹ️ MapleRun fills Box 15 from the finalized pay-run ledger — insurable amounts and hours are pulled per period, never re-keyed. Verify against your CRA account before submitting.</div>
+    </div>
+  </div>
+</main>
+</body>
+</html>
