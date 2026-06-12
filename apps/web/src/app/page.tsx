@@ -1,8 +1,5 @@
+import PaychequeCalculator from "@/components/paycheque-calculator";
 import Link from "next/link";
-
-function fmtCAD(n: number): string {
-  return `$${n.toFixed(2)}`;
-}
 
 export default function Home() {
   return (
@@ -161,7 +158,7 @@ export default function Home() {
       {/* Calculator */}
       <section id="calculator" className="py-[72px]">
         <div className="max-w-[1120px] mx-auto px-8">
-          <div className="bg-[#1C1917] rounded-[20px] p-11 grid grid-cols-[1.1fr_1fr] gap-10 items-center text-white">
+          <div className="bg-[#1C1917] rounded-[20px] p-11 grid grid-cols-[1fr_1.2fr] gap-10 items-start text-white">
             <div>
               <h3 className="text-[28px] font-extrabold tracking-[-0.02em]">See a paycheque in real time</h3>
               <p className="text-sm text-[#A8A29E] mt-2.5 leading-relaxed">
@@ -171,27 +168,8 @@ export default function Home() {
                 Try the full product →
               </Link>
             </div>
-            <div className="bg-white rounded-[14px] p-[22px] text-[#1C1917]">
-              <div className="flex items-center justify-between border border-[#D6D3D1] rounded-[9px] px-3.5 py-[11px] mb-3.5 text-sm">
-                <span>Gross (biweekly)</span>
-                <b className="font-mono tabular-nums">$2,884.62</b>
-              </div>
-              <div className="flex items-center justify-between border border-[#D6D3D1] rounded-[9px] px-3.5 py-[11px] mb-3.5 text-sm">
-                <span>Province</span>
-                <b>Ontario</b>
-              </div>
-              {[
-                ["CPP", "$166.36"], ["EI", "$46.93"], ["Federal tax", "$286.41"], ["Provincial tax", "$112.78"],
-              ].map(([label, value]) => (
-                <div key={label} className="flex justify-between py-[9px] text-[13px] border-b border-[#F0EFED]">
-                  <span className="text-[#57534E]">{label}</span>
-                  <span className="font-mono tabular-nums">{value}</span>
-                </div>
-              ))}
-              <div className="flex justify-between pt-3 mt-1 border-t-2 border-[#E7E5E4] font-bold">
-                <span>Net pay</span>
-                <span className="font-mono tabular-nums text-[#B3261E] text-lg">$2,272.14</span>
-              </div>
+            <div className="bg-white rounded-[14px] text-[#1C1917]">
+              <PaychequeCalculator />
             </div>
           </div>
         </div>
