@@ -1,82 +1,52 @@
 /**
- * Pay run list — view past pay runs and start a new one.
+ * Payroll history — table with pay date, period, employees, gross, net, status.
  */
-
-import { getPayRuns } from "@/lib/actions/payroll";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { requireCompany } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { PlusCircle, ChevronRight } from "lucide-react";
 
-function fmtCAD(n: number): string {
-  return `$${n.toFixed(2)}`;
-}
+function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
 
-export default async function PayrollPage() {
-  const payRuns = await getPayRuns();
+export default async function PayrollHistoryPage() {
+  const { companyId } = await requireCompany();
+  const runs = await prisma.payRun.findMany({
+    where: { companyId },
+    include: { payGroup: { select: { name: true, frequency: true } } },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Payroll</h1>
-          <p className="text-muted-foreground mt-1">
-            {payRuns.length} pay run{payRuns.length !== 1 ? "s" : ""}
-          </p>
+          <h1 className="text-[28px] font-extrabold tracking-[-0.02em]">Payroll</h1>
+          <p className="text-sm text-muted-foreground mt-1">Pay run history</p>
         </div>
-        <Link href="/payroll/new">
-          <Button size="sm" className="gap-2">
-            <PlusCircle className="h-4 w-4" />
-            New pay run
-          </Button>
-        </Link>
+        <Link href="/payroll/new" className="inline-flex items-center gap-2 rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-white text-sm font-semibold px-5 py-2.5 no-underline transition-colors">＋ Run payroll</Link>
       </div>
 
-      {payRuns.length === 0 ? (
-        <Card className="border-border/60">
-          <CardContent className="py-12 text-center space-y-3">
-            <p className="text-lg font-semibold">No pay runs yet</p>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              Run your first payroll. The system will calculate CRA-compliant
-              deductions for all active employees.
-            </p>
-            <Link href="/payroll/new">
-              <Button className="gap-2">
-                <PlusCircle className="h-4 w-4" />
-                Run your first payroll
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+      {runs.length === 0 ? (
+        <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-12 text-center space-y-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="w-14 h-14 rounded-[14px] bg-[#FEF2F2] flex items-center justify-center text-[26px] mx-auto">💵</div>
+          <p className="text-base font-bold">No pay runs yet</p>
+          <p className="text-[13px] text-muted-foreground max-w-[230px] mx-auto">Run your first payroll to see history here.</p>
+          <Link href="/payroll/new" className="inline-flex rounded-[9px] bg-[#B3261E] hover:bg-[#8F1D17] text-white text-[13px] font-semibold px-[18px] py-2.5 no-underline">＋ Run payroll</Link>
+        </div>
       ) : (
-        <div className="space-y-2">
-          {payRuns.map((pr) => (
-            <Link
-              key={pr.id}
-              href={`/payroll/${pr.id}`}
-              className="flex items-center justify-between px-4 py-3 rounded-lg border border-border/60 hover:border-primary/20 hover:bg-accent/30 transition-colors"
-            >
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium">
-                    {pr.payGroup.name} &mdash; {pr.payDate}
-                  </p>
-                  <Badge
-                    variant={pr.status === "FINALIZED" ? "default" : "secondary"}
-                    className="text-xs"
-                  >
-                    {pr.status.toLowerCase()}
-                  </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {pr.itemCount} employee{pr.itemCount !== 1 ? "s" : ""} &middot;{" "}
-                  Gross {fmtCAD(pr.totalGross)} &middot;{" "}
-                  Net {fmtCAD(pr.totalNetPay)} &middot;{" "}
-                  Employer cost {fmtCAD(pr.totalEmployerCost)}
-                </p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="grid grid-cols-[1.3fr_1.4fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3 bg-[#FAFAF9] border-b border-[#E7E5E4]">
+            {["Pay date","Pay period","Employees","Gross","Net","Status",""].map(h=><div key={h} className={`text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em] ${["Gross","Net"].includes(h)?"text-right":""}`}>{h}</div>)}
+          </div>
+          {runs.map(run=>(
+            <Link key={run.id} href={`/payroll/${run.id}`} className="grid grid-cols-[1.3fr_1.4fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-[15px] border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
+              <div className="text-sm font-semibold">{run.payDate}</div>
+              <div className="text-[13px] text-[#57534E]">{run.payGroup.name} · {run.payGroup.frequency.toLowerCase()}</div>
+              <div className="text-[13px] font-mono tabular-nums">{run.itemCount}</div>
+              <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(run.totalGross)}</div>
+              <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(run.totalNetPay)}</div>
+              <div><span className={`inline-flex items-center text-[11px] font-bold tracking-[0.03em] rounded-full px-2.5 py-1 ${run.status==="FINALIZED"?"bg-[#DCFCE7] text-[#15803D]":"bg-[#FEF3C7] text-[#92400E]"}`}>{run.status}</span></div>
+              <div className="text-[#A8A29E] text-right">→</div>
             </Link>
           ))}
         </div>

@@ -1,122 +1,78 @@
 /**
- * T4 Report — annual summary of all employee T4 slips.
+ * T4 Summary — employee list + T4 Summary totals with dark total row.
  */
-
 import { getT4Report } from "@/lib/actions/t4";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StubPrintButton } from "@/components/stub-actions";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Download } from "lucide-react";
 
-function fmtCAD(n: number): string {
-  return `$${n.toFixed(2)}`;
-}
+function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
 
-export default async function T4ReportPage() {
+export default async function T4SummaryPage() {
   const year = 2026;
   let report: Awaited<ReturnType<typeof getT4Report>> | null = null;
-  let error: string | null = null;
-
-  try {
-    report = await getT4Report(year);
-  } catch (e) {
-    error = e instanceof Error ? e.message : "Failed to generate T4 report.";
-  }
+  try { report = await getT4Report(year); } catch {}
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/reports" className="text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
+      <div className="text-[13px] text-[#A8A29E]"><Link href="/reports" className="text-[#A8A29E] no-underline">Reports</Link> › T4 slips</div>
+      <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">T4 Slips — {year}</h1>
-          <p className="text-muted-foreground mt-1">
-            Employee T4 summaries. Use these to complete CRA T4 filings and distribute to employees.
-          </p>
+          <h1 className="text-[28px] font-extrabold tracking-[-0.02em]">T4 slips · {year}</h1>
+          <p className="text-sm text-muted-foreground mt-1">Statement of remuneration paid{report ? ` · ${report.companyName}` : ""}</p>
         </div>
+        <StubPrintButton />
       </div>
 
-      {error && (
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardContent className="py-4 text-sm text-destructive">{error}</CardContent>
-        </Card>
-      )}
-
-      {report && report.slips.length === 0 && (
-        <Card className="border-border/60">
-          <CardContent className="py-12 text-center space-y-3">
-            <p className="text-lg font-semibold">No T4 data for {year}</p>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              T4 slips are generated from finalized pay runs. Run payroll to see T4 data here.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {report && report.slips.length > 0 && (
+      {!report || report.slips.length === 0 ? (
+        <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-12 text-center space-y-3 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-base font-bold">No T4 data for {year}</p>
+          <p className="text-[13px] text-muted-foreground">T4 slips are generated from finalized pay runs.</p>
+        </div>
+      ) : (
         <>
-          {/* Employee list */}
-          <div className="space-y-2">
-            {report.slips.map((slip) => (
-              <Link key={slip.employeeId} href={`/reports/t4/${slip.employeeId}`}>
-                <Card className="border-border/60 hover:border-primary/30 hover:bg-accent/50 transition-colors cursor-pointer">
-                  <CardContent className="py-4 flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="font-semibold text-sm">{slip.employeeName}</p>
-                      <div className="flex gap-4 text-xs text-muted-foreground">
-                        <span>Income: {fmtCAD(slip.box14)}</span>
-                        <span>CPP: {fmtCAD(slip.box16)}</span>
-                        <span>EI: {fmtCAD(slip.box18)}</span>
-                        <span>Tax: {fmtCAD(slip.box22)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="text-xs">
-                        {slip.payPeriods} periods
-                      </Badge>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </CardContent>
-                </Card>
+          <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[0.06em]">Employees</p>
+          <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3 bg-[#FAFAF9] border-b border-[#E7E5E4]">
+              {["Employee","Income (14)","CPP (16)","EI (18)","Tax (22)",""].map(h=><div key={h} className={`text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em] ${h!=="Employee"?"text-right":""}`}>{h}</div>)}
+            </div>
+            {report.slips.map(slip=>(
+              <Link key={slip.employeeId} href={`/reports/t4/${slip.employeeId}`} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3.5 border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
+                <div className="flex items-center gap-3">
+                  <div className="w-[34px] h-[34px] rounded-full bg-gradient-to-br from-[#B3261E] to-[#E56A5C] flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0">{slip.employeeName[0]}</div>
+                  <div><p className="text-sm font-semibold">{slip.employeeName}</p><p className="text-xs text-[#A8A29E]">{slip.payPeriods} pay periods</p></div>
+                </div>
+                <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box14)}</div>
+                <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box16)}</div>
+                <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box18)}</div>
+                <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box22)}</div>
+                <div className="text-right text-[#B3261E] text-[13px] font-semibold">Slip →</div>
               </Link>
             ))}
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3.5 bg-[#1C1917] text-white font-bold text-[13px] items-center">
+              <div>T4 Summary · all employees</div>
+              <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box14)}</div>
+              <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box16)}</div>
+              <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box18)}</div>
+              <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box22)}</div>
+              <div></div>
+            </div>
           </div>
 
-          {/* Totals */}
-          <Card className="border-primary/20 bg-primary/5">
-            <CardHeader>
-              <CardTitle className="text-lg">{report.companyName} — T4 Summary {year}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-                <Stat label="Employees" value={String(report.totals.employees)} />
-                <Stat label="Employment income (Box 14)" value={fmtCAD(report.totals.box14)} />
-                <Stat label="CPP (Box 16)" value={fmtCAD(report.totals.box16)} />
-                <Stat label="CPP2 (Box 16A)" value={fmtCAD(report.totals.box16A)} />
-                <Stat label="EI premiums (Box 18)" value={fmtCAD(report.totals.box18)} />
-                <Stat label="Tax deducted (Box 22)" value={fmtCAD(report.totals.box22)} />
-                <Stat label="EI insurable (Box 24)" value={fmtCAD(report.totals.box24)} />
-                <Stat label="Pensionable (Box 26)" value={fmtCAD(report.totals.box26)} />
-              </div>
-            </CardContent>
-          </Card>
+          <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[0.06em]">T4 Summary totals</p>
+          <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <div className="px-5 py-4 border-b border-[#F0EFED] flex justify-between items-center"><span className="text-[15px] font-bold">{report.companyName}</span></div>
+            <div className="grid grid-cols-4 gap-3.5 p-5">
+              {[["Box 14 · Employment income",report.totals.box14],["Box 16 · CPP",report.totals.box16],["Box 16A · CPP2",report.totals.box16A],["Box 18 · EI",report.totals.box18],["Box 22 · Income tax",report.totals.box22],["Box 24 · EI earnings",report.totals.box24],["Box 26 · Pensionable",report.totals.box26],["Employer remitted","—"]].map(([label,value])=>(
+                <div key={label as string}><p className="text-[11px] text-[#A8A29E] uppercase tracking-[0.05em]"><b className="text-[#1C1917] font-bold">{label as string}</b></p><p className="text-base font-bold mt-1.5 font-mono tabular-nums">{fmtCAD(value as number)}</p></div>
+              ))}
+            </div>
+          </div>
 
-          <p className="text-xs text-muted-foreground text-center">
-            Use these figures to complete CRA T4 Summary (RC-5688) and distribute T4 slips.
-            Verify against your CRA payroll account before filing.
-          </p>
+          <div className="flex gap-2.5 bg-[#EFF6FF] border border-[#BFDBFE] rounded-[10px] px-4 py-3.5 text-[13px] text-[#1E40AF] leading-relaxed">
+            ℹ️ Distribute slips to employees and file the T4 Summary with the CRA by <b className="text-[#1E40AF]">Feb 28, 2027</b>. Figures use 2026 rate tables; past years keep their own rates.
+          </div>
         </>
       )}
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="font-semibold tabular-nums">{value}</p>
     </div>
   );
 }
