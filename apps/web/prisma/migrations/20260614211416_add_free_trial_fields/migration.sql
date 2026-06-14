@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Company" ADD COLUMN     "freePayRunsUsed" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "maxFreePayRuns" INTEGER NOT NULL DEFAULT 2;

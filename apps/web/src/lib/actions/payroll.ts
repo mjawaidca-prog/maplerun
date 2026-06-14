@@ -198,6 +198,14 @@ export async function finalizePayRun(formData: FormData) {
     throw new Error("Invalid pay group.");
   }
 
+  // Free trial gate
+  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { freePayRunsUsed: true, maxFreePayRuns: true } });
+  const used = company?.freePayRunsUsed ?? 0;
+  const max = company?.maxFreePayRuns ?? 2;
+  if (used >= max) {
+    throw new Error(`Free trial limit reached (${used}/${max} pay runs). Upgrade your plan to continue.`);
+  }
+
   // Create the pay run
   const payRun = await prisma.payRun.create({
     data: {
@@ -277,6 +285,12 @@ export async function finalizePayRun(formData: FormData) {
       },
     });
   }
+
+  // Increment free trial counter
+  await prisma.company.update({
+    where: { id: companyId },
+    data: { freePayRunsUsed: { increment: 1 } },
+  });
 
   revalidatePath("/app/payroll");
   redirect("/app/payroll");
