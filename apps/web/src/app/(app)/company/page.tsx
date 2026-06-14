@@ -4,6 +4,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { PLAN_META, type Plan } from "@/lib/plan";
+import { UpgradePlanButton } from "@/components/upgrade-plan-button";
 import Link from "next/link";
 
 type SearchParams = Promise<{ tab?: string }>;
@@ -155,12 +156,7 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
                   {isCurrent ? (
                     <span className="inline-flex rounded-[9px] bg-[#F0EFED] text-[#A8A29E] text-xs font-semibold px-4 py-2">Current plan</span>
                   ) : (
-                    <Link
-                      href={`/company?tab=billing`}
-                      className="inline-flex rounded-[9px] bg-[#B3261E] hover:bg-[#8F1D17] text-white text-xs font-semibold px-4 py-2 no-underline transition-colors"
-                    >
-                      Upgrade to {p}
-                    </Link>
+                    <UpgradePlanButton planId={p} label={`Upgrade to ${p}`} />
                   )}
                 </div>
               );
