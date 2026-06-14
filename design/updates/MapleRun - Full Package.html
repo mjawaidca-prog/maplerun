@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Full Package</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Inter,system-ui,sans-serif;background:#1c1917;display:flex;flex-direction:column;overflow:hidden}
+.topbar{flex-shrink:0;background:#1c1917;color:#fff;display:flex;align-items:center;gap:18px;padding:0 22px;height:58px;border-bottom:1px solid #292524}
+.brand{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:800;letter-spacing:-.01em;padding-right:18px;border-right:1px solid #292524;white-space:nowrap}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font-family:inherit;font-size:13.5px;font-weight:600;color:#a8a29e;background:none;border:none;padding:9px 15px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tab:hover{background:#292524;color:#e7e5e4}
+.tab.on{background:#3f1413;color:#fff}
+.tab .ti{font-size:15px}
+.hint{margin-left:auto;font-size:12px;color:#57534e;white-space:nowrap}
+.stage{flex:1;position:relative;background:#e7e5e4}
+.frame{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;background:#e7e5e4}
+.frame.on{display:block}
+@media(max-width:720px){.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><span>🍁</span> MapleRun</div>
+  <div class="tabs">
+<button class="tab on" data-id="gap"><span class="ti">📊</span>Gap Analysis</button>
+<button class="tab" data-id="dash"><span class="ti">🏠</span>Adaptive Dashboard</button>
+<button class="tab" data-id="wiz"><span class="ti">💵</span>Adaptive Wizard</button>
+<button class="tab" data-id="report"><span class="ti">📄</span>Payroll Summary</button>
+<button class="tab" data-id="handoff"><span class="ti">🛠</span>Coder Handoff</button>
+  </div>
+  <div class="hint">Plan-tiering package · 5 documents</div>
+</div>
+<div class="stage">
+<iframe class="frame on" id="f-gap" srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;>
+<title>MapleRun — Gap Analysis &amp; Proposed Flow</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Geist+Mono:wght@400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;color:#1c1917;font-size:14px;line-height:1.55}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* ── Header ── */
+.header{background:#1c1917;color:#fff;padding:36px 56px 32px}
+.hdr-logo{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:800;letter-spacing:-.02em;margin-bottom:18px}
+.hdr-title{font-size:32px;font-weight:800;letter-spacing:-.025em}
+.hdr-sub{font-size:15px;color:#a8a29e;margin-top:8px;max-width:740px;line-height:1.6}
+.hdr-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.chip{font-size:11px;font-weight:700;letter-spacing:.05em;background:#292524;color:#e7e5e4;border-radius:20px;padding:5px 13px;display:inline-flex;align-items:center;gap:6px}
+.chip.red{background:#3f1413;color:#fca5a5}
+.chip.green{background:#14301a;color:#86efac}
+.chip.amber{background:#3b2800;color:#fcd34d}
+
+/* ── Body wrap ── */
+.wrap{max-width:1160px;margin:0 auto;padding:48px 56px 100px}
+
+/* ── Section headers ── */
+.section{margin-bottom:52px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#B3261E;margin-bottom:6px}
+.sec-title{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.sec-sub{font-size:14px;color:#78716c;margin-bottom:22px;max-width:760px}
+
+/* ── Score cards ── */
+.score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.score-card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#a8a29e}
+.sc-value{font-size:36px;font-weight:800;letter-spacing:-.03em;margin-top:8px}
+.sc-sub{font-size:12px;color:#78716c;margin-top:4px;line-height:1.4}
+.sc-value.good{color:#16a34a}
+.sc-value.warn{color:#d97706}
+.sc-value.bad{color:#B3261E}
+
+/* ── Gap table ── */
+.gtable{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.gtable thead tr{background:#1c1917;color:#fff}
+.gtable th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.gtable td{padding:11px 16px;border-bottom:1px solid #f0efed;vertical-align:top;font-size:13px}
+.gtable tr:last-child td{border-bottom:none}
+.gtable tr:hover td{background:#fafaf9}
+.gtable td:first-child{font-weight:600;white-space:nowrap}
+
+/* Status pills */
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.04em;border-radius:12px;padding:2px 8px;white-space:nowrap;gap:4px}
+.pill.exists{background:#dcfce7;color:#15803d}
+.pill.partial{background:#fef3c7;color:#92400e}
+.pill.missing{background:#fef2f2;color:#991b1b}
+.pill.new{background:#f0f9ff;color:#0369a1}
+.pill.gated{background:#f5f3ff;color:#6d28d9}
+.pill.critical{background:#fff1f2;border:1px solid #fda4af;color:#9f1239}
+
+/* ── Two-col layout ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start}
+
+/* ── Info card ── */
+.icard{background:#fff;border:1px solid #e7e5e4;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.icard-head{padding:16px 20px;border-bottom:1px solid #f0efed;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.icard-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.icard-body{padding:16px 20px}
+.icard-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #f7f6f4;font-size:13px}
+.icard-row:last-child{border-bottom:none}
+.icard-row .icon{width:22px;flex-shrink:0;text-align:center;font-size:14px}
+.icard-row .text{flex:1;color:#1c1917}
+.icard-row .text .sub{font-size:12px;color:#78716c;margin-top:1px}
+
+/* ── Alert boxes ── */
+.alert{display:flex;gap:13px;border-radius:12px;padding:14px 18px;margin-bottom:16px}
+.alert.red{background:#fef2f2;border:1px solid #fecaca}
+.alert.amber{background:#fffbeb;border:1px solid #fde68a}
+.alert.blue{background:#eff6ff;border:1px solid #bfdbfe}
+.alert.green{background:#f0fdf4;border:1px solid #bbf7d0}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-title{font-size:13px;font-weight:700}
+.alert-text{font-size:13px;color:#57534e;margin-top:3px;line-height:1.5}
+.alert.red .alert-title{color:#991b1b}
+.alert.amber .alert-title{color:#92400e}
+.alert.blue .alert-title{color:#1e40af}
+.alert.green .alert-title{color:#15803d}
+
+/* ── Nav comparison ── */
+.nav-compare{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.nav-col{background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.nav-head{background:#1c1917;color:#fff;padding:14px 18px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:9px}
+.nav-item-row{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid #f0efed;font-size:13px;font-weight:500}
+.nav-item-row:last-child{border-bottom:none}
+.nav-item-row.added{background:#f0fdf4}
+.nav-item-row.changed{background:#fefce8}
+.nav-item-row.missing{background:#fef2f2;color:#991b1b}
+.nav-item-row .nav-label{display:flex;align-items:center;gap:9px;color:#1c1917}
+.nav-item-row.missing .nav-label{color:#991b1b}
+
+/* ── Report grid ── */
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rcard{background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.rcard.missing{border-left:3px solid #B3261E}
+.rcard.partial{border-left:3px solid #f59e0b}
+.rcard.exists{border-left:3px solid #16a34a}
+.rcard-title{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rcard-desc{font-size:12px;color:#78716c;line-height:1.45}
+.rcard-note{font-size:11px;color:#B3261E;margin-top:6px;font-weight:600}
+
+/* ── Screen wireframe hints ── */
+.wireframe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.wf{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.wf-label{background:#1c1917;color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.wf-body{padding:14px}
+.wf-field{background:#f5f5f4;border-radius:6px;height:10px;margin-bottom:8px}
+.wf-field.w60{width:60%}
+.wf-field.w80{width:80%}
+.wf-field.w40{width:40%}
+.wf-field.w100{width:100%}
+.wf-field.h20{height:20px}
+.wf-field.h30{height:30px}
+.wf-field.h40{height:40px}
+.wf-field.accent{background:#fef2f2}
+.wf-row{display:flex;gap:6px;margin-bottom:8px}
+.wf-band{background:#1c1917;border-radius:6px;height:10px;width:100%;margin-bottom:8px;opacity:.12}
+.wf-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+.wf-stat{background:#f5f5f4;border-radius:6px;height:36px}
+
+/* ── Priority table ── */
+.ptable{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ptable thead tr{background:#f5f5f4}
+.ptable th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#78716c;border-bottom:1px solid #e7e5e4}
+.ptable td{padding:11px 16px;border-bottom:1px solid #f0efed;vertical-align:top;font-size:13px}
+.ptable tr:last-child td{border-bottom:none}
+.ptable tr:hover td{background:#fafaf9}
+.p1{color:#fff;background:#B3261E;border-radius:20px;font-size:10px;font-weight:800;padding:2px 8px;letter-spacing:.04em}
+.p2{color:#fff;background:#d97706;border-radius:20px;font-size:10px;font-weight:800;padding:2px 8px;letter-spacing:.04em}
+.p3{color:#57534e;background:#e7e5e4;border-radius:20px;font-size:10px;font-weight:800;padding:2px 8px;letter-spacing:.04em}
+
+/* ── Flow diagram ── */
+.flow-wrap{display:flex;flex-direction:column;gap:0}
+.flow-row{display:flex;gap:8px;align-items:stretch}
+.flow-step{flex:1;background:#fff;border:1px solid #e7e5e4;border-radius:10px;padding:12px 14px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.flow-step.new{border-color:#16a34a;background:#f0fdf4}
+.flow-step.enhanced{border-color:#f59e0b;background:#fefce8}
+.flow-step.existing{border-color:#d6d3d1}
+.flow-arrow{display:flex;align-items:center;color:#a8a29e;font-size:16px;padding:0 2px;flex-shrink:0}
+.flow-step .sub{font-size:11px;color:#78716c;font-weight:400;margin-top:2px}
+.flow-step .badge-new{font-size:10px;font-weight:700;background:#dcfce7;color:#15803d;border-radius:10px;padding:1px 6px;margin-left:6px}
+.flow-step .badge-enh{font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;border-radius:10px;padding:1px 6px;margin-left:6px}
+
+/* ── Sidebar mock ── */
+.sidebar-mock{background:#1c1917;border-radius:12px;padding:16px;width:200px;flex-shrink:0}
+.sm-logo{color:#fff;font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.sm-item{font-size:12.5px;color:#a8a29e;padding:7px 10px;border-radius:7px;margin-bottom:1px;font-weight:500}
+.sm-item.active{background:#3f1413;color:#fff}
+.sm-item.new{background:#0f2b1a;color:#86efac}
+.sm-item.section{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#44403c;padding:10px 10px 4px;margin-top:6px}
+.sm-item.changed{background:#1f1a00;color:#fcd34d}
+
+/* ── Employee profile comparison ── */
+.profile-compare{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.pcomp{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden}
+.pcomp-head{background:#f5f5f4;padding:11px 16px;font-size:12px;font-weight:700;color:#57534e;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid #e7e5e4}
+.pcomp-field{padding:9px 16px;border-bottom:1px solid #f7f6f4;font-size:13px;display:flex;align-items:center;justify-content:space-between}
+.pcomp-field:last-child{border-bottom:none}
+.pcomp-field.missing{background:#fff8f8}
+.pcomp-field.missing .fname{color:#B3261E}
+.fname{font-weight:500;color:#1c1917}
+
+/* ── Dashboard compare ── */
+.dash-compare{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.dcomp{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden}
+.dcomp-head{padding:13px 18px;font-size:13px;font-weight:700;border-bottom:1px solid #f0efed;display:flex;align-items:center;justify-content:space-between}
+.dcomp-item{padding:10px 18px;border-bottom:1px solid #f7f6f4;font-size:13px;display:flex;align-items:flex-start;gap:9px}
+.dcomp-item:last-child{border-bottom:none}
+.dcomp-item.missing{background:#fff8f8}
+.dcomp-item .dicon{font-size:14px;flex-shrink:0;margin-top:1px}
+.dcomp-item .dtxt{flex:1}
+.dcomp-item .dtxt .dsub{font-size:11px;color:#a8a29e;margin-top:1px}
+
+/* ── Divider ── */
+.divider{height:1px;background:#e7e5e4;margin:40px 0}
+
+/* ── Summary callout ── */
+.callout{background:#1c1917;color:#fff;border-radius:16px;padding:28px 32px;margin-bottom:32px}
+.callout-title{font-size:18px;font-weight:800;margin-bottom:10px;letter-spacing:-.02em}
+.callout-text{font-size:14px;color:#a8a29e;line-height:1.65;max-width:840px}
+.callout-text b{color:#e7e5e4}
+
+/* ── Plan tiering ── */
+.tier-intro{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:26px}
+.tier-card{border-radius:14px;padding:20px 22px;border:1px solid #e7e5e4;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.tier-card.solo{border-top:4px solid #0891b2}
+.tier-card.growth{border-top:4px solid #16a34a}
+.tier-card.acct{border-top:4px solid #B3261E}
+.tier-name{font-size:17px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.tier-for{font-size:12px;color:#78716c;margin-top:3px}
+.tier-price{font-size:13px;font-weight:600;color:#1c1917;margin-top:12px}
+.tier-price b{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.tier-tag{font-size:10px;font-weight:700;letter-spacing:.04em;border-radius:10px;padding:2px 8px;text-transform:uppercase}
+.tier-tag.solo{background:#cffafe;color:#0e7490}
+.tier-tag.growth{background:#dcfce7;color:#15803d}
+.tier-tag.acct{background:#fee2e2;color:#991b1b}
+.tier-tag.current{background:#1c1917;color:#fff}
+
+.matrix{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.matrix thead th{padding:13px 16px;font-size:12px;font-weight:700;text-align:center;border-bottom:1px solid #e7e5e4}
+.matrix thead th:first-child{text-align:left;background:#1c1917;color:#fff}
+.matrix thead th.solo{background:#ecfeff;color:#0e7490}
+.matrix thead th.growth{background:#f0fdf4;color:#15803d}
+.matrix thead th.acct{background:#fef2f2;color:#991b1b}
+.matrix tbody td{padding:10px 16px;font-size:13px;text-align:center;border-bottom:1px solid #f0efed}
+.matrix tbody td:first-child{text-align:left;font-weight:600;background:#fafaf9}
+.matrix tbody tr:last-child td{border-bottom:none}
+.matrix .grp td{background:#1c1917;color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:7px 16px}
+.yes{color:#16a34a;font-weight:700}
+.no{color:#d6d3d1;font-weight:700}
+.partial-c{color:#d97706;font-weight:600;font-size:12px}
+.matrix .cell-note{font-size:11.5px;color:#57534e;font-weight:500}
+
+/* Adaptive sidebar trio */
+.side-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.side-wrap{display:flex;flex-direction:column;gap:10px}
+.side-cap{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;justify-content:center}
+.side-cap .dot{width:9px;height:9px;border-radius:50%}
+.side-cap .dot.solo{background:#0891b2}
+.side-cap .dot.growth{background:#16a34a}
+.side-cap .dot.acct{background:#B3261E}
+
+/* Progressive disclosure mock */
+.pd-mock{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.pd-head{padding:11px 16px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:space-between}
+.pd-head.solo{background:#0891b2}
+.pd-head.growth{background:#16a34a}
+.pd-head.acct{background:#B3261E}
+.pd-body{padding:14px 16px}
+.pd-field{display:flex;align-items:center;gap:9px;font-size:12.5px;padding:7px 0;border-bottom:1px solid #f7f6f4;color:#1c1917}
+.pd-field:last-child{border-bottom:none}
+.pd-field .lab{flex:1;font-weight:500}
+.pd-field .box{background:#f5f5f4;border-radius:5px;height:20px;width:74px}
+.pd-field.add{color:#16a34a;font-weight:600}
+.pd-field.expander{color:#78716c;font-style:italic;font-weight:500}
+.pd-field.locked{color:#a8a29e}
+.pd-field.locked .lab{display:flex;align-items:center;gap:6px}
+
+/* ── Print ── */
+@media print{body{background:#fff}.wrap{padding:24px 32px}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ HEADER -->
+<div class=&quot;header&quot;>
+  <div class=&quot;hdr-logo&quot;><span>🍁</span> MapleRun</div>
+  <div class=&quot;hdr-title&quot;>Gap Analysis &amp;amp; Proposed Flow</div>
+  <div class=&quot;hdr-sub&quot;>A screen-by-screen comparison of MapleRun's current design against Canadian payroll software standards set by ADP, QuickBooks, and Sage — with a full redesign proposal for navigation, reports, dashboards, and missing screens.</div>
+  <div class=&quot;hdr-chips&quot;>
+    <span class=&quot;chip&quot;>June 2026</span>
+    <span class=&quot;chip&quot;>Based on 27 existing screens</span>
+    <span class=&quot;chip red&quot;>13 must-have reports missing</span>
+    <span class=&quot;chip amber&quot;>8 screens need enhancement</span>
+    <span class=&quot;chip green&quot;>9 screens well-executed</span>
+  </div>
+</div>
+
+<div class=&quot;wrap&quot;>
+
+  <!-- ═══════════════════════════════════════════════════ SCORES -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Overall Readiness</div>
+    <div class=&quot;sec-title&quot;>Where MapleRun stands today</div>
+    <div class=&quot;sec-sub&quot;>Scored against the ADP / QuickBooks / Sage Canadian payroll benchmark. Each area is rated on coverage of must-have features.</div>
+
+    <div class=&quot;score-row&quot;>
+      <div class=&quot;score-card&quot;>
+        <div class=&quot;sc-label&quot;>Core payroll flow</div>
+        <div class=&quot;sc-value good&quot;>82%</div>
+        <div class=&quot;sc-sub&quot;>Wizard, deductions, pay stubs, and history are solid. Missing comparison panel and payroll reversal utility.</div>
+      </div>
+      <div class=&quot;score-card&quot;>
+        <div class=&quot;sc-label&quot;>Reports centre</div>
+        <div class=&quot;sc-value bad&quot;>24%</div>
+        <div class=&quot;sc-sub&quot;>Only T4, PD7A, ROE, and payroll journal. Missing 13 of 17 must-have Canadian payroll reports.</div>
+      </div>
+      <div class=&quot;score-card&quot;>
+        <div class=&quot;sc-label&quot;>Employee profile</div>
+        <div class=&quot;sc-value warn&quot;>61%</div>
+        <div class=&quot;sc-sub&quot;>Missing vacation/leave balance, QPP/QPIP settings, benefits, department/project, and change history.</div>
+      </div>
+      <div class=&quot;score-card&quot;>
+        <div class=&quot;sc-label&quot;>Dashboard</div>
+        <div class=&quot;sc-value warn&quot;>42%</div>
+        <div class=&quot;sc-sub&quot;>Missing remittance due, EFT status, missing-data alerts, year-end readiness, and compliance version.</div>
+      </div>
+    </div>
+    <div class=&quot;score-row&quot;>
+      <div class=&quot;score-card&quot;>
+        <div class=&quot;sc-label&quot;>Navigation structure</div>
+        <div class=&quot;sc-value bad&quot;>33%</div>
+        <div class=&quot;sc-sub&quot;>5-item sidebar versus recommended 13-section menu. Missing Remittances, EFT, Year-End, GL, Audit Log.</div>
+      </div>
+      <div class=&quot;score-card&quot;>
+        <div class=&quot;sc-label&quot;>Year-end compliance</div>
+        <div class=&quot;sc-value warn&quot;>45%</div>
+        <div class=&quot;sc-sub&quot;>T4 and ROE are designed. Missing T4A, RL-1, PIER, Year-End Centre wizard, XML export status.</div>
+      </div>
+      <div class=&quot;score-card&quot;>
+        <div class=&quot;sc-label&quot;>Utilities &amp;amp; wizards</div>
+        <div class=&quot;sc-value bad&quot;>18%</div>
+        <div class=&quot;sc-sub&quot;>Only run-payroll wizard. Missing gross-up calculator, termination wizard, ROE wizard, YTD import, GL mapping.</div>
+      </div>
+      <div class=&quot;score-card&quot;>
+        <div class=&quot;sc-label&quot;>Québec readiness</div>
+        <div class=&quot;sc-value bad&quot;>5%</div>
+        <div class=&quot;sc-sub&quot;>QPP/QPIP fields missing from employee profile. RL-1, RL-1 Summary, and Revenu Québec remittance not designed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ CALLOUT -->
+  <div class=&quot;callout&quot;>
+    <div class=&quot;callout-title&quot;>The biggest gap: Reports</div>
+    <div class=&quot;callout-text&quot;>QuickBooks, ADP, and Sage all lead with a <b>rich, categorized report centre</b> — it's the #1 feature accountants and payroll administrators judge software by before trusting it with a client. MapleRun's current reports page has 4 cards (2 locked). The recommended MVP has <b>17 must-have reports across 10 categories</b>. This single section represents the most impactful design work to do next.</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ PLAN TIERING -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Plan Strategy</div>
+    <div class=&quot;sec-title&quot;>One product, three plans — not everything for everyone</div>
+    <div class=&quot;sec-sub&quot;>A solo business with 3 employees should never see the complexity a 40-person company needs. The fix is two design tools working together: <b>plan tiering</b> decides <i>what features exist</i> for a user, and <b>progressive disclosure</b> decides <i>how much is shown</i> even within a plan. MapleRun already does a little of this (ROE locked to the Accountant plan) — this section makes it systematic.</div>
+
+    <div class=&quot;tier-intro&quot;>
+      <div class=&quot;tier-card solo&quot;>
+        <div class=&quot;tier-name&quot;>🌱 Solo</div>
+        <div class=&quot;tier-for&quot;>Owner-operators &amp;amp; micro-business · 1–5 employees</div>
+        <div class=&quot;tier-price&quot;>Run a simple pay run: <b>enter period, salary → calculated deductions.</b> Nothing more. This is essentially what MapleRun does <i>today</i>, kept deliberately minimal.</div>
+        <div style=&quot;margin-top:12px&quot;><span class=&quot;tier-tag solo&quot;>Keep it simple</span></div>
+      </div>
+      <div class=&quot;tier-card growth&quot;>
+        <div class=&quot;tier-name&quot;>📈 Growth</div>
+        <div class=&quot;tier-for&quot;>Growing SMBs with hourly staff · 5–25 employees</div>
+        <div class=&quot;tier-price&quot;>Adds timesheets, more pay types, remittance tracking, EFT files, and the core reports. The everyday operating plan for a real small business.</div>
+        <div style=&quot;margin-top:12px&quot;><span class=&quot;tier-tag growth&quot;>Most customers</span> <span class=&quot;tier-tag current&quot;>≈ current</span></div>
+      </div>
+      <div class=&quot;tier-card acct&quot;>
+        <div class=&quot;tier-name&quot;>🧮 Accountant</div>
+        <div class=&quot;tier-for&quot;>Bookkeepers, controllers, multi-client firms · 25+</div>
+        <div class=&quot;tier-price&quot;>Full report suite, GL export, year-end XML, audit trail, Québec, and multi-client. Everything in the gap analysis above lives here.</div>
+        <div style=&quot;margin-top:12px&quot;><span class=&quot;tier-tag acct&quot;>Full power</span> <span class=&quot;tier-tag current&quot;>≈ current</span></div>
+      </div>
+    </div>
+
+    <div class=&quot;alert blue&quot; style=&quot;margin-bottom:24px&quot;>
+      <div class=&quot;alert-icon&quot;>🔑</div>
+      <div>
+        <div class=&quot;alert-title&quot;>The core principle</div>
+        <div class=&quot;alert-text&quot;><b>The simple case stays simple; the complex case is reachable but never imposed.</b> The worst outcome would be building one giant UI and greying out half of it — that burdens Solo users with complexity they'll never use. At lower plans the UI should genuinely <i>be smaller</i>, not just locked. Locked features that <i>do</i> appear should always offer a one-click upgrade path, exactly like the current ROE gating.</div>
+      </div>
+    </div>
+
+    <!-- Feature matrix -->
+    <table class=&quot;matrix&quot;>
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th class=&quot;solo&quot;>🌱 Solo</th>
+          <th class=&quot;growth&quot;>📈 Growth</th>
+          <th class=&quot;acct&quot;>🧮 Accountant</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class=&quot;grp&quot;><td colspan=&quot;4&quot;>Running payroll</td></tr>
+        <tr><td>Employee count</td><td class=&quot;cell-note&quot;>1–5</td><td class=&quot;cell-note&quot;>Up to 25</td><td class=&quot;cell-note&quot;>Unlimited / multi-client</td></tr>
+        <tr><td>Pay run wizard</td><td class=&quot;cell-note&quot;>Simple — salary &amp;amp; auto deductions</td><td class=&quot;cell-note&quot;>+ Bonus · stat · vacation pay types</td><td class=&quot;cell-note&quot;>+ Retro · commission · gross-up</td></tr>
+        <tr><td>Timesheets / hourly</td><td class=&quot;no&quot;>—</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td></tr>
+        <tr><td>Compare vs. prior run</td><td class=&quot;no&quot;>—</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td></tr>
+        <tr><td>Payroll reversal / void</td><td class=&quot;no&quot;>—</td><td class=&quot;partial-c&quot;>basic</td><td class=&quot;yes&quot;>✓</td></tr>
+
+        <tr class=&quot;grp&quot;><td colspan=&quot;4&quot;>Paying people &amp;amp; CRA</td></tr>
+        <tr><td>Pay stubs (PDF)</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td></tr>
+        <tr><td>Direct deposit / EFT file</td><td class=&quot;cell-note&quot;>Bank info only</td><td class=&quot;yes&quot;>✓ file gen</td><td class=&quot;yes&quot;>✓ + batch status</td></tr>
+        <tr><td>Remittance tracking (PD7A)</td><td class=&quot;partial-c&quot;>amount shown</td><td class=&quot;yes&quot;>✓ full section</td><td class=&quot;yes&quot;>✓ + history</td></tr>
+
+        <tr class=&quot;grp&quot;><td colspan=&quot;4&quot;>Reports</td></tr>
+        <tr><td>Payroll Summary</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td></tr>
+        <tr><td>Remittance · EFT · Exception · Audit</td><td class=&quot;no&quot;>—</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td></tr>
+        <tr><td>GL · Department · Custom builder</td><td class=&quot;no&quot;>—</td><td class=&quot;no&quot;>—</td><td class=&quot;yes&quot;>✓</td></tr>
+
+        <tr class=&quot;grp&quot;><td colspan=&quot;4&quot;>Compliance &amp;amp; year-end</td></tr>
+        <tr><td>T4 slips &amp;amp; summary</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td></tr>
+        <tr><td>ROE</td><td class=&quot;no&quot;>—</td><td class=&quot;yes&quot;>✓</td><td class=&quot;yes&quot;>✓</td></tr>
+        <tr><td>Year-End Centre + XML · PIER</td><td class=&quot;no&quot;>—</td><td class=&quot;partial-c&quot;>T4 flow</td><td class=&quot;yes&quot;>✓ full</td></tr>
+        <tr><td>Québec — RL-1 · QPP · QPIP</td><td class=&quot;no&quot;>—</td><td class=&quot;no&quot;>—</td><td class=&quot;yes&quot;>✓</td></tr>
+        <tr><td>T4A (contractors)</td><td class=&quot;no&quot;>—</td><td class=&quot;no&quot;>—</td><td class=&quot;yes&quot;>✓</td></tr>
+
+        <tr class=&quot;grp&quot;><td colspan=&quot;4&quot;>Interface</td></tr>
+        <tr><td>Sidebar sections shown</td><td class=&quot;cell-note&quot;>5 items</td><td class=&quot;cell-note&quot;>10 items</td><td class=&quot;cell-note&quot;>13 items</td></tr>
+        <tr><td>Dashboard widgets</td><td class=&quot;cell-note&quot;>Essentials</td><td class=&quot;cell-note&quot;>+ Remittance · EFT</td><td class=&quot;cell-note&quot;>+ Compliance · year-end panel</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ ADAPTIVE SIDEBAR -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Adaptive Interface</div>
+    <div class=&quot;sec-title&quot;>The sidebar grows with the plan</div>
+    <div class=&quot;sec-sub&quot;>Same app, same code — the navigation simply renders fewer sections at lower tiers. A Solo user sees the calm 5-item menu they have today; locked sections appear only as a single subtle upsell, never a wall of greyed-out items.</div>
+
+    <div class=&quot;side-trio&quot;>
+      <div class=&quot;side-wrap&quot;>
+        <div class=&quot;side-cap&quot;><span class=&quot;dot solo&quot;></span> Solo — 5 items</div>
+        <div class=&quot;sidebar-mock&quot; style=&quot;width:100%&quot;>
+          <div class=&quot;sm-logo&quot;><span>🍁</span> MapleRun</div>
+          <div class=&quot;sm-item active&quot;>🏠 Dashboard</div>
+          <div class=&quot;sm-item&quot;>👥 Employees</div>
+          <div class=&quot;sm-item&quot;>💵 Run Payroll</div>
+          <div class=&quot;sm-item&quot;>📄 Pay Statements</div>
+          <div class=&quot;sm-item&quot;>⚙️ Settings</div>
+          <div class=&quot;sm-item section&quot;>Grow</div>
+          <div class=&quot;sm-item&quot; style=&quot;color:#0e7490;background:#06303a&quot;>↑ Add timesheets &amp;amp; reports</div>
+        </div>
+      </div>
+
+      <div class=&quot;side-wrap&quot;>
+        <div class=&quot;side-cap&quot;><span class=&quot;dot growth&quot;></span> Growth — 10 items</div>
+        <div class=&quot;sidebar-mock&quot; style=&quot;width:100%&quot;>
+          <div class=&quot;sm-logo&quot;><span>🍁</span> MapleRun</div>
+          <div class=&quot;sm-item active&quot;>🏠 Dashboard</div>
+          <div class=&quot;sm-item&quot;>👥 Employees</div>
+          <div class=&quot;sm-item new&quot;>⏱ Timesheets</div>
+          <div class=&quot;sm-item&quot;>💵 Run Payroll</div>
+          <div class=&quot;sm-item&quot;>📄 Pay Statements</div>
+          <div class=&quot;sm-item section&quot;>Compliance</div>
+          <div class=&quot;sm-item new&quot;>🧾 Remittances</div>
+          <div class=&quot;sm-item new&quot;>🏦 Direct Deposit</div>
+          <div class=&quot;sm-item&quot;>📋 ROE</div>
+          <div class=&quot;sm-item section&quot;>Analytics</div>
+          <div class=&quot;sm-item changed&quot;>📊 Reports</div>
+          <div class=&quot;sm-item&quot;>⚙️ Settings</div>
+        </div>
+      </div>
+
+      <div class=&quot;side-wrap&quot;>
+        <div class=&quot;side-cap&quot;><span class=&quot;dot acct&quot;></span> Accountant — 13 items</div>
+        <div class=&quot;sidebar-mock&quot; style=&quot;width:100%&quot;>
+          <div class=&quot;sm-logo&quot;><span>🍁</span> MapleRun</div>
+          <div class=&quot;sm-item active&quot;>🏠 Dashboard</div>
+          <div class=&quot;sm-item&quot;>👥 Employees</div>
+          <div class=&quot;sm-item&quot;>⏱ Timesheets</div>
+          <div class=&quot;sm-item&quot;>💵 Run Payroll</div>
+          <div class=&quot;sm-item&quot;>📄 Pay Statements</div>
+          <div class=&quot;sm-item section&quot;>Compliance</div>
+          <div class=&quot;sm-item&quot;>🧾 Remittances</div>
+          <div class=&quot;sm-item&quot;>🏦 Direct Deposit</div>
+          <div class=&quot;sm-item&quot;>📋 ROE</div>
+          <div class=&quot;sm-item new&quot;>🗓 Year-End</div>
+          <div class=&quot;sm-item section&quot;>Analytics &amp;amp; System</div>
+          <div class=&quot;sm-item&quot;>📊 Reports</div>
+          <div class=&quot;sm-item new&quot;>📒 GL / Accounting</div>
+          <div class=&quot;sm-item&quot;>⚙️ Settings</div>
+          <div class=&quot;sm-item new&quot;>🔍 Audit Log</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progressive disclosure: the wizard -->
+    <div style=&quot;font-size:14px;font-weight:700;margin:30px 0 6px;display:flex;align-items:center;gap:9px&quot;>💵 Same wizard, three depths — progressive disclosure in Step 1</div>
+    <div class=&quot;sec-sub&quot;>The Run Payroll screen is <i>one</i> screen at the same URL. It simply renders more inputs as the plan grows. Solo users get the clean flow they have now; complexity is opt-in via an expander, never forced.</div>
+    <div class=&quot;three-col&quot;>
+      <div class=&quot;pd-mock&quot;>
+        <div class=&quot;pd-head solo&quot;><span>🌱 Solo — Step 1</span><span>Simple</span></div>
+        <div class=&quot;pd-body&quot;>
+          <div class=&quot;pd-field&quot;><span class=&quot;lab&quot;>Pay period</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field&quot;><span class=&quot;lab&quot;>Salary / gross</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field locked&quot;><span class=&quot;lab&quot;>CPP · EI · tax</span><span style=&quot;font-size:11px&quot;>auto ✓</span></div>
+          <div class=&quot;pd-field&quot; style=&quot;color:#0891b2;font-weight:600&quot;><span class=&quot;lab&quot;>→ Continue to preview</span></div>
+        </div>
+      </div>
+      <div class=&quot;pd-mock&quot;>
+        <div class=&quot;pd-head growth&quot;><span>📈 Growth — Step 1</span><span>+ Pay types</span></div>
+        <div class=&quot;pd-body&quot;>
+          <div class=&quot;pd-field&quot;><span class=&quot;lab&quot;>Pay period</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field&quot;><span class=&quot;lab&quot;>Salary / gross</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field add&quot;><span class=&quot;lab&quot;>+ Hours from timesheet</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field expander&quot;><span class=&quot;lab&quot;>▸ Add bonus · stat · vacation</span></div>
+          <div class=&quot;pd-field locked&quot;><span class=&quot;lab&quot;>CPP · EI · tax</span><span style=&quot;font-size:11px&quot;>auto ✓</span></div>
+        </div>
+      </div>
+      <div class=&quot;pd-mock&quot;>
+        <div class=&quot;pd-head acct&quot;><span>🧮 Accountant — Step 1</span><span>Full</span></div>
+        <div class=&quot;pd-body&quot;>
+          <div class=&quot;pd-field&quot;><span class=&quot;lab&quot;>Pay period</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field&quot;><span class=&quot;lab&quot;>Salary / gross</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field add&quot;><span class=&quot;lab&quot;>+ Bonus · stat · vacation</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field add&quot;><span class=&quot;lab&quot;>+ Retro · commission</span><span class=&quot;box&quot;></span></div>
+          <div class=&quot;pd-field add&quot;><span class=&quot;lab&quot;>+ Gross-up · GL code</span><span class=&quot;box&quot;></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class=&quot;alert green&quot; style=&quot;margin-top:22px&quot;>
+      <div class=&quot;alert-icon&quot;>✅</div>
+      <div>
+        <div class=&quot;alert-title&quot;>Why this works for engineering too</div>
+        <div class=&quot;alert-text&quot;>One codebase, one set of screens — gated by a <span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>plan</span> flag on the company record. No separate &quot;lite&quot; app to maintain. Each screen reads the plan and conditionally renders sections, and every locked capability uses the same upgrade-prompt component. This is exactly how QuickBooks Online (Simple Start → Essentials → Plus) and ADP (Run → Workforce Now) scale a single product across very different customer sizes.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ NAV COMPARISON -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Navigation</div>
+    <div class=&quot;sec-title&quot;>Sidebar: current vs. full (Accountant plan)</div>
+    <div class=&quot;sec-sub&quot;>The current 5-item sidebar collapses too much for professional users. At the <b>Accountant tier</b>, each major function gets its own section — bookkeepers, controllers, and HR expect this at-a-glance structure. (Solo and Growth render a subset, as shown above.)</div>
+
+    <div class=&quot;nav-compare&quot;>
+      <!-- Current -->
+      <div class=&quot;nav-col&quot;>
+        <div class=&quot;nav-head&quot;>
+          <span>📍</span> Current navigation (5 items)
+        </div>
+        <div class=&quot;nav-item-row&quot;><span class=&quot;nav-label&quot;>🏠 Dashboard</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;nav-item-row&quot;><span class=&quot;nav-label&quot;>👥 Employees</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;nav-item-row&quot;><span class=&quot;nav-label&quot;>💵 Payroll</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;nav-item-row&quot;><span class=&quot;nav-label&quot;>📊 Reports</span><span class=&quot;pill partial&quot;>partial</span></div>
+        <div class=&quot;nav-item-row&quot;><span class=&quot;nav-label&quot;>🏢 Company</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;nav-item-row missing&quot;><span class=&quot;nav-label&quot;>— Timesheets / Hours</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;nav-item-row missing&quot;><span class=&quot;nav-label&quot;>— Taxes &amp;amp; Remittances</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;nav-item-row missing&quot;><span class=&quot;nav-label&quot;>— Direct Deposit / EFT</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;nav-item-row missing&quot;><span class=&quot;nav-label&quot;>— Year-End Forms</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;nav-item-row missing&quot;><span class=&quot;nav-label&quot;>— Accounting / GL</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;nav-item-row missing&quot;><span class=&quot;nav-label&quot;>— Audit Log</span><span class=&quot;pill missing&quot;>missing</span></div>
+      </div>
+
+      <!-- Proposed -->
+      <div class=&quot;nav-col&quot;>
+        <div class=&quot;nav-head&quot; style=&quot;background:#1a2e1a;&quot;>
+          <span>✦</span> Proposed navigation (13 items)
+        </div>
+        <div class=&quot;nav-item-row&quot; style=&quot;background:#fafaf9&quot;><span class=&quot;nav-label&quot;>🏠 Dashboard</span><span class=&quot;pill exists&quot;>enhanced</span></div>
+        <div class=&quot;nav-item-row&quot; style=&quot;background:#fafaf9&quot;><span class=&quot;nav-label&quot;>👥 Employees</span><span class=&quot;pill exists&quot;>enhanced</span></div>
+        <div class=&quot;nav-item-row&quot; style=&quot;background:#fafaf9&quot;><span class=&quot;nav-label&quot;>⏱ Timesheets</span><span class=&quot;pill new&quot;>surface to nav</span></div>
+        <div class=&quot;nav-item-row&quot; style=&quot;background:#fafaf9&quot;><span class=&quot;nav-label&quot;>💵 Run Payroll</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;nav-item-row&quot; style=&quot;background:#fafaf9&quot;><span class=&quot;nav-label&quot;>📄 Pay Statements</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;nav-item-row added&quot;><span class=&quot;nav-label&quot;>🧾 Taxes &amp;amp; Remittances</span><span class=&quot;pill new&quot;>new section</span></div>
+        <div class=&quot;nav-item-row added&quot;><span class=&quot;nav-label&quot;>🏦 Direct Deposit / EFT</span><span class=&quot;pill new&quot;>new section</span></div>
+        <div class=&quot;nav-item-row&quot; style=&quot;background:#fafaf9&quot;><span class=&quot;nav-label&quot;>📋 ROE</span><span class=&quot;pill exists&quot;>promote to nav</span></div>
+        <div class=&quot;nav-item-row added&quot;><span class=&quot;nav-label&quot;>🗓 Year-End Forms</span><span class=&quot;pill new&quot;>new section</span></div>
+        <div class=&quot;nav-item-row&quot; style=&quot;background:#fafaf9&quot;><span class=&quot;nav-label&quot;>📊 Reports</span><span class=&quot;pill partial&quot;>overhauled</span></div>
+        <div class=&quot;nav-item-row added&quot;><span class=&quot;nav-label&quot;>📒 Accounting / GL</span><span class=&quot;pill new&quot;>new section</span></div>
+        <div class=&quot;nav-item-row&quot; style=&quot;background:#fafaf9&quot;><span class=&quot;nav-label&quot;>⚙️ Settings</span><span class=&quot;pill exists&quot;>rename Company</span></div>
+        <div class=&quot;nav-item-row added&quot;><span class=&quot;nav-label&quot;>🔍 Audit Log</span><span class=&quot;pill new&quot;>new section</span></div>
+      </div>
+    </div>
+
+    <!-- Sidebar mock visual -->
+    <div style=&quot;margin-top:24px;display:flex;gap:24px;align-items:flex-start&quot;>
+      <div class=&quot;sidebar-mock&quot;>
+        <div class=&quot;sm-logo&quot;><span>🍁</span> MapleRun</div>
+        <div class=&quot;sm-item active&quot;>🏠 Dashboard</div>
+        <div class=&quot;sm-item&quot;>👥 Employees</div>
+        <div class=&quot;sm-item&quot;>⏱ Timesheets</div>
+        <div class=&quot;sm-item&quot;>💵 Run Payroll</div>
+        <div class=&quot;sm-item&quot;>📄 Pay Statements</div>
+        <div class=&quot;sm-item section&quot;>Compliance</div>
+        <div class=&quot;sm-item new&quot;>🧾 Remittances</div>
+        <div class=&quot;sm-item new&quot;>🏦 Direct Deposit</div>
+        <div class=&quot;sm-item&quot;>📋 ROE</div>
+        <div class=&quot;sm-item new&quot;>🗓 Year-End</div>
+        <div class=&quot;sm-item section&quot;>Analytics</div>
+        <div class=&quot;sm-item changed&quot;>📊 Reports</div>
+        <div class=&quot;sm-item new&quot;>📒 GL / Accounting</div>
+        <div class=&quot;sm-item section&quot;>System</div>
+        <div class=&quot;sm-item&quot;>⚙️ Settings</div>
+        <div class=&quot;sm-item new&quot;>🔍 Audit Log</div>
+      </div>
+      <div style=&quot;flex:1&quot;>
+        <div class=&quot;alert amber&quot; style=&quot;margin-bottom:12px&quot;>
+          <div class=&quot;alert-icon&quot;>💡</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Group compliance items together</div>
+            <div class=&quot;alert-text&quot;>Remittances, Direct Deposit, ROE, and Year-End Forms should be visually grouped under a &quot;Compliance&quot; heading in the sidebar — this is the pattern ADP Workforce Now uses and it helps accountants instantly see where their regulatory deliverables live.</div>
+          </div>
+        </div>
+        <div class=&quot;alert blue&quot;>
+          <div class=&quot;alert-icon&quot;>💡</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Timesheets should be a first-class nav item</div>
+            <div class=&quot;alert-text&quot;>Currently Timesheets is only reachable from inside the payroll wizard. For employers with hourly staff (the majority of small business in Canada), timesheets are a daily task — it needs direct sidebar access.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ DASHBOARD GAPS -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Dashboard</div>
+    <div class=&quot;sec-title&quot;>Dashboard: what's missing</div>
+    <div class=&quot;sec-sub&quot;>ADP and QuickBooks dashboards are built around urgency signals — what's due, what's missing, what needs action today. MapleRun's dashboard is calm and informational but lacks the compliance urgency layer.</div>
+
+    <div class=&quot;dash-compare&quot;>
+      <div class=&quot;dcomp&quot;>
+        <div class=&quot;dcomp-head&quot;>Current dashboard widgets <span class=&quot;pill exists&quot;>4 of ~12</span></div>
+        <div class=&quot;dcomp-item&quot;><div class=&quot;dicon&quot;>✅</div><div class=&quot;dtxt&quot;>Active employees count<div class=&quot;dsub&quot;>Present</div></div></div>
+        <div class=&quot;dcomp-item&quot;><div class=&quot;dicon&quot;>✅</div><div class=&quot;dtxt&quot;>Next pay run date<div class=&quot;dsub&quot;>Present</div></div></div>
+        <div class=&quot;dcomp-item&quot;><div class=&quot;dicon&quot;>✅</div><div class=&quot;dtxt&quot;>YTD payroll gross<div class=&quot;dsub&quot;>Present</div></div></div>
+        <div class=&quot;dcomp-item&quot;><div class=&quot;dicon&quot;>✅</div><div class=&quot;dtxt&quot;>Recent pay runs<div class=&quot;dsub&quot;>Present</div></div></div>
+        <div class=&quot;dcomp-item missing&quot;><div class=&quot;dicon&quot;>❌</div><div class=&quot;dtxt&quot;>CRA remittance due date &amp;amp; amount<div class=&quot;dsub&quot;>Critical compliance item — missing</div></div></div>
+        <div class=&quot;dcomp-item missing&quot;><div class=&quot;dicon&quot;>❌</div><div class=&quot;dtxt&quot;>Direct deposit / EFT file status<div class=&quot;dsub&quot;>Missing</div></div></div>
+        <div class=&quot;dcomp-item missing&quot;><div class=&quot;dicon&quot;>❌</div><div class=&quot;dtxt&quot;>Missing employee data alerts (SIN, TD1, bank)<div class=&quot;dsub&quot;>Missing</div></div></div>
+        <div class=&quot;dcomp-item missing&quot;><div class=&quot;dicon&quot;>❌</div><div class=&quot;dtxt&quot;>Year-end readiness indicator<div class=&quot;dsub&quot;>Missing</div></div></div>
+        <div class=&quot;dcomp-item missing&quot;><div class=&quot;dicon&quot;>❌</div><div class=&quot;dtxt&quot;>Payroll approval deadline countdown<div class=&quot;dsub&quot;>Missing</div></div></div>
+        <div class=&quot;dcomp-item missing&quot;><div class=&quot;dicon&quot;>❌</div><div class=&quot;dtxt&quot;>Tax table / compliance version<div class=&quot;dsub&quot;>Missing</div></div></div>
+        <div class=&quot;dcomp-item missing&quot;><div class=&quot;dicon&quot;>❌</div><div class=&quot;dtxt&quot;>Employer cost this period<div class=&quot;dsub&quot;>Missing from stat cards</div></div></div>
+        <div class=&quot;dcomp-item missing&quot;><div class=&quot;dicon&quot;>❌</div><div class=&quot;dtxt&quot;>Pay groups count &amp;amp; status<div class=&quot;dsub&quot;>Present but not prominently</div></div></div>
+      </div>
+      <div style=&quot;display:flex;flex-direction:column;gap:12px&quot;>
+        <div class=&quot;alert red&quot;>
+          <div class=&quot;alert-icon&quot;>🚨</div>
+          <div>
+            <div class=&quot;alert-title&quot;>CRA remittance due must be on the dashboard</div>
+            <div class=&quot;alert-text&quot;>Missing a remittance deadline is a CRA penalty. This is the #1 item payroll administrators look for when they open the app. It must be a prominent card on the dashboard with days-remaining and amount owed.</div>
+          </div>
+        </div>
+        <div class=&quot;alert amber&quot;>
+          <div class=&quot;alert-icon&quot;>⚠️</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Missing employee data creates compliance risk</div>
+            <div class=&quot;alert-text&quot;>Employees without a SIN, TD1, or bank account cannot be paid compliantly. QuickBooks shows these as prominent warning badges on the dashboard — MapleRun has no equivalent alert system.</div>
+          </div>
+        </div>
+        <div class=&quot;alert blue&quot;>
+          <div class=&quot;alert-icon&quot;>📋</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Proposed stat card layout (6 cards)</div>
+            <div class=&quot;alert-text&quot;>
+              Replace the current 4-card grid with 6 cards:<br><br>
+              <strong>Row 1:</strong> Next pay run · CRA due · EFT status<br>
+              <strong>Row 2:</strong> Active employees · YTD gross · Employer cost YTD<br><br>
+              Add a separate <strong>Action Required</strong> section below the stats showing outstanding alerts (missing SIN, unapproved timesheets, pending EFT upload, year-end warnings).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ REPORTS GAP -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Reports Centre</div>
+    <div class=&quot;sec-title&quot;>Reports: current 4 cards → proposed 17+ reports in 10 categories</div>
+    <div class=&quot;sec-sub&quot;>This is the most significant gap. Accountants will test the reports section first when evaluating payroll software. The current page needs a complete overhaul — organized into categories, with a search/filter bar and export controls on every report.</div>
+
+    <div style=&quot;margin-bottom:20px&quot;>
+      <div class=&quot;alert green&quot;>
+        <div class=&quot;alert-icon&quot;>✅</div>
+        <div>
+          <div class=&quot;alert-title&quot;>Keep the visual style — just add more reports</div>
+          <div class=&quot;alert-text&quot;>The existing report card design (icon, title, description, metric strip, arrow) is excellent and consistent with ADP/QB patterns. Don't redesign it — expand it. Add category section headers (Payroll · Taxes &amp;amp; Remittances · Year-End · ROE · Direct Deposit · GL · Employees · Benefits · Audit) above groups of report cards.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class=&quot;report-grid&quot;>
+      <!-- Payroll category -->
+      <div class=&quot;rcard exists&quot;><div class=&quot;rcard-title&quot;>Payroll Register / Journal <span class=&quot;pill gated&quot;>Accountant plan</span></div><div class=&quot;rcard-desc&quot;>Every pay run: gross, deductions, employer costs, net by employee.</div><div class=&quot;rcard-note&quot; style=&quot;color:#15803d&quot;>✓ Designed — but should be accessible to Growth plan too</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Payroll Summary <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Total wages, CPP/EI, employer contributions, net by date range. QuickBooks leads with this report — it's the first one clients ask for.</div><div class=&quot;rcard-note&quot;>Must add — critical for accountants</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Payroll Summary by Employee <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Same as summary but employee-by-employee. Essential for reconciliation and year-end auditing.</div><div class=&quot;rcard-note&quot;>Must add</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Payroll Comparison Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Current pay run vs. previous — flags unusual wage or deduction changes. ADP and Sage include this.</div><div class=&quot;rcard-note&quot;>Prevents costly payroll errors</div></div>
+
+      <!-- Tax &amp; remittance -->
+      <div class=&quot;rcard partial&quot;><div class=&quot;rcard-title&quot;>PD7A Remittance <span class=&quot;pill partial&quot;>partial</span></div><div class=&quot;rcard-desc&quot;>CRA source deductions owed. Currently linked from Reports but lives inside Company Settings — should be its own dedicated screen.</div><div class=&quot;rcard-note&quot;>Move to Remittances section</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Source Deduction Liability Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Detailed breakdown of federal/provincial tax, CPP, EI, and employer EI owed, with remittance due dates per period.</div><div class=&quot;rcard-note&quot;>Must add</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Payroll Liability Balance <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>What's owed to CRA, Revenu Québec, benefit providers, unions, and garnishment agencies.</div><div class=&quot;rcard-note&quot;>Must add</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Employer Cost Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Gross wages + CPP employer share + EI employer share + benefits + estimated workers' comp by province.</div><div class=&quot;rcard-note&quot;>Must add — critical for budgeting</div></div>
+
+      <!-- Year-end -->
+      <div class=&quot;rcard exists&quot;><div class=&quot;rcard-title&quot;>T4 Slip <span class=&quot;pill exists&quot;>exists</span></div><div class=&quot;rcard-desc&quot;>Individual T4 per employee. Well-designed.</div></div>
+      <div class=&quot;rcard exists&quot;><div class=&quot;rcard-title&quot;>T4 Summary <span class=&quot;pill exists&quot;>exists</span></div><div class=&quot;rcard-desc&quot;>Employer total of all T4 slips. Well-designed.</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>PIER / Year-End Review Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Detects CPP/QPP/EI discrepancies before year-end filing. Sage has this. Critical for avoiding CRA assessments.</div><div class=&quot;rcard-note&quot;>Must add before year-end</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>RL-1 / RL-1 Summary (Québec) <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Required for any employer with Québec employees. Revenu Québec equivalent of T4/T4 Summary.</div><div class=&quot;rcard-note&quot;>Must add for Québec clients</div></div>
+
+      <!-- ROE -->
+      <div class=&quot;rcard exists&quot;><div class=&quot;rcard-title&quot;>ROE List &amp;amp; Detail <span class=&quot;pill gated&quot;>Accountant plan</span></div><div class=&quot;rcard-desc&quot;>Record of Employment generation. Well-designed.</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>ROE Worksheet / Insurable Earnings Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Shows insurable earnings by pay period for ROE validation — needed before generating the ROE.</div><div class=&quot;rcard-note&quot;>Add as ROE preparation step</div></div>
+
+      <!-- Employee &amp; HR -->
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Vacation Pay / Leave Balance Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Vacation accrued, taken, paid out, and balance by employee. Required for employment standards audits in all provinces.</div><div class=&quot;rcard-note&quot;>Must add</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Benefits &amp;amp; Deductions Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Health benefits, RRSP, union dues, garnishments, loans, and advances by employee.</div><div class=&quot;rcard-note&quot;>Must add</div></div>
+
+      <!-- Audit -->
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Audit Trail Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Who changed salary, bank account, TD1, tax setup, pay run, reversal, or year-end data, and when.</div><div class=&quot;rcard-note&quot;>Critical for compliance — must add</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Exception Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Negative net pay, missing SIN, missing tax setup, over CPP/EI max, duplicate bank accounts, unusual hours/pay.</div><div class=&quot;rcard-note&quot;>Must add — prevents compliance failures</div></div>
+
+      <!-- EFT / Direct deposit -->
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>Direct Deposit / EFT Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Employee bank, net deposit amount, file status, rejected payments, bank upload batch summary (Payments Canada Standard 005).</div><div class=&quot;rcard-note&quot;>Must add — needed for every pay run</div></div>
+      <div class=&quot;rcard missing&quot;><div class=&quot;rcard-title&quot;>GL Payroll Posting Report <span class=&quot;pill missing&quot;>missing</span></div><div class=&quot;rcard-desc&quot;>Debit/credit journal entries for wages, taxes, liabilities, employer costs by department — feeds accounting software.</div><div class=&quot;rcard-note&quot;>Must add — gated to Accountant plan is fine</div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ EMPLOYEE PROFILE GAPS -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Employee Profile</div>
+    <div class=&quot;sec-title&quot;>Employee detail: field gaps</div>
+    <div class=&quot;sec-sub&quot;>The existing employee profile is cleanly designed but missing several fields that CRA, Revenu Québec, and employment standards require. These fields are shown in ADP and Sage employee records by default.</div>
+
+    <div class=&quot;profile-compare&quot;>
+      <div class=&quot;pcomp&quot;>
+        <div class=&quot;pcomp-head&quot;>Current fields (Overview tab)</div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>Legal name, SIN, DOB</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>Address, Email, Phone</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>Province (pay group line)</span><span class=&quot;pill partial&quot;>implied</span></div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>Pay type (Salary/Hourly)</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>Pay rate &amp;amp; frequency</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>Start date</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>Direct deposit bank info</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>TD1 federal &amp;amp; provincial</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;pcomp-field&quot;><span class=&quot;fname&quot;>2026 YTD ledger</span><span class=&quot;pill exists&quot;>exists</span></div>
+        <div class=&quot;pcomp-field missing&quot;><span class=&quot;fname&quot;>Employment type (contractor / commission)</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;pcomp-field missing&quot;><span class=&quot;fname&quot;>Department / Cost centre / Job code</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;pcomp-field missing&quot;><span class=&quot;fname&quot;>Vacation policy &amp;amp; balance</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;pcomp-field missing&quot;><span class=&quot;fname&quot;>Benefits &amp;amp; deductions schedule</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;pcomp-field missing&quot;><span class=&quot;fname&quot;>QPP / QPIP exemption (Québec)</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;pcomp-field missing&quot;><span class=&quot;fname&quot;>Termination date &amp;amp; reason</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;pcomp-field missing&quot;><span class=&quot;fname&quot;>Change history / field audit log</span><span class=&quot;pill missing&quot;>missing</span></div>
+        <div class=&quot;pcomp-field missing&quot;><span class=&quot;fname&quot;>Preferred name</span><span class=&quot;pill missing&quot;>missing</span></div>
+      </div>
+      <div style=&quot;display:flex;flex-direction:column;gap:12px&quot;>
+        <div class=&quot;alert amber&quot;>
+          <div class=&quot;alert-icon&quot;>⚠️</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Add a 5th tab: History</div>
+            <div class=&quot;alert-text&quot;>Currently there are 4 tabs: Overview, TD1 &amp;amp; Tax, YTD Ledger, Documents. Add a <strong>History</strong> tab showing every salary change, TD1 update, bank change, and deduction modification with timestamp and who made the change. This is required for audit purposes and it's what accountants check when something looks wrong.</div>
+          </div>
+        </div>
+        <div class=&quot;alert blue&quot;>
+          <div class=&quot;alert-icon&quot;>💡</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Vacation balance belongs on the Overview tab</div>
+            <div class=&quot;alert-text&quot;>Add vacation earned, taken, and remaining balance to the Overview tab — it's asked about constantly. Link to a leave management page from there.</div>
+          </div>
+        </div>
+        <div class=&quot;alert amber&quot;>
+          <div class=&quot;alert-icon&quot;>⚠️</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Department / cost centre is critical for most clients</div>
+            <div class=&quot;alert-text&quot;>Construction, healthcare, retail, and agencies all need labour costs broken down by department or job code. Without this field on the employee profile, the Department Cost Report and GL posting report cannot be generated correctly.</div>
+          </div>
+        </div>
+        <div class=&quot;alert red&quot;>
+          <div class=&quot;alert-icon&quot;>🇶🇵</div>
+          <div>
+            <div class=&quot;alert-title&quot;>QPP and QPIP fields are absent</div>
+            <div class=&quot;alert-text&quot;>Any employer with Québec employees needs QPP (instead of CPP), QPIP (parental insurance), and Revenu Québec tax setup fields on the employee profile. These are distinct from federal fields and cannot be treated as the same.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ PAY RUN WIZARD GAPS -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Pay Run Wizard</div>
+    <div class=&quot;sec-title&quot;>Wizard: what to enhance</div>
+    <div class=&quot;sec-sub&quot;>The 3-step wizard (Input → Preview → Finalize) is solid and well-designed. The following additions would bring it to ADP/QB parity.</div>
+
+    <div class=&quot;two-col&quot;>
+      <div>
+        <table class=&quot;gtable&quot;>
+          <thead><tr><th>Feature</th><th>Status</th><th>Priority</th></tr></thead>
+          <tbody>
+            <tr><td>Salary gross input</td><td><span class=&quot;pill exists&quot;>exists</span></td><td>—</td></tr>
+            <tr><td>Hourly / timesheet input</td><td><span class=&quot;pill exists&quot;>exists</span></td><td>—</td></tr>
+            <tr><td>CPP / CPP2 / EI deductions</td><td><span class=&quot;pill exists&quot;>exists</span></td><td>—</td></tr>
+            <tr><td>Federal + provincial tax</td><td><span class=&quot;pill exists&quot;>exists</span></td><td>—</td></tr>
+            <tr><td>Per-employee warnings</td><td><span class=&quot;pill exists&quot;>exists</span></td><td>—</td></tr>
+            <tr><td>Bonus / commission pay type</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p1&quot;>P1</span></td></tr>
+            <tr><td>Vacation payout field</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p1&quot;>P1</span></td></tr>
+            <tr><td>Stat holiday pay field</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p1&quot;>P1</span></td></tr>
+            <tr><td>Retroactive / back pay field</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p2&quot;>P2</span></td></tr>
+            <tr><td>Benefits / deduction override</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p2&quot;>P2</span></td></tr>
+            <tr><td>Comparison vs. prior run (side panel)</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p1&quot;>P1</span></td></tr>
+            <tr><td>EFT file generation on finalize</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p1&quot;>P1</span></td></tr>
+            <tr><td>Gross-up calculator</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p2&quot;>P2</span></td></tr>
+            <tr><td>Payroll reversal / void flow</td><td><span class=&quot;pill missing&quot;>missing</span></td><td><span class=&quot;p2&quot;>P2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style=&quot;display:flex;flex-direction:column;gap:12px&quot;>
+        <div class=&quot;alert red&quot;>
+          <div class=&quot;alert-icon&quot;>🚨</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Step 1 needs pay type fields</div>
+            <div class=&quot;alert-text&quot;>Currently Step 1 only supports regular gross. A real pay run often includes: regular pay, overtime, stat holiday, vacation payout, retroactive, bonus, and commission — each calculated differently for CPP/EI. Add per-employee expandable rows for each pay type.</div>
+          </div>
+        </div>
+        <div class=&quot;alert amber&quot;>
+          <div class=&quot;alert-icon&quot;>⚠️</div>
+          <div>
+            <div class=&quot;alert-title&quot;>Add &quot;Compare to last run&quot; in Step 2</div>
+            <div class=&quot;alert-text&quot;>ADP and QuickBooks show a delta column in the preview step — current period vs. prior period. This catches data entry errors before finalizing. It's the #1 thing payroll admins use to verify a run looks correct.</div>
+          </div>
+        </div>
+        <div class=&quot;alert blue&quot;>
+          <div class=&quot;alert-icon&quot;>🏦</div>
+          <div>
+            <div class=&quot;alert-title&quot;>EFT file should be generated on Step 3</div>
+            <div class=&quot;alert-text&quot;>When a pay run is finalized, the system should automatically generate the EFT/AFT bank file (Payments Canada Standard 005 format). Step 3 success screen should show &quot;EFT file ready — download for your bank&quot; or show an upload status if integrated.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ NEW SCREENS -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Missing Screens</div>
+    <div class=&quot;sec-title&quot;>New screens to design — prioritized</div>
+    <div class=&quot;sec-sub&quot;>These screens don't exist at all in the current design. Organized by priority for MVP vs. later phases.</div>
+
+    <table class=&quot;ptable&quot;>
+      <thead>
+        <tr>
+          <th>Screen</th>
+          <th>Route</th>
+          <th>Priority</th>
+          <th>Why it's needed</th>
+          <th>Comparable to</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Taxes &amp;amp; Remittances dashboard</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/remittances</span></td>
+          <td><span class=&quot;p1&quot;>P1</span></td>
+          <td>Shows PD7A amounts, due dates, and remittance history. Currently buried in Company Settings. Every payroll admin needs this front and centre.</td>
+          <td>QuickBooks &quot;Taxes&quot; section</td>
+        </tr>
+        <tr>
+          <td>Direct Deposit / EFT centre</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/eft</span></td>
+          <td><span class=&quot;p1&quot;>P1</span></td>
+          <td>Manages bank file uploads, shows deposit status per employee, flags rejected payments. Required every pay run.</td>
+          <td>ADP &quot;Payment Services&quot;</td>
+        </tr>
+        <tr>
+          <td>Year-End Centre</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/year-end</span></td>
+          <td><span class=&quot;p1&quot;>P1</span></td>
+          <td>Central hub for T4/RL-1 preparation. Shows missing SIN warnings, CPP/EI discrepancies, T4 draft status, XML export, and distribution status.</td>
+          <td>Sage &quot;Year End&quot; module</td>
+        </tr>
+        <tr>
+          <td>Payroll Summary Report</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/reports/summary</span></td>
+          <td><span class=&quot;p1&quot;>P1</span></td>
+          <td>The single most-requested payroll report. Total wages, CPP, EI, tax, net pay by date range with PDF/CSV export.</td>
+          <td>QuickBooks &quot;Payroll Summary&quot;</td>
+        </tr>
+        <tr>
+          <td>Audit Trail</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/audit</span></td>
+          <td><span class=&quot;p1&quot;>P1</span></td>
+          <td>Every sensitive field change (salary, bank, SIN, TD1) logged with timestamp and user. Required for compliance and client trust.</td>
+          <td>ADP &quot;Audit Trail&quot;</td>
+        </tr>
+        <tr>
+          <td>Exception Report</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/reports/exceptions</span></td>
+          <td><span class=&quot;p1&quot;>P1</span></td>
+          <td>Proactively surfaces problems: negative net pay, missing data, over-max CPP/EI, duplicate bank accounts.</td>
+          <td>ADP / Sage &quot;Exception Report&quot;</td>
+        </tr>
+        <tr>
+          <td>Employer Cost Report</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/reports/employer-cost</span></td>
+          <td><span class=&quot;p1&quot;>P1</span></td>
+          <td>Total employer liability including CPP employer, EI employer, and benefits. Finance teams need this for budgeting.</td>
+          <td>ADP &quot;Payroll Cost Report&quot;</td>
+        </tr>
+        <tr>
+          <td>Termination Wizard</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/employees/[id]/terminate</span></td>
+          <td><span class=&quot;p1&quot;>P1</span></td>
+          <td>Guides employer through final pay, vacation payout, benefit end date, and ROE preparation in a single flow.</td>
+          <td>ADP &quot;Terminate Employee&quot;</td>
+        </tr>
+        <tr>
+          <td>Vacation &amp;amp; Leave Balances</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/employees/leave</span></td>
+          <td><span class=&quot;p2&quot;>P2</span></td>
+          <td>Vacation earned, taken, and remaining for all employees. Required for provincial employment standards audits.</td>
+          <td>Sage &quot;Vacation Pay Report&quot;</td>
+        </tr>
+        <tr>
+          <td>GL Mapping &amp;amp; Journal</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/accounting</span></td>
+          <td><span class=&quot;p2&quot;>P2</span></td>
+          <td>Maps wage types, deductions, and employer costs to accounting chart of accounts. Exports journal entries to accounting software.</td>
+          <td>QuickBooks integration / Sage GL</td>
+        </tr>
+        <tr>
+          <td>Benefits &amp;amp; Deductions manager</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/benefits</span></td>
+          <td><span class=&quot;p2&quot;>P2</span></td>
+          <td>Manages recurring deductions: health benefits, RRSP contributions, union dues, garnishments, and advances.</td>
+          <td>ADP &quot;Benefits &amp;amp; Deductions&quot;</td>
+        </tr>
+        <tr>
+          <td>PIER / Year-End Review Report</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/reports/pier</span></td>
+          <td><span class=&quot;p2&quot;>P2</span></td>
+          <td>Detects CPP/EI discrepancies before T4 filing. Sage includes this as &quot;Year End Review&quot; and it prevents CRA assessment notices.</td>
+          <td>Sage &quot;PIER Report&quot;</td>
+        </tr>
+        <tr>
+          <td>RL-1 &amp;amp; Québec Year-End</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/year-end/rl1</span></td>
+          <td><span class=&quot;p2&quot;>P2</span></td>
+          <td>Required for any employer with Québec employees. Separate from T4 flow — uses QPP, QPIP, and Revenu Québec tax boxes.</td>
+          <td>ADP / Sage Québec modules</td>
+        </tr>
+        <tr>
+          <td>Opening YTD Balance Import</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/settings/ytd-import</span></td>
+          <td><span class=&quot;p2&quot;>P2</span></td>
+          <td>Allows clients migrating mid-year from ADP/QBO/Sage/manual records to enter existing CPP/EI/tax YTD balances so calculations are correct.</td>
+          <td>QuickBooks &quot;Set up YTD amounts&quot;</td>
+        </tr>
+        <tr>
+          <td>Department / Cost Centre Report</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/reports/departments</span></td>
+          <td><span class=&quot;p3&quot;>P3</span></td>
+          <td>Labour cost by department, job code, or project. Needed by construction, healthcare, retail, and agencies.</td>
+          <td>ADP &quot;Labour Cost Report&quot;</td>
+        </tr>
+        <tr>
+          <td>Headcount &amp;amp; Trend Report</td>
+          <td><span class=&quot;mono&quot; style=&quot;font-size:12px&quot;>/reports/trends</span></td>
+          <td><span class=&quot;p3&quot;>P3</span></td>
+          <td>Active/terminated headcount over time, average pay, payroll cost trends. Useful for growing companies.</td>
+          <td>ADP &quot;Insights &amp;amp; Analytics&quot;</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ PROPOSED FLOWS -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Proposed Flows</div>
+    <div class=&quot;sec-title&quot;>Enhanced user journeys</div>
+    <div class=&quot;sec-sub&quot;>How the new and enhanced screens connect to existing flows. Green = new, Yellow = enhanced, White = unchanged.</div>
+
+    <!-- Flow 1: Run payroll enhanced -->
+    <div style=&quot;margin-bottom:28px&quot;>
+      <div style=&quot;font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px&quot;>💵 Enhanced Run Payroll flow</div>
+      <div style=&quot;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px&quot;>
+        <div class=&quot;flow-step existing&quot; style=&quot;flex:none;max-width:160px&quot;><div>Dashboard</div><div class=&quot;sub&quot;>Click &quot;Run Payroll&quot;</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step enhanced&quot; style=&quot;flex:none;max-width:180px&quot;><div>Step 1 — Input<span class=&quot;badge-enh&quot;>enhanced</span></div><div class=&quot;sub&quot;>+ Bonus, stat, vacation, retro pay type fields</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step enhanced&quot; style=&quot;flex:none;max-width:180px&quot;><div>Step 2 — Preview<span class=&quot;badge-enh&quot;>enhanced</span></div><div class=&quot;sub&quot;>+ Delta vs. prior run column</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step enhanced&quot; style=&quot;flex:none;max-width:180px&quot;><div>Step 3 — Finalize<span class=&quot;badge-enh&quot;>enhanced</span></div><div class=&quot;sub&quot;>+ EFT file generated + remittance updated</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:160px&quot;><div>EFT Centre<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>Review deposit status</div></div>
+      </div>
+    </div>
+
+    <!-- Flow 2: Remittance -->
+    <div style=&quot;margin-bottom:28px&quot;>
+      <div style=&quot;font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px&quot;>🧾 New: Remittance flow</div>
+      <div style=&quot;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px&quot;>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:160px&quot;><div>Remittances<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>PD7A amounts by period</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:180px&quot;><div>Remittance Detail<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>CPP/EI/Tax breakdown per period</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:180px&quot;><div>PD7A Print / Export<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>Formatted for CRA submission</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:160px&quot;><div>Mark as Remitted<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>Updates liability balance</div></div>
+      </div>
+    </div>
+
+    <!-- Flow 3: Termination -->
+    <div style=&quot;margin-bottom:28px&quot;>
+      <div style=&quot;font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px&quot;>🚪 New: Termination flow</div>
+      <div style=&quot;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px&quot;>
+        <div class=&quot;flow-step existing&quot; style=&quot;flex:none;max-width:160px&quot;><div>Employee Detail</div><div class=&quot;sub&quot;>Click &quot;Terminate&quot;</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:180px&quot;><div>Termination Wizard<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>Last day, reason code, vacation payout</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:180px&quot;><div>Final Pay Run<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>Pre-filled with final pay + vac payout</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step existing&quot; style=&quot;flex:none;max-width:160px&quot;><div>ROE Wizard</div><div class=&quot;sub&quot;>Pre-filled from termination data</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step existing&quot; style=&quot;flex:none;max-width:160px&quot;><div>ROE Detail</div><div class=&quot;sub&quot;>Export for Service Canada</div></div>
+      </div>
+    </div>
+
+    <!-- Flow 4: Year-end -->
+    <div style=&quot;margin-bottom:28px&quot;>
+      <div style=&quot;font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px&quot;>🗓 New: Year-End flow</div>
+      <div style=&quot;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px&quot;>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:160px&quot;><div>Year-End Centre<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>Status dashboard + warnings</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:180px&quot;><div>PIER Review<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>Fix CPP/EI discrepancies</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step existing&quot; style=&quot;flex:none;max-width:160px&quot;><div>T4 Summary</div><div class=&quot;sub&quot;>Review all T4 slips</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:180px&quot;><div>T4 XML Export<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>CRA electronic filing</div></div>
+        <div class=&quot;flow-arrow&quot;>→</div>
+        <div class=&quot;flow-step new&quot; style=&quot;flex:none;max-width:160px&quot;><div>Distribute T4s<span class=&quot;badge-new&quot;>new</span></div><div class=&quot;sub&quot;>Email / employee portal</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ PRIORITY SUMMARY -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Recommended Next Steps</div>
+    <div class=&quot;sec-title&quot;>Build order for maximum client trust</div>
+    <div class=&quot;sec-sub&quot;>Based on what ADP, QuickBooks, and Sage say clients demand before switching — and what payroll professionals test first.</div>
+
+    <div class=&quot;three-col&quot;>
+      <div class=&quot;icard&quot;>
+        <div class=&quot;icard-head&quot;>
+          <div class=&quot;icard-title&quot;><span class=&quot;p1&quot;>P1</span> Build first — MVP</div>
+        </div>
+        <div class=&quot;icard-body&quot;>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>1</div><div class=&quot;text&quot;>Payroll Summary report<div class=&quot;sub&quot;>Most-requested report by accountants</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>2</div><div class=&quot;text&quot;>Taxes &amp;amp; Remittances section<div class=&quot;sub&quot;>PD7A amounts + due dates front &amp;amp; centre</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>3</div><div class=&quot;text&quot;>Dashboard remittance card<div class=&quot;sub&quot;>CRA due date + amount on every login</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>4</div><div class=&quot;text&quot;>Exception Report<div class=&quot;sub&quot;>Catches compliance errors proactively</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>5</div><div class=&quot;text&quot;>Wizard pay type expansion<div class=&quot;sub&quot;>Bonus, stat, vacation payout fields</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>6</div><div class=&quot;text&quot;>EFT / Direct Deposit centre<div class=&quot;sub&quot;>Bank file status per pay run</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>7</div><div class=&quot;text&quot;>Termination wizard<div class=&quot;sub&quot;>Final pay + ROE prep flow</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>8</div><div class=&quot;text&quot;>Audit Trail screen<div class=&quot;sub&quot;>Change log for compliance</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>9</div><div class=&quot;text&quot;>Employer Cost Report<div class=&quot;sub&quot;>Total cost including CPP/EI employer share</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>10</div><div class=&quot;text&quot;>Sidebar restructure (13 items)<div class=&quot;sub&quot;>Add Remittances, EFT, Year-End, GL, Audit</div></div></div>
+        </div>
+      </div>
+
+      <div class=&quot;icard&quot;>
+        <div class=&quot;icard-head&quot;>
+          <div class=&quot;icard-title&quot;><span class=&quot;p2&quot;>P2</span> Phase 2 — Pro features</div>
+        </div>
+        <div class=&quot;icard-body&quot;>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>1</div><div class=&quot;text&quot;>Year-End Centre screen<div class=&quot;sub&quot;>T4 readiness hub + XML export</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>2</div><div class=&quot;text&quot;>PIER / Year-End Review report<div class=&quot;sub&quot;>CPP/EI discrepancy detection</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>3</div><div class=&quot;text&quot;>Vacation &amp;amp; Leave Balance report<div class=&quot;sub&quot;>Provincial employment standards</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>4</div><div class=&quot;text&quot;>Benefits &amp;amp; Deductions manager<div class=&quot;sub&quot;>Recurring deductions + schedules</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>5</div><div class=&quot;text&quot;>GL Mapping &amp;amp; Journal export<div class=&quot;sub&quot;>Chart of accounts integration</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>6</div><div class=&quot;text&quot;>Compare vs. prior run in Step 2<div class=&quot;sub&quot;>Delta column in preview step</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>7</div><div class=&quot;text&quot;>Employee department/cost centre<div class=&quot;sub&quot;>Field addition to employee form</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>8</div><div class=&quot;text&quot;>Payroll Comparison Report<div class=&quot;sub&quot;>Run-over-run variance report</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>9</div><div class=&quot;text&quot;>Opening YTD balance import<div class=&quot;sub&quot;>Mid-year migration support</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>10</div><div class=&quot;text&quot;>Payroll reversal / void utility<div class=&quot;sub&quot;>Cancel &amp;amp; reissue pay runs</div></div></div>
+        </div>
+      </div>
+
+      <div class=&quot;icard&quot;>
+        <div class=&quot;icard-head&quot;>
+          <div class=&quot;icard-title&quot;><span class=&quot;p3&quot;>P3</span> Phase 3 — Enterprise</div>
+        </div>
+        <div class=&quot;icard-body&quot;>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>1</div><div class=&quot;text&quot;>RL-1 &amp;amp; Québec Year-End<div class=&quot;sub&quot;>Revenu Québec compliance</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>2</div><div class=&quot;text&quot;>QPP / QPIP employee fields<div class=&quot;sub&quot;>Québec-specific tax setup</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>3</div><div class=&quot;text&quot;>Department Labour Cost Report<div class=&quot;sub&quot;>Construction, healthcare, retail</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>4</div><div class=&quot;text&quot;>Job / Project Costing Report<div class=&quot;sub&quot;>Labour by project or grant</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>5</div><div class=&quot;text&quot;>Taxable Benefits Report<div class=&quot;sub&quot;>Auto allowance, housing, gifts, parking</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>6</div><div class=&quot;text&quot;>Workers' Comp earnings report<div class=&quot;sub&quot;>WSIB/WCB/CNESST by province</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>7</div><div class=&quot;text&quot;>T4A (contractors / commission)<div class=&quot;sub&quot;>Non-employment income slips</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>8</div><div class=&quot;text&quot;>Headcount &amp;amp; Trend Report<div class=&quot;sub&quot;>Payroll cost analytics over time</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>9</div><div class=&quot;text&quot;>Custom Report Builder<div class=&quot;sub&quot;>ADP/QB/Sage all have this</div></div></div>
+          <div class=&quot;icard-row&quot;><div class=&quot;icon&quot;>10</div><div class=&quot;text&quot;>Compliance Update Manager<div class=&quot;sub&quot;>Tax table version + CPP/EI rate alerts</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ WHAT'S GOOD -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>What's Working Well</div>
+    <div class=&quot;sec-title&quot;>Strengths to build on</div>
+    <div class=&quot;sec-sub&quot;>These elements are genuinely strong and differentiate MapleRun from many Canadian payroll tools. Don't change them — build the missing coverage around them.</div>
+    <div class=&quot;two-col&quot;>
+      <div style=&quot;display:flex;flex-direction:column;gap:10px&quot;>
+        <div class=&quot;alert green&quot;><div class=&quot;alert-icon&quot;>✅</div><div><div class=&quot;alert-title&quot;>Pay run wizard is best-in-class UX</div><div class=&quot;alert-text&quot;>The 3-step wizard with inline CPP/CPP2/EI/federal/provincial breakdown per employee, the warning system, and the sticky action bar are better than QuickBooks' equivalent. Keep this exact pattern.</div></div></div>
+        <div class=&quot;alert green&quot;><div class=&quot;alert-icon&quot;>✅</div><div><div class=&quot;alert-title&quot;>Pay stub design is excellent</div><div class=&quot;alert-text&quot;>Both light and dark pay stub variants are polished and professional. The YTD column and leave balance band are exactly what employees need. This is a competitive differentiator.</div></div></div>
+        <div class=&quot;alert green&quot;><div class=&quot;alert-icon&quot;>✅</div><div><div class=&quot;alert-title&quot;>T4 slip design matches CRA requirements</div><div class=&quot;alert-text&quot;>The T4 slip and T4 summary screens correctly show the CRA box numbering. The export-to-PDF flow is clean.</div></div></div>
+      </div>
+      <div style=&quot;display:flex;flex-direction:column;gap:10px&quot;>
+        <div class=&quot;alert green&quot;><div class=&quot;alert-icon&quot;>✅</div><div><div class=&quot;alert-title&quot;>Visual design system is consistent and professional</div><div class=&quot;alert-text&quot;>The Inter + Geist Mono pairing, maple red accent, warm stone neutrals, and card system are coherent and distinctive. The dark sidebar creates a strong professional identity. Don't change it.</div></div></div>
+        <div class=&quot;alert green&quot;><div class=&quot;alert-icon&quot;>✅</div><div><div class=&quot;alert-title&quot;>ROE detail is well-structured</div><div class=&quot;alert-text&quot;>The ROE detail screen with Box 15 insurable earnings table is correctly modelled on Service Canada's requirements. The upgrade gating strategy makes sense commercially.</div></div></div>
+        <div class=&quot;alert green&quot;><div class=&quot;alert-icon&quot;>✅</div><div><div class=&quot;alert-title&quot;>Employee YTD ledger is uniquely clear</div><div class=&quot;alert-text&quot;>Showing CPP pensionable room, EI insurable room remaining, and YTD withheld in one table is better than Sage's equivalent. This helps accountants spot ceiling-approach issues at a glance.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class=&quot;divider&quot;></div>
+
+  <!-- ═══════════════════════════════════════════════════ FOOTER SUMMARY -->
+  <div class=&quot;callout&quot;>
+    <div class=&quot;callout-title&quot;>Summary for the team</div>
+    <div class=&quot;callout-text&quot;>
+      MapleRun has a <b>strong visual foundation</b> and a <b>well-designed core payroll flow</b>. The critical gap is <b>reporting coverage and compliance navigation</b> — accountants will reject software that can't produce a Payroll Summary, Remittance Liability, or Audit Trail report. The <b>sidebar needs to grow from 5 to 13 sections</b> to match what users expect from ADP and QuickBooks. <b>Quebec support is almost entirely absent</b> and will block any Québec client from using the product. The recommended next design sprint should focus on: <b>Reports overhaul → Remittances section → Dashboard compliance layer → Wizard pay-type expansion → Termination wizard</b> — in that order.
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
+"></iframe>
+<iframe class="frame" id="f-dash" srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;>
+<title>MapleRun — Adaptive Dashboard</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Geist+Mono:wght@400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#e7e5e4;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* ── Top control bar (not part of product — explains the mock) ── */
+.controlbar{background:#1c1917;color:#fff;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;position:sticky;top:0;z-index:20}
+.cb-left{display:flex;flex-direction:column;gap:3px}
+.cb-title{font-size:15px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.cb-sub{font-size:12px;color:#a8a29e;max-width:560px;line-height:1.45}
+.cb-sub code{font-family:'Geist Mono',monospace;background:#292524;padding:1px 6px;border-radius:5px;color:#fcd34d;font-size:11px}
+.seg{display:inline-flex;background:#292524;border-radius:11px;padding:4px;gap:3px}
+.seg button{font-family:inherit;font-size:13px;font-weight:600;color:#a8a29e;background:none;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .12s}
+.seg button:hover{color:#e7e5e4}
+.seg button.on{background:#fff;color:#1c1917}
+.seg button .d{width:7px;height:7px;border-radius:50%}
+.seg button .d.solo{background:#0891b2}
+.seg button .d.growth{background:#16a34a}
+.seg button .d.acct{background:#B3261E}
+
+/* ── App shell ── */
+.app{display:flex;min-height:760px;background:#f5f5f4;margin:20px;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.12)}
+
+.sidebar{width:220px;background:#1c1917;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 22px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;margin-bottom:2px;font-size:13.5px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.nav-item.is-new{animation:fadein .35s ease}
+.nav-sec{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#57534e;padding:14px 12px 5px}
+.nav-upsell{font-size:12px;color:#5eb6c9;background:#06303a;border-radius:9px;padding:9px 12px;margin-top:6px;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:600}
+.nav-upsell:hover{background:#08404e}
+@keyframes fadein{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.plan-badge .pdot{width:6px;height:6px;border-radius:50%}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+
+.main{flex:1;padding:32px 40px;overflow-y:auto}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.page-sub{font-size:14px;color:#78716c;margin-top:5px}
+.btn-primary{padding:11px 20px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+
+/* stat cards */
+.stat-grid{display:grid;gap:14px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.stat-label{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em}
+.stat-value{font-size:27px;font-weight:700;margin-top:7px;letter-spacing:-.02em}
+.stat-foot{font-size:12px;color:#78716c;margin-top:4px}
+.stat.accent-amber{border-color:#fcd34d;background:#fffbeb}
+.stat.accent-amber .stat-value{color:#b45309}
+.stat.accent-blue{border-color:#bfdbfe;background:#eff6ff}
+.stat.accent-blue .stat-value{color:#1d4ed8}
+.stat .tagnew{position:absolute;top:12px;right:12px;font-size:9px;font-weight:800;letter-spacing:.05em;border-radius:10px;padding:2px 7px}
+.tag-growth{background:#dcfce7;color:#15803d}
+.tag-acct{background:#fee2e2;color:#991b1b}
+
+/* action-required panel */
+.alert-panel{background:#fff;border:1px solid #e7e5e4;border-left:4px solid #B3261E;border-radius:14px;padding:18px 20px;margin-bottom:22px;box-shadow:0 1px 3px rgba(0,0,0,.04);animation:pop .3s ease}
+.ap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ap-title{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
+.ap-count{font-size:11px;font-weight:700;background:#fee2e2;color:#991b1b;border-radius:20px;padding:3px 10px}
+.ap-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f7f6f4;font-size:13px}
+.ap-row:last-child{border-bottom:none}
+.ap-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ap-ic.red{background:#fef2f2}
+.ap-ic.amber{background:#fffbeb}
+.ap-ic.blue{background:#eff6ff}
+.ap-txt{flex:1}
+.ap-txt b{font-weight:700}
+.ap-txt .s{font-size:12px;color:#78716c;margin-top:1px}
+.ap-act{font-size:12px;font-weight:700;color:#B3261E;text-decoration:none;white-space:nowrap}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.col-title{font-size:13px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.qa{display:flex;gap:13px;align-items:flex-start;padding:16px;border:1px solid #e7e5e4;border-radius:12px;background:#fff;text-decoration:none;color:inherit;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.qa:hover{border-color:#B3261E}
+.qa-icon{width:42px;height:42px;border-radius:11px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.qa-title{font-size:14px;font-weight:700}
+.qa-desc{font-size:12.5px;color:#78716c;margin-top:3px}
+.qa-arrow{margin-left:auto;color:#a8a29e;font-size:18px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.run-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid #f0efed;text-decoration:none;color:inherit}
+.run-row:last-child{border-bottom:none}
+.run-row:hover{background:#fafaf9}
+.run-date{font-size:14px;font-weight:600}
+.run-sub{font-size:12px;color:#a8a29e;margin-top:2px}
+.run-net{font-size:14px;font-weight:600;text-align:right}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:20px;padding:3px 9px}
+.b-final{background:#dcfce7;color:#15803d}
+
+/* caption strip under app */
+.caption{margin:0 20px 24px;background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start}
+.caption .ci{font-size:18px}
+.caption .ct{font-size:13px;color:#57534e;line-height:1.55}
+.caption .ct b{color:#1c1917}
+.diff-new{background:#dcfce7;color:#15803d;font-weight:700;border-radius:5px;padding:0 5px}
+.diff-acct{background:#fee2e2;color:#991b1b;font-weight:700;border-radius:5px;padding:0 5px}
+</style>
+</head>
+<body>
+
+<!-- ── Mock control bar (explains the artifact; not part of the product) ── -->
+<div class=&quot;controlbar&quot;>
+  <div class=&quot;cb-left&quot;>
+    <div class=&quot;cb-title&quot;>🍁 MapleRun · Adaptive Dashboard</div>
+    <div class=&quot;cb-sub&quot;>One screen, one codebase. Toggle the plan to see exactly what each tier renders — driven by a single <code>company.plan</code> flag. This is the visual target for Steps 2–4.</div>
+  </div>
+  <div class=&quot;seg&quot; id=&quot;seg&quot;>
+    <button data-plan=&quot;solo&quot; class=&quot;on&quot;><span class=&quot;d solo&quot;></span>Solo</button>
+    <button data-plan=&quot;growth&quot;><span class=&quot;d growth&quot;></span>Growth</button>
+    <button data-plan=&quot;accountant&quot;><span class=&quot;d acct&quot;></span>Accountant</button>
+  </div>
+</div>
+
+<!-- ── App shell ── -->
+<div class=&quot;app&quot;>
+  <aside class=&quot;sidebar&quot;>
+    <div class=&quot;sidebar-logo&quot;><span style=&quot;font-size:22px&quot;>🍁</span><span class=&quot;sidebar-logo-name&quot;>MapleRun</span></div>
+    <nav id=&quot;nav&quot;></nav>
+    <div class=&quot;sidebar-foot&quot;>
+      <span class=&quot;plan-badge&quot; id=&quot;planBadge&quot;></span>
+      <div class=&quot;user-row&quot;><div class=&quot;user-avatar&quot;>M</div><div><div class=&quot;user-name&quot;>Marcus Reid</div><div class=&quot;user-sub&quot;>Sign out</div></div></div>
+    </div>
+  </aside>
+
+  <main class=&quot;main&quot;>
+    <div class=&quot;page-head&quot;>
+      <div>
+        <div class=&quot;page-title&quot;>Dashboard</div>
+        <div class=&quot;page-sub&quot; id=&quot;pageSub&quot;></div>
+      </div>
+      <a class=&quot;btn-primary&quot; href=&quot;#&quot;>＋ Run payroll</a>
+    </div>
+
+    <div id=&quot;alertPanel&quot;></div>
+    <div class=&quot;stat-grid&quot; id=&quot;statGrid&quot;></div>
+
+    <div class=&quot;cols&quot;>
+      <div>
+        <div class=&quot;col-title&quot;>Quick actions</div>
+        <div id=&quot;quickActions&quot;></div>
+      </div>
+      <div>
+        <div class=&quot;col-title&quot;>Recent pay runs</div>
+        <div class=&quot;card&quot;>
+          <a class=&quot;run-row&quot; href=&quot;#&quot;><div><div class=&quot;run-date&quot;>Jan 31, 2026</div><div class=&quot;run-sub&quot;>Biweekly · <span id=&quot;empCount1&quot;>3</span> employees</div></div><div style=&quot;display:flex;align-items:center;gap:14px&quot;><span class=&quot;badge b-final&quot;>FINALIZED</span><div class=&quot;run-net mono&quot;>$6,914.20</div></div></a>
+          <a class=&quot;run-row&quot; href=&quot;#&quot;><div><div class=&quot;run-date&quot;>Jan 17, 2026</div><div class=&quot;run-sub&quot;>Biweekly · <span class=&quot;empCount&quot;>3</span> employees</div></div><div style=&quot;display:flex;align-items:center;gap:14px&quot;><span class=&quot;badge b-final&quot;>FINALIZED</span><div class=&quot;run-net mono&quot;>$6,914.20</div></div></a>
+          <a class=&quot;run-row&quot; href=&quot;#&quot;><div><div class=&quot;run-date&quot;>Jan 3, 2026</div><div class=&quot;run-sub&quot;>Biweekly · <span class=&quot;empCount&quot;>3</span> employees</div></div><div style=&quot;display:flex;align-items:center;gap:14px&quot;><span class=&quot;badge b-final&quot;>FINALIZED</span><div class=&quot;run-net mono&quot;>$6,914.20</div></div></a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ── Caption ── -->
+<div class=&quot;caption&quot;>
+  <div class=&quot;ci&quot;>🧭</div>
+  <div class=&quot;ct&quot; id=&quot;caption&quot;></div>
+</div>
+
+<script>
+const PLAN_META = {
+  solo:       {label:'Solo plan',       dot:'#0891b2', sub:&quot;Good morning, Marcus — here's where things stand at Northwind Carpentry.&quot;, emps:3},
+  growth:     {label:'Growth plan',     dot:'#16a34a', sub:&quot;Good morning, Marcus — here's where things stand at Northwind Carpentry.&quot;, emps:14},
+  accountant: {label:'Accountant plan', dot:'#B3261E', sub:&quot;Good morning, Marcus — 3 clients need attention across Northwind &amp; 2 others.&quot;, emps:38}
+};
+
+// ── Sidebar definitions ──
+const NAV = {
+  solo: {
+    items: [
+      {i:'🏠',t:'Dashboard',active:true},{i:'👥',t:'Employees'},{i:'💵',t:'Run Payroll'},
+      {i:'📄',t:'Pay Statements'},{i:'⚙️',t:'Settings'}
+    ],
+    upsell:'↑ Add timesheets &amp; reports'
+  },
+  growth: {
+    groups:[
+      {items:[{i:'🏠',t:'Dashboard',active:true},{i:'👥',t:'Employees'},{i:'⏱',t:'Timesheets',isnew:true},{i:'💵',t:'Run Payroll'},{i:'📄',t:'Pay Statements'}]},
+      {sec:'Compliance',items:[{i:'🧾',t:'Remittances',isnew:true},{i:'🏦',t:'Direct Deposit',isnew:true},{i:'📋',t:'ROE'}]},
+      {sec:'Analytics',items:[{i:'📊',t:'Reports'},{i:'⚙️',t:'Settings'}]}
+    ]
+  },
+  accountant: {
+    groups:[
+      {items:[{i:'🏠',t:'Dashboard',active:true},{i:'👥',t:'Employees'},{i:'⏱',t:'Timesheets'},{i:'💵',t:'Run Payroll'},{i:'📄',t:'Pay Statements'}]},
+      {sec:'Compliance',items:[{i:'🧾',t:'Remittances'},{i:'🏦',t:'Direct Deposit'},{i:'📋',t:'ROE'},{i:'🗓',t:'Year-End',isnew:true}]},
+      {sec:'Analytics &amp; System',items:[{i:'📊',t:'Reports'},{i:'📒',t:'GL / Accounting',isnew:true},{i:'⚙️',t:'Settings'},{i:'🔍',t:'Audit Log',isnew:true}]}
+    ]
+  }
+};
+
+// ── Stat cards per plan ──
+const STATS = {
+  solo: [
+    {l:'Active employees',v:'3',f:'All in Ontario'},
+    {l:'Next pay run',v:'Jan 31',f:'Period Jan 18 – 31'},
+    {l:'Last net pay',v:'$6,914',f:'Finalized Jan 31',mono:true},
+    {l:'YTD payroll',v:'$48,210',f:'Gross, 2026',mono:true}
+  ],
+  growth: [
+    {l:'Next pay run',v:'Jan 31',f:'Period Jan 18 – 31'},
+    {l:'CRA remittance due',v:'Feb 15',f:'$3,180 owed · 1 day late risk',accent:'amber',tag:'growth'},
+    {l:'EFT file',v:'Ready',f:'14 deposits · upload to bank',accent:'blue',tag:'growth'},
+    {l:'Active employees',v:'14',f:'12 ON · 2 BC'},
+    {l:'YTD payroll',v:'$214,800',f:'Gross, 2026',mono:true},
+    {l:'Employer cost YTD',v:'$28,640',f:'CPP + EI + benefits',mono:true,tag:'growth'}
+  ],
+  accountant: [
+    {l:'Next pay run',v:'Jan 31',f:'3 pay groups due'},
+    {l:'CRA remittance due',v:'Feb 15',f:'$11,420 across clients',accent:'amber',tag:'growth'},
+    {l:'EFT file',v:'2 pending',f:'1 ready · 1 needs review',accent:'blue',tag:'growth'},
+    {l:'Active employees',v:'38',f:'Across 3 clients'},
+    {l:'YTD payroll',v:'$612,300',f:'Gross, 2026',mono:true},
+    {l:'Year-end readiness',v:'72%',f:'4 T4 warnings to clear',accent:'amber',tag:'acct'}
+  ]
+};
+
+// ── Action-required panel (Accountant only) ──
+const ALERTS = [
+  {ic:'red',e:'⚠️',t:'<b>2 employees missing a SIN</b>',s:&quot;Can't file T4s until resolved — Priya S., Daniel O.&quot;,a:'Fix →'},
+  {ic:'amber',e:'⏱',t:'<b>5 timesheets unapproved</b>',s:'Due before the Jan 31 run can be finalized.',a:'Review →'},
+  {ic:'blue',e:'🏦',t:'<b>EFT file for Westbridge Café not uploaded</b>',s:'Deposits land Jan 31 — upload by 2pm today.',a:'Upload →'},
+  {ic:'amber',e:'🗓',t:'<b>Year-end: 4 CPP/EI discrepancies (PIER)</b>',s:'Clear before generating T4 slips.',a:'Open PIER →'}
+];
+
+const QA = {
+  solo: [
+    {i:'👤',t:'Add an employee',d:'Personal details, TD1, and pay group.'},
+    {i:'💵',t:'Run payroll',d:'Enter salary, auto-calc deductions, finalize.'},
+    {i:'📄',t:'View pay stubs',d:'Download and email employee pay statements.'}
+  ],
+  growth: [
+    {i:'💵',t:'Run payroll',d:'Hours, pay types, deductions, finalize + EFT.'},
+    {i:'🧾',t:'Review remittance',d:'$3,180 due to CRA by Feb 15.'},
+    {i:'📊',t:'View reports',d:'Payroll summary, exceptions, EFT, audit.'}
+  ],
+  accountant: [
+    {i:'💵',t:'Run payroll',d:'3 pay groups due across clients.'},
+    {i:'🗓',t:'Year-End Centre',d:'72% ready · 4 T4 warnings to clear.'},
+    {i:'📒',t:'Post to GL',d:'Export journal entries to accounting.'}
+  ]
+};
+
+const COLS = {
+  solo:'repeat(4,1fr)', growth:'repeat(3,1fr)', accountant:'repeat(3,1fr)'
+};
+
+const CAPTIONS = {
+  solo:'<b>Solo</b> — the calm view you have today. 4 essential stat cards, 3 quick actions, recent runs. No remittance, EFT, or compliance noise. This is the baseline; the code renders this when <b>company.plan === &quot;solo&quot;</b>.',
+  growth:'<b>Growth</b> adds the cards a real operating business needs: <span class=&quot;diff-new&quot;>CRA remittance due</span>, <span class=&quot;diff-new&quot;>EFT file status</span>, and <span class=&quot;diff-new&quot;>employer cost</span>. Same grid, same components — three extra cards conditionally rendered. Quick actions shift toward compliance tasks.',
+  accountant:'<b>Accountant</b> layers on the <span class=&quot;diff-acct&quot;>Action Required panel</span> (missing SIN, unapproved timesheets, pending EFT, PIER warnings) and a <span class=&quot;diff-acct&quot;>year-end readiness</span> card. Everything is additive — no card from lower tiers is removed, only added above.'
+};
+
+function navItemHTML(it){
+  return `<a class=&quot;nav-item ${it.active?'active':''} ${it.isnew?'is-new':''}&quot; href=&quot;#&quot;>${it.i} ${it.t}</a>`;
+}
+function renderNav(plan){
+  const def = NAV[plan]; let html='';
+  if(def.items){ def.items.forEach(it=>html+=navItemHTML(it)); if(def.upsell) html+=`<div class=&quot;nav-upsell&quot;>${def.upsell}</div>`; }
+  else def.groups.forEach(g=>{ if(g.sec) html+=`<div class=&quot;nav-sec&quot;>${g.sec}</div>`; g.items.forEach(it=>html+=navItemHTML(it)); });
+  document.getElementById('nav').innerHTML=html;
+}
+function renderStats(plan){
+  document.getElementById('statGrid').style.gridTemplateColumns = COLS[plan];
+  document.getElementById('statGrid').innerHTML = STATS[plan].map(s=>{
+    const tag = s.tag ? `<span class=&quot;tagnew ${s.tag==='acct'?'tag-acct':'tag-growth'}&quot;>${s.tag==='acct'?'ACCOUNTANT':'GROWTH+'}</span>` : '';
+    return `<div class=&quot;stat ${s.accent?'accent-'+s.accent:''}&quot;>${tag}<div class=&quot;stat-label&quot;>${s.l}</div><div class=&quot;stat-value ${s.mono?'mono':''}&quot;>${s.v}</div><div class=&quot;stat-foot&quot;>${s.f}</div></div>`;
+  }).join('');
+}
+function renderAlerts(plan){
+  const el = document.getElementById('alertPanel');
+  if(plan!=='accountant'){ el.innerHTML=''; return; }
+  el.innerHTML = `<div class=&quot;alert-panel&quot;>
+    <div class=&quot;ap-head&quot;><div class=&quot;ap-title&quot;>🚨 Action required</div><div class=&quot;ap-count&quot;>${ALERTS.length} items</div></div>
+    ${ALERTS.map(a=>`<div class=&quot;ap-row&quot;><div class=&quot;ap-ic ${a.ic}&quot;>${a.e}</div><div class=&quot;ap-txt&quot;>${a.t}<div class=&quot;s&quot;>${a.s}</div></div><a class=&quot;ap-act&quot; href=&quot;#&quot;>${a.a}</a></div>`).join('')}
+  </div>`;
+}
+function renderQA(plan){
+  document.getElementById('quickActions').innerHTML = QA[plan].map(q=>
+    `<a class=&quot;qa&quot; href=&quot;#&quot;><div class=&quot;qa-icon&quot;>${q.i}</div><div><div class=&quot;qa-title&quot;>${q.t}</div><div class=&quot;qa-desc&quot;>${q.d}</div></div><div class=&quot;qa-arrow&quot;>→</div></a>`
+  ).join('');
+}
+function render(plan){
+  const m = PLAN_META[plan];
+  document.getElementById('planBadge').innerHTML = `<span class=&quot;pdot&quot; style=&quot;background:${m.dot}&quot;></span>${m.label}`;
+  document.getElementById('pageSub').textContent = m.sub;
+  document.querySelectorAll('.empCount, #empCount1').forEach(e=>e.textContent=m.emps);
+  renderNav(plan); renderStats(plan); renderAlerts(plan); renderQA(plan);
+  document.getElementById('caption').innerHTML = CAPTIONS[plan];
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on', b.dataset.plan===plan));
+}
+document.getElementById('seg').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const p = b.dataset.plan; render(p);
+  try{ localStorage.setItem('mapleRunDashPlan', p); }catch(_){}
+});
+let init='solo'; try{ const s=localStorage.getItem('mapleRunDashPlan'); if(s&amp;&amp;PLAN_META[s]) init=s; }catch(_){}
+render(init);
+</script>
+</body>
+</html>
+"></iframe>
+<iframe class="frame" id="f-wiz" srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;>
+<title>MapleRun — Adaptive Pay Run (Step 1)</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Geist+Mono:wght@400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#e7e5e4;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* control bar */
+.controlbar{background:#1c1917;color:#fff;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;position:sticky;top:0;z-index:20}
+.cb-left{display:flex;flex-direction:column;gap:3px}
+.cb-title{font-size:15px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.cb-sub{font-size:12px;color:#a8a29e;max-width:580px;line-height:1.45}
+.cb-sub code{font-family:'Geist Mono',monospace;background:#292524;padding:1px 6px;border-radius:5px;color:#fcd34d;font-size:11px}
+.seg{display:inline-flex;background:#292524;border-radius:11px;padding:4px;gap:3px}
+.seg button{font-family:inherit;font-size:13px;font-weight:600;color:#a8a29e;background:none;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .12s}
+.seg button:hover{color:#e7e5e4}
+.seg button.on{background:#fff;color:#1c1917}
+.seg button .d{width:7px;height:7px;border-radius:50%}
+.seg button .d.solo{background:#0891b2}
+.seg button .d.growth{background:#16a34a}
+.seg button .d.acct{background:#B3261E}
+
+.app{display:flex;min-height:780px;background:#f5f5f4;margin:20px;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.12);position:relative}
+.sidebar{width:220px;background:#1c1917;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 22px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;margin-bottom:2px;font-size:13.5px;font-weight:500;color:#a8a29e;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.nav-sec{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#57534e;padding:14px 12px 5px}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.plan-badge .pdot{width:6px;height:6px;border-radius:50%}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c}
+
+.main{flex:1;padding:32px 44px 110px;overflow-y:auto}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:4px}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:24px}
+.stepper{display:flex;align-items:center;max-width:440px;margin:0 0 30px}
+.step{display:flex;align-items:center}
+.step.grow{flex:1}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.step-dot.active{background:#B3261E;color:#fff}
+.step-dot.pending{background:#e7e5e4;color:#a8a29e}
+.step-name{font-size:13px;font-weight:600;margin-left:9px}
+.step-name.active{color:#1c1917}
+.step-name.pending{color:#a8a29e}
+.step-line{flex:1;height:2px;margin:0 12px;background:#e7e5e4}
+
+/* period bar */
+.period{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:14px 18px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.period .pl{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em}
+.period .pv{font-size:15px;font-weight:700;margin-top:2px}
+.period .sep{width:1px;height:32px;background:#e7e5e4}
+.col-title{font-size:13px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.06em;margin:18px 0 12px}
+
+/* employee input card */
+.emp-card{background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:16px 18px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.emp-top{display:flex;align-items:center;justify-content:space-between}
+.emp{display:flex;align-items:center;gap:12px}
+.emp-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.emp-name{font-size:14px;font-weight:700}
+.emp-sub{font-size:12px;color:#a8a29e}
+.emp-gross{text-align:right}
+.emp-gross-l{font-size:11px;color:#a8a29e;text-transform:uppercase;letter-spacing:.05em}
+.emp-gross-v{font-size:18px;font-weight:700;color:#1c1917}
+.salaried-tag{font-size:10px;font-weight:700;background:#eef2ff;color:#4338ca;border-radius:10px;padding:2px 7px;margin-left:6px;letter-spacing:.03em}
+
+.inputs{display:grid;gap:12px;border-top:1px solid #f0efed;margin-top:14px;padding-top:14px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:600;color:#78716c}
+.field .inp{border:1px solid #d6d3d1;border-radius:8px;padding:9px 11px;font-size:14px;font-family:'Geist Mono',monospace;background:#fff;color:#1c1917}
+.field .inp.calc{background:#fafaf9;color:#78716c;border-style:dashed}
+.field .inp:focus{outline:none;border-color:#B3261E}
+.field .pref{font-size:10px;font-weight:700;border-radius:9px;padding:1px 6px;margin-left:6px}
+.pref-growth{background:#dcfce7;color:#15803d}
+.pref-acct{background:#fee2e2;color:#991b1b}
+
+/* expander */
+.expander{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#0e7490;background:#ecfeff;border:1px dashed #67e8f9;border-radius:9px;padding:9px 13px;cursor:pointer;margin-top:4px;width:fit-content}
+.expander:hover{background:#cffafe}
+.expander .chev{transition:transform .18s}
+.expander.open .chev{transform:rotate(90deg)}
+.extra{display:none;gap:12px;margin-top:12px}
+.extra.open{display:grid;animation:slidein .22s ease}
+@keyframes slidein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* helper note */
+.note{display:flex;gap:11px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 15px;margin-bottom:18px}
+.note .ni{font-size:15px}
+.note .nt{font-size:12.5px;color:#1e40af;line-height:1.5}
+.note .nt b{font-weight:700}
+
+.gridcols{display:grid;gap:12px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:1fr 1fr 1fr}
+
+/* action bar */
+.actionbar{position:absolute;left:220px;right:0;bottom:0;background:#fff;border-top:1px solid #e7e5e4;box-shadow:0 -2px 12px rgba(0,0,0,.06);padding:14px 44px;display:flex;justify-content:space-between;align-items:center}
+.ab-total{font-size:13px;color:#a8a29e}
+.ab-total b{font-size:17px;color:#1c1917;margin-left:8px}
+.btn-primary{padding:11px 22px;border-radius:10px;border:none;background:#B3261E;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-outline{padding:11px 22px;border-radius:10px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-right:12px}
+
+.caption{margin:0 20px 24px;background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start}
+.caption .ci{font-size:18px}
+.caption .ct{font-size:13px;color:#57534e;line-height:1.55}
+.caption .ct b{color:#1c1917}
+.diff-new{background:#dcfce7;color:#15803d;font-weight:700;border-radius:5px;padding:0 5px}
+.diff-acct{background:#fee2e2;color:#991b1b;font-weight:700;border-radius:5px;padding:0 5px}
+</style>
+</head>
+<body>
+
+<div class=&quot;controlbar&quot;>
+  <div class=&quot;cb-left&quot;>
+    <div class=&quot;cb-title&quot;>🍁 MapleRun · Run Payroll — Step 1 (Input)</div>
+    <div class=&quot;cb-sub&quot;>Same screen, same URL. The plan flag decides how many pay-type inputs render — Solo stays a two-field flow, complexity is opt-in behind an expander. Toggle the plan; click <code>+ Add pay types</code> to see disclosure in action.</div>
+  </div>
+  <div class=&quot;seg&quot; id=&quot;seg&quot;>
+    <button data-plan=&quot;solo&quot; class=&quot;on&quot;><span class=&quot;d solo&quot;></span>Solo</button>
+    <button data-plan=&quot;growth&quot;><span class=&quot;d growth&quot;></span>Growth</button>
+    <button data-plan=&quot;accountant&quot;><span class=&quot;d acct&quot;></span>Accountant</button>
+  </div>
+</div>
+
+<div class=&quot;app&quot;>
+  <aside class=&quot;sidebar&quot;>
+    <div class=&quot;sidebar-logo&quot;><span style=&quot;font-size:22px&quot;>🍁</span><span class=&quot;sidebar-logo-name&quot;>MapleRun</span></div>
+    <nav id=&quot;nav&quot;></nav>
+    <div class=&quot;sidebar-foot&quot;>
+      <span class=&quot;plan-badge&quot; id=&quot;planBadge&quot;></span>
+      <div class=&quot;user-row&quot;><div class=&quot;user-avatar&quot;>M</div><div><div class=&quot;user-name&quot;>Marcus Reid</div><div class=&quot;user-sub&quot;>Sign out</div></div></div>
+    </div>
+  </aside>
+
+  <main class=&quot;main&quot;>
+    <div class=&quot;breadcrumb&quot;>Payroll › New pay run</div>
+    <div class=&quot;page-title&quot;>Run payroll</div>
+    <div class=&quot;stepper&quot;>
+      <div class=&quot;step grow&quot;><div class=&quot;step-dot active&quot;>1</div><span class=&quot;step-name active&quot;>Input</span><div class=&quot;step-line&quot;></div></div>
+      <div class=&quot;step grow&quot;><div class=&quot;step-dot pending&quot;>2</div><span class=&quot;step-name pending&quot;>Preview</span><div class=&quot;step-line&quot;></div></div>
+      <div class=&quot;step&quot;><div class=&quot;step-dot pending&quot;>3</div><span class=&quot;step-name pending&quot;>Finalize</span></div>
+    </div>
+
+    <div class=&quot;period&quot;>
+      <div><div class=&quot;pl&quot;>Pay group</div><div class=&quot;pv&quot;>All staff · Biweekly</div></div>
+      <div class=&quot;sep&quot;></div>
+      <div><div class=&quot;pl&quot;>Pay period</div><div class=&quot;pv&quot;>Jan 18 – 31, 2026</div></div>
+      <div class=&quot;sep&quot;></div>
+      <div><div class=&quot;pl&quot;>Pay date</div><div class=&quot;pv&quot;>Jan 31, 2026</div></div>
+    </div>
+
+    <div id=&quot;planNote&quot;></div>
+
+    <div class=&quot;col-title&quot;>Enter hours &amp;amp; earnings</div>
+    <div id=&quot;empList&quot;></div>
+  </main>
+
+  <div class=&quot;actionbar&quot;>
+    <div class=&quot;ab-total&quot;>Estimated net<b class=&quot;mono&quot; id=&quot;abNet&quot;>$6,914.20</b></div>
+    <div><button class=&quot;btn-outline&quot;>Save draft</button><button class=&quot;btn-primary&quot;>Continue to preview →</button></div>
+  </div>
+</div>
+
+<div class=&quot;caption&quot;>
+  <div class=&quot;ci&quot;>🧭</div>
+  <div class=&quot;ct&quot; id=&quot;caption&quot;></div>
+</div>
+
+<script>
+const PLAN_META = {
+  solo:{label:'Solo plan',dot:'#0891b2'}, growth:{label:'Growth plan',dot:'#16a34a'}, accountant:{label:'Accountant plan',dot:'#B3261E'}
+};
+const NAV = {
+  solo:[{i:'🏠',t:'Dashboard'},{i:'👥',t:'Employees'},{i:'💵',t:'Run Payroll',active:true},{i:'📄',t:'Pay Statements'},{i:'⚙️',t:'Settings'}],
+  growth:[{i:'🏠',t:'Dashboard'},{i:'👥',t:'Employees'},{i:'⏱',t:'Timesheets'},{i:'💵',t:'Run Payroll',active:true},{i:'📄',t:'Pay Statements'},{sec:'Compliance'},{i:'🧾',t:'Remittances'},{i:'🏦',t:'Direct Deposit'},{i:'📋',t:'ROE'},{sec:'Analytics'},{i:'📊',t:'Reports'},{i:'⚙️',t:'Settings'}],
+  accountant:[{i:'🏠',t:'Dashboard'},{i:'👥',t:'Employees'},{i:'⏱',t:'Timesheets'},{i:'💵',t:'Run Payroll',active:true},{i:'📄',t:'Pay Statements'},{sec:'Compliance'},{i:'🧾',t:'Remittances'},{i:'🏦',t:'Direct Deposit'},{i:'📋',t:'ROE'},{i:'🗓',t:'Year-End'},{sec:'Analytics &amp; System'},{i:'📊',t:'Reports'},{i:'📒',t:'GL'},{i:'⚙️',t:'Settings'},{i:'🔍',t:'Audit Log'}]
+};
+const NOTES = {
+  solo:`<div class=&quot;note&quot;><div class=&quot;ni&quot;>✨</div><div class=&quot;nt&quot;><b>Simple mode.</b> Salaried pay is filled automatically — just confirm and continue. CPP, EI, and tax are calculated for you.</div></div>`,
+  growth:`<div class=&quot;note&quot;><div class=&quot;ni&quot;>⏱</div><div class=&quot;nt&quot;><b>Hours pulled from timesheets.</b> Adjust if needed, then optionally add bonus, stat holiday, or vacation payout per employee.</div></div>`,
+  accountant:`<div class=&quot;note&quot;><div class=&quot;ni&quot;>🧮</div><div class=&quot;nt&quot;><b>Full earnings entry.</b> All pay types, retro &amp;amp; commission, gross-up, and GL coding are available per employee.</div></div>`
+};
+const EMPS = [
+  {n:'Sarah Tremblay',a:'S',sub:'Ontario · Salaried',gross:'$2,884.62',rate:'$75,000 / yr',hours:'75.0'},
+  {n:'David Chen',a:'D',sub:'Ontario · Hourly',gross:'$3,100.00',rate:'$41.33 / hr',hours:'75.0'},
+  {n:'Amara Okonkwo',a:'A',sub:'Ontario · Hourly',gross:'$2,900.00',rate:'$38.67 / hr',hours:'75.0'}
+];
+const CAPTIONS = {
+  solo:'<b>Solo</b> — the minimum viable pay run. Pay period is set, salaried gross is auto-filled, deductions calculated. Two decisions: confirm and continue. This is essentially the current flow, kept deliberately small.',
+  growth:'<b>Growth</b> adds <span class=&quot;diff-new&quot;>timesheet hours</span> and an opt-in <span class=&quot;diff-new&quot;>+ Add pay types</span> expander (bonus · stat · vacation). The base view stays clean — extra earnings are one click away, never forced on screen.',
+  accountant:'<b>Accountant</b> expands everything inline: <span class=&quot;diff-acct&quot;>overtime, stat, vacation, bonus, commission, retro</span> plus <span class=&quot;diff-acct&quot;>gross-up</span> and a <span class=&quot;diff-acct&quot;>GL code</span> per employee — the full earnings grid a bookkeeper needs.'
+};
+
+function renderNav(plan){
+  document.getElementById('nav').innerHTML = NAV[plan].map(it=>
+    it.sec ? `<div class=&quot;nav-sec&quot;>${it.sec}</div>` : `<a class=&quot;nav-item ${it.active?'active':''}&quot; href=&quot;#&quot;>${it.i} ${it.t}</a>`
+  ).join('');
+}
+function empCard(e,i,plan){
+  let body='';
+  if(plan==='solo'){
+    body = `<div class=&quot;inputs&quot;><div class=&quot;field&quot;><label>Gross this period <span class=&quot;salaried-tag&quot;>SALARIED · AUTO</span></label><input class=&quot;inp calc&quot; value=&quot;${e.gross}&quot; readonly></div></div>`;
+  } else if(plan==='growth'){
+    body = `<div class=&quot;inputs&quot;>
+      <div class=&quot;gridcols c2&quot;>
+        <div class=&quot;field&quot;><label>Regular hours <span class=&quot;pref pref-growth&quot;>FROM TIMESHEET</span></label><input class=&quot;inp&quot; value=&quot;${e.hours}&quot;></div>
+        <div class=&quot;field&quot;><label>Rate</label><input class=&quot;inp calc&quot; value=&quot;${e.rate}&quot; readonly></div>
+      </div>
+      <div class=&quot;expander&quot; data-i=&quot;${i}&quot;><span class=&quot;chev&quot;>▸</span> + Add bonus · stat · vacation</div>
+      <div class=&quot;extra c3&quot; id=&quot;extra-${i}&quot;>
+        <div class=&quot;field&quot;><label>Bonus</label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+        <div class=&quot;field&quot;><label>Stat holiday pay</label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+        <div class=&quot;field&quot;><label>Vacation payout</label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+      </div>
+    </div>`;
+  } else {
+    body = `<div class=&quot;inputs&quot;>
+      <div class=&quot;gridcols c3&quot;>
+        <div class=&quot;field&quot;><label>Regular hours</label><input class=&quot;inp&quot; value=&quot;${e.hours}&quot;></div>
+        <div class=&quot;field&quot;><label>Overtime hrs <span class=&quot;pref pref-acct&quot;>1.5×</span></label><input class=&quot;inp&quot; placeholder=&quot;0.0&quot;></div>
+        <div class=&quot;field&quot;><label>Stat holiday pay</label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+      </div>
+      <div class=&quot;gridcols c3&quot;>
+        <div class=&quot;field&quot;><label>Vacation payout</label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+        <div class=&quot;field&quot;><label>Bonus</label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+        <div class=&quot;field&quot;><label>Commission</label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+      </div>
+      <div class=&quot;gridcols c3&quot;>
+        <div class=&quot;field&quot;><label>Retro / back pay</label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+        <div class=&quot;field&quot;><label>Gross-up to net <span class=&quot;pref pref-acct&quot;>CALC</span></label><input class=&quot;inp&quot; placeholder=&quot;$0.00&quot;></div>
+        <div class=&quot;field&quot;><label>GL cost centre <span class=&quot;pref pref-acct&quot;>GL</span></label><input class=&quot;inp&quot; value=&quot;5010 · Wages&quot;></div>
+      </div>
+    </div>`;
+  }
+  const grossTag = (plan==='solo') ? '' : `<div class=&quot;emp-gross&quot;><div class=&quot;emp-gross-l&quot;>Gross</div><div class=&quot;emp-gross-v mono&quot;>${e.gross}</div></div>`;
+  return `<div class=&quot;emp-card&quot;>
+    <div class=&quot;emp-top&quot;><div class=&quot;emp&quot;><div class=&quot;emp-avatar&quot;>${e.a}</div><div><div class=&quot;emp-name&quot;>${e.n}</div><div class=&quot;emp-sub&quot;>${e.sub} · ${e.rate}</div></div></div>${grossTag}</div>
+    ${body}
+  </div>`;
+}
+function render(plan){
+  const m=PLAN_META[plan];
+  document.getElementById('planBadge').innerHTML=`<span class=&quot;pdot&quot; style=&quot;background:${m.dot}&quot;></span>${m.label}`;
+  renderNav(plan);
+  document.getElementById('planNote').innerHTML = NOTES[plan];
+  document.getElementById('empList').innerHTML = EMPS.map((e,i)=>empCard(e,i,plan)).join('');
+  document.getElementById('caption').innerHTML = CAPTIONS[plan];
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on', b.dataset.plan===plan));
+  // wire expanders
+  document.querySelectorAll('.expander').forEach(ex=>{
+    ex.addEventListener('click',()=>{
+      ex.classList.toggle('open');
+      const t=document.getElementById('extra-'+ex.dataset.i); if(t) t.classList.toggle('open');
+    });
+  });
+}
+document.getElementById('seg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  render(b.dataset.plan);
+  try{ localStorage.setItem('mapleRunWizPlan', b.dataset.plan); }catch(_){}
+});
+let init='solo'; try{const s=localStorage.getItem('mapleRunWizPlan'); if(s&amp;&amp;PLAN_META[s]) init=s;}catch(_){}
+render(init);
+</script>
+</body>
+</html>
+"></iframe>
+<iframe class="frame" id="f-report" srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;>
+<title>MapleRun — Payroll Summary Report</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Geist+Mono:wght@400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 22px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;margin-bottom:2px;font-size:13.5px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.nav-sec{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#57534e;padding:14px 12px 5px}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+
+.main{flex:1;padding:34px 44px;max-width:1180px}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:4px}
+.breadcrumb a{color:#a8a29e;text-decoration:none}
+.breadcrumb a:hover{color:#78716c}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.page-sub{font-size:14px;color:#78716c;margin-top:5px}
+.exports{display:flex;gap:10px}
+.btn-out{padding:9px 15px;border-radius:9px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.btn-out:hover{border-color:#B3261E;color:#B3261E}
+
+/* filter bar */
+.filters{display:flex;align-items:flex-end;gap:14px;background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:14px 18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04);flex-wrap:wrap}
+.filt{display:flex;flex-direction:column;gap:5px}
+.filt label{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.05em}
+.filt select,.filt .seg-date{border:1px solid #d6d3d1;border-radius:8px;padding:8px 11px;font-size:13px;font-family:inherit;background:#fff;color:#1c1917;cursor:pointer}
+.filt select:focus{outline:none;border-color:#B3261E}
+.seg-date{display:inline-flex;gap:2px;padding:3px;background:#f5f5f4;border:1px solid #e7e5e4}
+.seg-date button{font-family:inherit;font-size:12px;font-weight:600;color:#78716c;background:none;border:none;padding:6px 11px;border-radius:6px;cursor:pointer}
+.seg-date button.on{background:#fff;color:#1c1917;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.filt-spacer{flex:1}
+.run-btn{padding:9px 16px;border-radius:9px;border:none;background:#1c1917;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+
+/* summary totals */
+.totals{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#e7e5e4;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;margin-bottom:14px}
+.tt{background:#fff;padding:16px 18px}
+.tt-l{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em}
+.tt-v{font-size:22px;font-weight:700;margin-top:6px;letter-spacing:-.01em}
+.tt.net{background:linear-gradient(135deg,#fef2f2,#fee2e2)}
+.tt.net .tt-l{color:#991b1b}
+.tt.net .tt-v{color:#B3261E}
+
+.sub-strip{display:flex;gap:22px;font-size:12px;color:#78716c;margin-bottom:20px;padding:0 2px}
+.sub-strip b{color:#1c1917;font-weight:700}
+
+/* table */
+.col-title{font-size:13px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.table-wrap{background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+table{width:100%;border-collapse:collapse}
+thead th{background:#fafaf9;font-size:11px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.04em;padding:11px 14px;text-align:right;border-bottom:1px solid #e7e5e4;white-space:nowrap}
+thead th:first-child,thead th.l{text-align:left}
+tbody td{padding:12px 14px;text-align:right;font-size:13px;border-bottom:1px solid #f0efed;white-space:nowrap}
+tbody td:first-child{text-align:left}
+tbody tr:hover{background:#fafaf9}
+.emp-cell{display:flex;align-items:center;gap:10px}
+.emp-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
+.emp-n{font-size:13px;font-weight:600}
+.emp-s{font-size:11px;color:#a8a29e}
+.net-col{font-weight:700;color:#B3261E}
+tfoot td{padding:13px 14px;text-align:right;font-size:13px;font-weight:700;background:#1c1917;color:#fff;border:none;white-space:nowrap}
+tfoot td:first-child{text-align:left}
+.muted{color:#a8a29e}
+
+.footnote{display:flex;gap:11px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:13px 16px;margin-top:18px}
+.footnote .fi{font-size:15px}
+.footnote .ft{font-size:12.5px;color:#1e40af;line-height:1.5}
+.footnote .ft b{font-weight:700}
+</style>
+</head>
+<body>
+<aside class=&quot;sidebar&quot;>
+  <div class=&quot;sidebar-logo&quot;><span style=&quot;font-size:22px&quot;>🍁</span><span class=&quot;sidebar-logo-name&quot;>MapleRun</span></div>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>🏠 Dashboard</a>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>👥 Employees</a>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>⏱ Timesheets</a>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>💵 Run Payroll</a>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>📄 Pay Statements</a>
+  <div class=&quot;nav-sec&quot;>Compliance</div>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>🧾 Remittances</a>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>🏦 Direct Deposit</a>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>📋 ROE</a>
+  <div class=&quot;nav-sec&quot;>Analytics</div>
+  <a class=&quot;nav-item active&quot; href=&quot;#&quot;>📊 Reports</a>
+  <a class=&quot;nav-item&quot; href=&quot;#&quot;>⚙️ Settings</a>
+  <div class=&quot;sidebar-foot&quot;>
+    <span class=&quot;plan-badge&quot;><span class=&quot;dot&quot;></span>Growth plan</span>
+    <div class=&quot;user-row&quot;><div class=&quot;user-avatar&quot;>M</div><div><div class=&quot;user-name&quot;>Marcus Reid</div><div class=&quot;user-sub&quot;>Sign out</div></div></div>
+  </div>
+</aside>
+
+<main class=&quot;main&quot;>
+  <div class=&quot;breadcrumb&quot;><a href=&quot;#&quot;>Reports</a> › Payroll Summary</div>
+  <div class=&quot;page-head&quot;>
+    <div>
+      <div class=&quot;page-title&quot;>Payroll Summary</div>
+      <div class=&quot;page-sub&quot;>Total wages, deductions, and employer costs for Northwind Carpentry Ltd.</div>
+    </div>
+    <div class=&quot;exports&quot;>
+      <a class=&quot;btn-out&quot; href=&quot;#&quot;>⬇︎ PDF</a>
+      <a class=&quot;btn-out&quot; href=&quot;#&quot;>⬇︎ CSV</a>
+      <a class=&quot;btn-out&quot; href=&quot;#&quot;>🖨 Print</a>
+    </div>
+  </div>
+
+  <!-- filter bar -->
+  <div class=&quot;filters&quot;>
+    <div class=&quot;filt&quot;>
+      <label>Date range</label>
+      <div class=&quot;seg-date&quot; id=&quot;dateSeg&quot;>
+        <button>This pay run</button>
+        <button class=&quot;on&quot;>Month to date</button>
+        <button>Quarter</button>
+        <button>Year to date</button>
+        <button>Custom</button>
+      </div>
+    </div>
+    <div class=&quot;filt&quot;>
+      <label>Pay group</label>
+      <select><option>All staff (Biweekly)</option><option>Office</option><option>Field crew</option></select>
+    </div>
+    <div class=&quot;filt&quot;>
+      <label>Group by</label>
+      <select><option>Employee</option><option>Department</option><option>Pay date</option></select>
+    </div>
+    <div class=&quot;filt-spacer&quot;></div>
+    <button class=&quot;run-btn&quot;>Apply</button>
+  </div>
+
+  <!-- totals -->
+  <div class=&quot;totals&quot;>
+    <div class=&quot;tt&quot;><div class=&quot;tt-l&quot;>Gross pay</div><div class=&quot;tt-v mono&quot;>$53,307.72</div></div>
+    <div class=&quot;tt&quot;><div class=&quot;tt-l&quot;>Total deductions</div><div class=&quot;tt-v mono&quot;>$11,822.52</div></div>
+    <div class=&quot;tt net&quot;><div class=&quot;tt-l&quot;>Net pay</div><div class=&quot;tt-v mono&quot;>$41,485.20</div></div>
+    <div class=&quot;tt&quot;><div class=&quot;tt-l&quot;>Employer contributions</div><div class=&quot;tt-v mono&quot;>$4,303.80</div></div>
+    <div class=&quot;tt&quot;><div class=&quot;tt-l&quot;>Total payroll cost</div><div class=&quot;tt-v mono&quot;>$57,611.52</div></div>
+  </div>
+  <div class=&quot;sub-strip&quot;>
+    <div>Period: <b>Jan 1 – 31, 2026</b></div>
+    <div>Pay runs: <b>2</b></div>
+    <div>Employees paid: <b>14</b></div>
+    <div>Remittance to CRA: <b class=&quot;mono&quot;>$15,126.32</b></div>
+  </div>
+
+  <!-- table -->
+  <div class=&quot;col-title&quot;>By employee</div>
+  <div class=&quot;table-wrap&quot;>
+    <table>
+      <thead>
+        <tr>
+          <th class=&quot;l&quot;>Employee</th>
+          <th>Gross</th>
+          <th>CPP</th>
+          <th>EI</th>
+          <th>Fed tax</th>
+          <th>Prov tax</th>
+          <th>Other</th>
+          <th>Net pay</th>
+          <th>Empr. cost</th>
+        </tr>
+      </thead>
+      <tbody id=&quot;rows&quot;></tbody>
+      <tfoot>
+        <tr>
+          <td>Totals · 14 employees</td>
+          <td class=&quot;mono&quot;>$53,307.72</td>
+          <td class=&quot;mono&quot;>$3,074.64</td>
+          <td class=&quot;mono&quot;>$867.24</td>
+          <td class=&quot;mono&quot;>$5,293.20</td>
+          <td class=&quot;mono&quot;>$2,078.04</td>
+          <td class=&quot;mono&quot;>$509.40</td>
+          <td class=&quot;mono&quot;>$41,485.20</td>
+          <td class=&quot;mono&quot;>$4,303.80</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class=&quot;footnote&quot;>
+    <div class=&quot;fi&quot;>💡</div>
+    <div class=&quot;ft&quot;><b>Reuses data you already compute.</b> Every figure here is an aggregation of finalized pay runs — no new calculations or data model. This is why it's the recommended first new report to build (Roadmap Step 3): high value to accountants, low engineering cost.</div>
+  </div>
+</main>
+
+<script>
+const ROWS = [
+  {n:'Sarah Tremblay',a:'S',d:'Office · Salaried',g:'5,769.24',cpp:'332.72',ei:'93.86',ft:'572.82',pt:'225.56',o:'55.00',net:'4,489.28',ec:'465.80'},
+  {n:'David Chen',a:'D',d:'Field crew · Hourly',g:'6,200.00',cpp:'357.68',ei:'100.88',ft:'625.80',pt:'319.84',o:'0.00',net:'4,795.80',ec:'500.40'},
+  {n:'Amara Okonkwo',a:'A',d:'Field crew · Hourly',g:'5,800.00',cpp:'334.48',ei:'94.34',ft:'577.80',pt:'231.06',o:'120.00',net:'4,442.32',ec:'468.20'},
+  {n:'Liam Gauthier',a:'L',d:'Office · Salaried',g:'4,615.38',cpp:'266.16',ei:'75.08',ft:'412.40',pt:'162.30',o:'48.00',net:'3,651.44',ec:'372.60'},
+  {n:'Priya Sharma',a:'P',d:'Office · Salaried',g:'5,000.00',cpp:'288.40',ei:'81.34',ft:'461.20',pt:'181.40',o:'55.00',net:'3,932.66',ec:'403.60'},
+  {n:'Daniel Okafor',a:'D',d:'Field crew · Hourly',g:'4,920.00',cpp:'283.76',ei:'80.04',ft:'448.60',pt:'176.20',o:'0.00',net:'3,931.40',ec:'397.20'},
+  {n:'Emma Bouchard',a:'E',d:'Office · Salaried',g:'4,038.46',cpp:'232.92',ei:'65.70',ft:'342.60',pt:'134.80',o:'40.00',net:'3,222.44',ec:'326.00'},
+];
+document.getElementById('rows').innerHTML = ROWS.map(r=>`
+  <tr>
+    <td><div class=&quot;emp-cell&quot;><div class=&quot;emp-av&quot;>${r.a}</div><div><div class=&quot;emp-n&quot;>${r.n}</div><div class=&quot;emp-s&quot;>${r.d}</div></div></div></td>
+    <td class=&quot;mono&quot;>$${r.g}</td>
+    <td class=&quot;mono&quot;>$${r.cpp}</td>
+    <td class=&quot;mono&quot;>$${r.ei}</td>
+    <td class=&quot;mono&quot;>$${r.ft}</td>
+    <td class=&quot;mono&quot;>$${r.pt}</td>
+    <td class=&quot;mono ${r.o==='0.00'?'muted':''}&quot;>$${r.o}</td>
+    <td class=&quot;mono net-col&quot;>$${r.net}</td>
+    <td class=&quot;mono&quot;>$${r.ec}</td>
+  </tr>`).join('') + `<tr><td colspan=&quot;9&quot; style=&quot;text-align:center;color:#a8a29e;font-size:12px;padding:12px&quot;>+ 7 more employees</td></tr>`;
+
+document.getElementById('dateSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#dateSeg button').forEach(x=>x.classList.toggle('on',x===b));
+});
+</script>
+</body>
+</html>
+"></iframe>
+<iframe class="frame" id="f-handoff" srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;>
+<title>MapleRun — Coder Handoff</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Geist+Mono:wght@400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;color:#1c1917;font-size:14px;line-height:1.55}
+.mono{font-family:'Geist Mono',monospace}
+code{font-family:'Geist Mono',monospace;font-size:.92em;background:#eceae8;padding:1px 6px;border-radius:5px;color:#9f1239}
+
+.header{background:#1c1917;color:#fff;padding:36px 56px 30px}
+.hdr-logo{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:800;letter-spacing:-.02em;margin-bottom:16px}
+.hdr-title{font-size:30px;font-weight:800;letter-spacing:-.025em}
+.hdr-sub{font-size:15px;color:#a8a29e;margin-top:8px;max-width:760px;line-height:1.6}
+.hdr-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.chip{font-size:11px;font-weight:700;letter-spacing:.04em;background:#292524;color:#e7e5e4;border-radius:20px;padding:5px 13px}
+.chip.green{background:#14301a;color:#86efac}
+
+.wrap{max-width:1080px;margin:0 auto;padding:44px 56px 100px}
+.section{margin-bottom:46px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#B3261E;margin-bottom:6px}
+.sec-title{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.sec-sub{font-size:14px;color:#78716c;margin-bottom:22px;max-width:780px}
+
+.principle{background:#1c1917;color:#fff;border-radius:14px;padding:22px 26px;margin-bottom:30px;display:flex;gap:16px;align-items:flex-start}
+.principle .pi{font-size:22px}
+.principle .pt{font-size:15px;line-height:1.6;color:#e7e5e4}
+.principle .pt b{color:#fff}
+
+/* code block */
+.code{background:#1c1917;border-radius:12px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+.code pre{font-family:'Geist Mono',monospace;font-size:12.5px;line-height:1.65;color:#e7e5e4;white-space:pre}
+.code .c{color:#78716c}
+.code .k{color:#fcd34d}
+.code .s{color:#86efac}
+.code .f{color:#7dd3fc}
+
+/* step cards */
+.step{display:flex;gap:18px;background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.step-num{width:38px;height:38px;border-radius:10px;background:#1c1917;color:#fff;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step.s0 .step-num{background:#0891b2}
+.step.s1 .step-num{background:#6d28d9}
+.step.s2 .step-num{background:#16a34a}
+.step.s3 .step-num{background:#B3261E}
+.step.s4 .step-num{background:#d97706}
+.step-body{flex:1}
+.step-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.step-title{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.risk{font-size:10px;font-weight:800;letter-spacing:.04em;border-radius:20px;padding:2px 9px}
+.risk.none{background:#dcfce7;color:#15803d}
+.risk.low{background:#fef9c3;color:#854d0e}
+.risk.med{background:#ffedd5;color:#9a3412}
+.step-what{font-size:13.5px;color:#44403c;line-height:1.55;margin-bottom:10px}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:12.5px;margin-top:8px}
+.meta dt{color:#a8a29e;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:10.5px;padding-top:1px;white-space:nowrap}
+.meta dd{color:#1c1917}
+.meta dd b{font-weight:600}
+.ac{margin-top:10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:10px 13px}
+.ac-t{font-size:11px;font-weight:800;color:#15803d;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+.ac ul{margin:0;padding-left:18px}
+.ac li{font-size:12.5px;color:#166534;margin-bottom:3px}
+
+/* file map */
+.fmap{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.fmap thead tr{background:#1c1917;color:#fff}
+.fmap th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.fmap td{padding:12px 16px;border-bottom:1px solid #f0efed;vertical-align:top;font-size:13px}
+.fmap tr:last-child td{border-bottom:none}
+.fmap td:first-child{font-weight:600;white-space:nowrap}
+.fmap a{color:#B3261E;text-decoration:none;font-weight:600}
+.fmap a:hover{text-decoration:underline}
+.tag{display:inline-block;font-size:10px;font-weight:700;border-radius:10px;padding:2px 8px;letter-spacing:.03em}
+.tag.target{background:#eff6ff;color:#1d4ed8}
+.tag.ref{background:#f5f3ff;color:#6d28d9}
+.tag.spec{background:#fef2f2;color:#991b1b}
+
+/* two col */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card h4{font-size:14px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lirow{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid #f7f6f4;font-size:13px}
+.lirow:last-child{border-bottom:none}
+.lirow .i{flex-shrink:0}
+.dont .lirow .i{color:#B3261E}
+.do .lirow .i{color:#16a34a}
+
+.checklist{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:8px 22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ck{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #f0efed;font-size:13.5px;align-items:flex-start}
+.ck:last-child{border-bottom:none}
+.ck .box{width:17px;height:17px;border:2px solid #d6d3d1;border-radius:5px;flex-shrink:0;margin-top:1px}
+.ck b{font-weight:700}
+.ck .s{color:#78716c;font-size:12.5px;margin-top:1px}
+
+.note{display:flex;gap:12px;border-radius:11px;padding:14px 18px;margin:14px 0}
+.note.amber{background:#fffbeb;border:1px solid #fde68a}
+.note.blue{background:#eff6ff;border:1px solid #bfdbfe}
+.note .ni{font-size:16px}
+.note .nt{font-size:13px;line-height:1.5}
+.note.amber .nt{color:#92400e}
+.note.blue .nt{color:#1e40af}
+.note .nt b{font-weight:700}
+@media print{body{background:#fff}.wrap{padding:24px 32px}}
+</style>
+</head>
+<body>
+
+<div class=&quot;header&quot;>
+  <div class=&quot;hdr-logo&quot;><span>🍁</span> MapleRun</div>
+  <div class=&quot;hdr-title&quot;>Coder Handoff — Plan Tiering Rollout</div>
+  <div class=&quot;hdr-sub&quot;>Everything a developer needs to ship the Solo / Growth / Accountant model on top of the existing app — without breaking what works. Architecture, a 5-step build order, file map, and acceptance criteria.</div>
+  <div class=&quot;hdr-chips&quot;>
+    <span class=&quot;chip&quot;>For the dev implementing Steps 0–4</span>
+    <span class=&quot;chip green&quot;>Additive · flag-gated · zero rewrites</span>
+  </div>
+</div>
+
+<div class=&quot;wrap&quot;>
+
+  <!-- PRINCIPLE -->
+  <div class=&quot;principle&quot;>
+    <div class=&quot;pi&quot;>🔑</div>
+    <div class=&quot;pt&quot;><b>The one rule:</b> never refactor a working screen — only <b>wrap</b> it (to hide things) or <b>extend</b> it (to add things). Every step below is additive and gated by a single <code>company.plan</code> value. The simple case stays simple; complexity is reachable but never imposed.</div>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Foundation</div>
+    <div class=&quot;sec-title&quot;>The architecture — three primitives</div>
+    <div class=&quot;sec-sub&quot;>Everything in the rollout rests on these three pieces. Build them once in Steps 0–1, then every later screen is a one-liner.</div>
+
+    <div class=&quot;code&quot;><pre><span class=&quot;c&quot;>// 1. One source of truth on the company/account record</span>
+<span class=&quot;k&quot;>type</span> Plan = <span class=&quot;s&quot;>'solo'</span> | <span class=&quot;s&quot;>'growth'</span> | <span class=&quot;s&quot;>'accountant'</span>;
+company.plan = <span class=&quot;s&quot;>'growth'</span>;  <span class=&quot;c&quot;>// default EXISTING accounts here — see Step 0</span>
+
+<span class=&quot;c&quot;>// 2. One capability map — features unlock at a tier and above</span>
+<span class=&quot;k&quot;>const</span> TIERS = [<span class=&quot;s&quot;>'solo'</span>, <span class=&quot;s&quot;>'growth'</span>, <span class=&quot;s&quot;>'accountant'</span>];
+<span class=&quot;k&quot;>const</span> REQUIRES = {
+  timesheets:<span class=&quot;s&quot;>'growth'</span>, remittances:<span class=&quot;s&quot;>'growth'</span>, eft:<span class=&quot;s&quot;>'growth'</span>, roe:<span class=&quot;s&quot;>'growth'</span>,
+  reportsCore:<span class=&quot;s&quot;>'growth'</span>, payTypesExtra:<span class=&quot;s&quot;>'growth'</span>,
+  yearEndCentre:<span class=&quot;s&quot;>'accountant'</span>, gl:<span class=&quot;s&quot;>'accountant'</span>, auditLog:<span class=&quot;s&quot;>'accountant'</span>,
+  quebec:<span class=&quot;s&quot;>'accountant'</span>, compliancePanel:<span class=&quot;s&quot;>'accountant'</span>, customReports:<span class=&quot;s&quot;>'accountant'</span>
+};
+
+<span class=&quot;c&quot;>// 3. One gate helper + one upgrade-prompt component</span>
+<span class=&quot;k&quot;>function</span> <span class=&quot;f&quot;>can</span>(feature) {
+  <span class=&quot;k&quot;>return</span> TIERS.indexOf(company.plan) &amp;gt;= TIERS.indexOf(REQUIRES[feature]);
+}
+<span class=&quot;c&quot;>// &amp;lt;UpgradePrompt feature=&quot;roe&quot; /&amp;gt;  — the existing ROE lock, generalised</span></pre></div>
+
+    <div class=&quot;note blue&quot;><div class=&quot;ni&quot;>💡</div><div class=&quot;nt&quot;><b>You already have the pattern.</b> The current ROE / Payroll-Journal locks are exactly <code>can('roe')</code> + an upgrade card. Step 1 just extracts that into the shared helper and component above — then points the existing locks at it. No new behaviour, just centralisation.</div></div>
+  </div>
+
+  <!-- BUILD ORDER -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Build Order</div>
+    <div class=&quot;sec-title&quot;>Five steps, lowest risk first</div>
+    <div class=&quot;sec-sub&quot;>Ship in this order. Steps 0–1 change nothing users see (pure de-risking). Steps 2–4 are visible but additive. Each has its own acceptance criteria.</div>
+
+    <div class=&quot;step s0&quot;>
+      <div class=&quot;step-num&quot;>0</div>
+      <div class=&quot;step-body&quot;>
+        <div class=&quot;step-head&quot;><span class=&quot;step-title&quot;>Introduce the <code>plan</code> flag</span><span class=&quot;risk none&quot;>ZERO RISK</span></div>
+        <div class=&quot;step-what&quot;>Add <code>plan</code> to the company record + the capability map &amp;amp; <code>can()</code> helper above. <b>Default every existing account to the tier that matches what they see today</b> (≈ <code>growth</code> / <code>accountant</code>). Nothing renders differently yet.</div>
+        <dl class=&quot;meta&quot;>
+          <dt>Touches</dt><dd>Data model / company record, one new <code>plan.ts</code> util</dd>
+          <dt>UI change</dt><dd><b>None</b></dd>
+        </dl>
+        <div class=&quot;ac&quot;><div class=&quot;ac-t&quot;>✓ Done when</div><ul><li>Every account has a <code>plan</code> value; existing users render identically to before.</li><li><code>can('feature')</code> returns correct booleans in a unit test for all three tiers.</li></ul></div>
+      </div>
+    </div>
+
+    <div class=&quot;step s1&quot;>
+      <div class=&quot;step-num&quot;>1</div>
+      <div class=&quot;step-body&quot;>
+        <div class=&quot;step-head&quot;><span class=&quot;step-title&quot;>Consolidate existing gates</span><span class=&quot;risk low&quot;>LOW RISK</span></div>
+        <div class=&quot;step-what&quot;>Replace the hand-written ROE &amp;amp; Payroll-Journal locks with the shared <code>can()</code> + <code>&amp;lt;UpgradePrompt&amp;gt;</code>. Refactor only code that already gates — no new screens.</div>
+        <dl class=&quot;meta&quot;>
+          <dt>Touches</dt><dd>Reports screen (existing locked cards)</dd>
+          <dt>UI change</dt><dd>Visually identical; one reusable component now</dd>
+        </dl>
+        <div class=&quot;ac&quot;><div class=&quot;ac-t&quot;>✓ Done when</div><ul><li>ROE &amp;amp; Journal still lock/unlock exactly as before, now via the shared component.</li><li>Adding a new gated feature is a one-liner.</li></ul></div>
+      </div>
+    </div>
+
+    <div class=&quot;step s2&quot;>
+      <div class=&quot;step-num&quot;>2</div>
+      <div class=&quot;step-body&quot;>
+        <div class=&quot;step-head&quot;><span class=&quot;step-title&quot;>Make the sidebar plan-aware</span><span class=&quot;risk low&quot;>LOW RISK</span></div>
+        <div class=&quot;step-what&quot;>Drive the nav from a config array and wrap each item in <code>can()</code>. Solo renders 5 items, Growth 10, Accountant 13. Add the &quot;Compliance / Analytics&quot; group headings. Show a single subtle upsell at the bottom for Solo — never a wall of greyed-out items.</div>
+        <dl class=&quot;meta&quot;>
+          <dt>Touches</dt><dd>Sidebar component only</dd>
+          <dt>Visual target</dt><dd><b>MapleRun Adaptive Dashboard</b> (sidebar morphs as you toggle)</dd>
+        </dl>
+        <div class=&quot;ac&quot;><div class=&quot;ac-t&quot;>✓ Done when</div><ul><li>Toggling <code>plan</code> shows 5 / 10 / 13 items with correct grouping.</li><li>No hidden route is reachable by URL on a plan that shouldn't have it (guard the routes too).</li></ul></div>
+      </div>
+    </div>
+
+    <div class=&quot;step s3&quot;>
+      <div class=&quot;step-num&quot;>3</div>
+      <div class=&quot;step-body&quot;>
+        <div class=&quot;step-head&quot;><span class=&quot;step-title&quot;>Dashboard compliance layer + first new report</span><span class=&quot;risk med&quot;>ADDITIVE</span></div>
+        <div class=&quot;step-what&quot;>Render dashboard stat cards from a per-plan config (Solo 4 → Growth +remittance/EFT/employer-cost → Accountant +Action-Required panel &amp;amp; year-end card). Then build the <b>Payroll Summary report</b> — it only aggregates finalised pay runs, so no new data model.</div>
+        <dl class=&quot;meta&quot;>
+          <dt>Touches</dt><dd>Dashboard (extend), new <code>/reports/summary</code> route</dd>
+          <dt>Visual targets</dt><dd><b>Adaptive Dashboard</b> + <b>Payroll Summary Report</b></dd>
+          <dt>Data</dt><dd>Aggregate existing pay-run records — gross, CPP, EI, tax, net, employer cost</dd>
+        </dl>
+        <div class=&quot;ac&quot;><div class=&quot;ac-t&quot;>✓ Done when</div><ul><li>Dashboard cards/panel match the mock per tier; no lower-tier card is removed.</li><li>Payroll Summary totals reconcile to the sum of underlying pay runs; PDF/CSV export works.</li></ul></div>
+      </div>
+    </div>
+
+    <div class=&quot;step s4&quot;>
+      <div class=&quot;step-num&quot;>4</div>
+      <div class=&quot;step-body&quot;>
+        <div class=&quot;step-head&quot;><span class=&quot;step-title&quot;>Wizard pay-types + remaining P1 screens</span><span class=&quot;risk med&quot;>ADDITIVE</span></div>
+        <div class=&quot;step-what&quot;>Extend Run Payroll Step 1 with the progressive-disclosure pattern (Solo 2 fields → Growth + expander → Accountant full grid). Then work the P1 list: Remittances section, EFT centre, Exception report, Termination wizard, Audit Trail.</div>
+        <dl class=&quot;meta&quot;>
+          <dt>Touches</dt><dd>Wizard Step 1 (extend), new routes per screen</dd>
+          <dt>Visual target</dt><dd><b>Adaptive Wizard</b> (click the expander to see disclosure)</dd>
+        </dl>
+        <div class=&quot;ac&quot;><div class=&quot;ac-t&quot;>✓ Done when</div><ul><li>Solo wizard is unchanged from today; extra pay types appear only behind the expander / at Accountant tier.</li><li>Each new screen is gated and routes are guarded.</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILE MAP -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Reference Files</div>
+    <div class=&quot;sec-title&quot;>What each deliverable is for</div>
+    <div class=&quot;sec-sub&quot;>The mocks are interactive visual targets — open them, toggle the plan, and build to match. Specs are read-only references.</div>
+    <table class=&quot;fmap&quot;>
+      <thead><tr><th>File</th><th>Type</th><th>Use it for</th></tr></thead>
+      <tbody>
+        <tr><td><a href=&quot;MapleRun Gap Analysis.html&quot;>MapleRun Gap Analysis</a></td><td><span class=&quot;tag spec&quot;>SPEC</span></td><td>The full feature backlog, plan matrix, and P1/P2/P3 priorities. The &quot;why&quot; behind everything.</td></tr>
+        <tr><td><a href=&quot;MapleRun Adaptive Dashboard.html&quot;>MapleRun Adaptive Dashboard</a></td><td><span class=&quot;tag target&quot;>BUILD TARGET</span></td><td>Step 2 (sidebar) + Step 3 (dashboard cards/panel). Toggle plan to see each tier's exact layout.</td></tr>
+        <tr><td><a href=&quot;MapleRun Adaptive Wizard.html&quot;>MapleRun Adaptive Wizard</a></td><td><span class=&quot;tag target&quot;>BUILD TARGET</span></td><td>Step 4 wizard. The progressive-disclosure / expander pattern for pay types.</td></tr>
+        <tr><td><a href=&quot;MapleRun Payroll Summary Report.html&quot;>MapleRun Payroll Summary Report</a></td><td><span class=&quot;tag target&quot;>BUILD TARGET</span></td><td>Step 3 report. Filter bar, totals, by-employee table, export controls.</td></tr>
+        <tr><td class=&quot;mono&quot;>screens/*.html</td><td><span class=&quot;tag ref&quot;>EXISTING</span></td><td>The current app. The CSS vocabulary (dark sidebar, Inter + Geist Mono, maple-red, stone) to match. <b>Do not rewrite these.</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DO / DONT -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Guardrails</div>
+    <div class=&quot;sec-title&quot;>Do / Don't</div>
+    <div class=&quot;two&quot;>
+      <div class=&quot;card do&quot;>
+        <h4>✅ Do</h4>
+        <div class=&quot;lirow&quot;><span class=&quot;i&quot;>→</span><div>Render nav, dashboard cards, and wizard fields from <b>per-plan config objects</b> (see the mocks' JS — they already do this).</div></div>
+        <div class=&quot;lirow&quot;><span class=&quot;i&quot;>→</span><div>Gate at <b>both</b> the UI and the route/API — a Solo user shouldn't reach <code>/year-end</code> by typing the URL.</div></div>
+        <div class=&quot;lirow&quot;><span class=&quot;i&quot;>→</span><div>Keep every locked feature's upgrade path one click away, reusing <code>&amp;lt;UpgradePrompt&amp;gt;</code>.</div></div>
+        <div class=&quot;lirow&quot;><span class=&quot;i&quot;>→</span><div>Reuse existing components &amp;amp; CSS tokens so new screens are visually seamless.</div></div>
+      </div>
+      <div class=&quot;card dont&quot;>
+        <h4>⛔ Don't</h4>
+        <div class=&quot;lirow&quot;><span class=&quot;i&quot;>✕</span><div>Build a separate &quot;lite&quot; app or fork screens per plan. One codebase, gated.</div></div>
+        <div class=&quot;lirow&quot;><span class=&quot;i&quot;>✕</span><div>Show Solo users greyed-out walls of features they can't use — render <i>less</i>, not <i>disabled</i>.</div></div>
+        <div class=&quot;lirow&quot;><span class=&quot;i&quot;>✕</span><div>Touch the wizard calc engine, pay stubs, T4, or employee ledger — they're strong; only extend additively.</div></div>
+        <div class=&quot;lirow&quot;><span class=&quot;i&quot;>✕</span><div>Invent new colours or fonts — the system is fixed (maple-red #B3261E, stone neutrals, Inter + Geist Mono).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QA CHECKLIST -->
+  <div class=&quot;section&quot;>
+    <div class=&quot;sec-label&quot;>Before Merge</div>
+    <div class=&quot;sec-title&quot;>QA checklist</div>
+    <div class=&quot;sec-sub&quot;>Run this against all three plan values for every PR in the rollout.</div>
+    <div class=&quot;checklist&quot;>
+      <div class=&quot;ck&quot;><div class=&quot;box&quot;></div><div><b>Existing accounts unchanged</b><div class=&quot;s&quot;>A pre-rollout account on its default tier renders pixel-identically to before Step 0.</div></div></div>
+      <div class=&quot;ck&quot;><div class=&quot;box&quot;></div><div><b>Solo stays minimal</b><div class=&quot;s&quot;>5 nav items, 4 dashboard cards, 2-field wizard. No remittance/EFT/compliance/year-end anywhere.</div></div></div>
+      <div class=&quot;ck&quot;><div class=&quot;box&quot;></div><div><b>Additive only</b><div class=&quot;s&quot;>No card or field present at a lower tier disappears at a higher tier — tiers only add.</div></div></div>
+      <div class=&quot;ck&quot;><div class=&quot;box&quot;></div><div><b>Routes guarded</b><div class=&quot;s&quot;>Direct-URL access to a gated route on the wrong plan redirects to an upgrade prompt, not a 500 or a blank page.</div></div></div>
+      <div class=&quot;ck&quot;><div class=&quot;box&quot;></div><div><b>Upgrade path works</b><div class=&quot;s&quot;>Every lock surfaces <code>&amp;lt;UpgradePrompt&amp;gt;</code> with a working CTA.</div></div></div>
+      <div class=&quot;ck&quot;><div class=&quot;box&quot;></div><div><b>Payroll Summary reconciles</b><div class=&quot;s&quot;>Report totals equal the sum of the underlying finalised pay runs; PDF &amp;amp; CSV export match the on-screen figures.</div></div></div>
+      <div class=&quot;ck&quot;><div class=&quot;box&quot;></div><div><b>Visual parity</b><div class=&quot;s&quot;>New screens use the existing sidebar, type scale, and maple-red accent — indistinguishable from current screens.</div></div></div>
+    </div>
+  </div>
+
+  <div class=&quot;note amber&quot;><div class=&quot;ni&quot;>📌</div><div class=&quot;nt&quot;><b>Suggested first PR:</b> Steps 0 + 1 together (flag + gate consolidation). It ships with zero visible change, proves the architecture, and unblocks every screen after it. Steps 2–4 can then land independently and in parallel.</div></div>
+
+</div>
+</body>
+</html>
+"></iframe>
+</div>
+<script>
+document.querySelector('.tabs').addEventListener('click', e=>{
+  const b=e.target.closest('.tab'); if(!b) return;
+  const id=b.dataset.id;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t===b));
+  document.querySelectorAll('.frame').forEach(f=>f.classList.toggle('on', f.id==='f-'+id));
+});
+</script>
+</body>
+</html>
