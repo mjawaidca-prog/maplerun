@@ -8,23 +8,17 @@
 
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { type Plan } from "@/lib/plan";
 import { previewPayRun, finalizePayRun, type PayRunPreview } from "@/lib/actions/payroll";
 import { PayRunWizard } from "./wizard";
 
 export default async function NewPayRunPage() {
   const { companyId } = await requireCompany();
 
-  // Load data needed for step 1
-  const [payGroups, employees] = await Promise.all([
-    prisma.payGroup.findMany({
-      where: { companyId },
-      orderBy: { name: "asc" },
-    }),
-    prisma.employee.findMany({
-      where: { companyId, active: true },
-      orderBy: { lastName: "asc" },
-      select: { id: true, firstName: true, lastName: true },
-    }),
+  const [payGroups, employees, company] = await Promise.all([
+    prisma.payGroup.findMany({ where: { companyId }, orderBy: { name: "asc" } }),
+    prisma.employee.findMany({ where: { companyId, active: true }, orderBy: { lastName: "asc" }, select: { id: true, firstName: true, lastName: true } }),
+    prisma.company.findUnique({ where: { id: companyId }, select: { plan: true } }),
   ]);
 
   return (
@@ -37,16 +31,9 @@ export default async function NewPayRunPage() {
       </div>
 
       <PayRunWizard
-        payGroups={payGroups.map((pg) => ({
-          id: pg.id,
-          name: pg.name,
-          frequency: pg.frequency,
-          defaultProvince: pg.defaultProvince,
-        }))}
-        employees={employees.map((e) => ({
-          id: e.id,
-          name: `${e.firstName} ${e.lastName}`,
-        }))}
+        plan={(company?.plan as Plan) ?? "growth"}
+        payGroups={payGroups.map((pg) => ({ id: pg.id, name: pg.name, frequency: pg.frequency, defaultProvince: pg.defaultProvince }))}
+        employees={employees.map((e) => ({ id: e.id, name: `${e.firstName} ${e.lastName}` }))}
         previewAction={previewPayRun}
         finalizeAction={finalizePayRun}
       />

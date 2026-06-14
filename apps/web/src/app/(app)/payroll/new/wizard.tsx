@@ -38,6 +38,7 @@ type EmployeeOption = {
 };
 
 type Props = {
+  plan?: string;
   payGroups: PayGroupOption[];
   employees: EmployeeOption[];
   previewAction: (formData: FormData) => Promise<PayRunPreview>;
@@ -65,8 +66,10 @@ function clearWizardState() { try { sessionStorage.removeItem(STORAGE_KEY); } ca
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 
-export function PayRunWizard({ payGroups, employees, previewAction, finalizeAction }: Props) {
+export function PayRunWizard({ plan = "growth", payGroups, employees, previewAction, finalizeAction }: Props) {
   const router = useRouter();
+  const showExtendedPayTypes = plan === "growth" || plan === "accountant";
+  const showFullPayGrid = plan === "accountant";
   const saved = typeof window !== "undefined" ? loadWizardState() : null;
   const [step, setStep] = useState<Step>("input");
   const [isPending, startTransition] = useTransition();
@@ -225,28 +228,78 @@ export function PayRunWizard({ payGroups, employees, previewAction, finalizeActi
               ) : (
                 <div className="space-y-3">
                   {employees.map((emp) => (
-                    <div key={emp.id} className="flex items-center gap-4">
-                      <Label className="w-48 text-sm truncate" htmlFor={`gross-${emp.id}`}>
-                        {emp.name}
-                      </Label>
-                      <div className="relative flex-1 max-w-xs">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                          $
-                        </span>
-                        <Input
-                          id={`gross-${emp.id}`}
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          placeholder="0.00"
-                          className="pl-7 tabular-nums"
-                          value={grossAmounts[emp.id] ?? ""}
-                          onChange={(e) => {
-                            const next = { ...grossAmounts, [emp.id]: e.target.value };
-                            updateGrossAmounts(next);
-                          }}
-                        />
+                    <div key={emp.id}>
+                      <div className="flex items-center gap-4">
+                        <Label className="w-48 text-sm truncate" htmlFor={`gross-${emp.id}`}>
+                          {emp.name}
+                        </Label>
+                        <div className="relative flex-1 max-w-xs">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                          <Input
+                            id={`gross-${emp.id}`}
+                            type="number" min="0" step="0.01" placeholder="0.00"
+                            className="pl-7 tabular-nums"
+                            value={grossAmounts[emp.id] ?? ""}
+                            onChange={(e) => { const next = { ...grossAmounts, [emp.id]: e.target.value }; updateGrossAmounts(next); }}
+                          />
+                        </div>
                       </div>
+                      {/* Growth expander */}
+                      {showExtendedPayTypes && (
+                        <details className="group ml-[13.5rem] mt-2">
+                          <summary className="text-xs text-muted-foreground cursor-pointer hover:text-[#1C1917] transition-colors">
+                            ▸ Add bonus · stat · vacation
+                          </summary>
+                          <div className={`grid ${showFullPayGrid ? "grid-cols-3" : "grid-cols-2"} gap-3 mt-3 pl-1`}>
+                            <div>
+                              <Label className="text-[11px] text-[#A8A29E]">Bonus</Label>
+                              <div className="relative mt-1">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                              </div>
+                            </div>
+                            <div>
+                              <Label className="text-[11px] text-[#A8A29E]">Stat holiday pay</Label>
+                              <div className="relative mt-1">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                              </div>
+                            </div>
+                            <div>
+                              <Label className="text-[11px] text-[#A8A29E]">Vacation payout</Label>
+                              <div className="relative mt-1">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                              </div>
+                            </div>
+                            {showFullPayGrid && (
+                              <>
+                                <div>
+                                  <Label className="text-[11px] text-[#A8A29E]">Overtime (1.5×)</Label>
+                                  <div className="relative mt-1">
+                                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                                    <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                                  </div>
+                                </div>
+                                <div>
+                                  <Label className="text-[11px] text-[#A8A29E]">Commission</Label>
+                                  <div className="relative mt-1">
+                                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                                    <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                                  </div>
+                                </div>
+                                <div>
+                                  <Label className="text-[11px] text-[#A8A29E]">Retro / back pay</Label>
+                                  <div className="relative mt-1">
+                                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                                    <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </details>
+                      )}
                     </div>
                   ))}
                 </div>
