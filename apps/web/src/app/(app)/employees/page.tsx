@@ -3,7 +3,9 @@
  */
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { deleteEmployee } from "@/lib/actions/employee";
 import Link from "next/link";
+import { Trash2 } from "lucide-react";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
 
@@ -34,11 +36,12 @@ export default async function EmployeesPage() {
         </div>
       ) : (
         <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <div className="grid grid-cols-[2.4fr_1fr_1.2fr_1.2fr_0.8fr_32px] gap-3 px-5 py-3 bg-[#FAFAF9] border-b border-[#E7E5E4]">
+          <div className="grid grid-cols-[2.4fr_1fr_1.2fr_1.2fr_0.8fr_48px] gap-3 px-5 py-3 bg-[#FAFAF9] border-b border-[#E7E5E4]">
             {["Employee","Province","Pay group","YTD gross","Status",""].map(h=><div key={h} className={`text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em] ${h==="YTD gross"?"text-right":""}`}>{h}</div>)}
           </div>
           {employees.map(emp=>(
-            <Link key={emp.id} href={`/employees/${emp.id}`} className="grid grid-cols-[2.4fr_1fr_1.2fr_1.2fr_0.8fr_32px] gap-3 px-5 py-3.5 border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
+            <div key={emp.id} className="grid grid-cols-[2.4fr_1fr_1.2fr_1.2fr_0.8fr_48px] gap-3 px-5 py-3.5 border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9]">
+              <Link href={`/employees/${emp.id}`} className="contents no-underline text-inherit">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#B3261E] to-[#E56A5C] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{emp.firstName[0]}</div>
                 <div><p className="text-sm font-semibold">{emp.firstName} {emp.lastName}</p><p className="text-xs text-[#A8A29E]">SIN •••-•••-•••</p></div>
@@ -49,6 +52,13 @@ export default async function EmployeesPage() {
               <div><span className="inline-flex items-center text-[11px] font-bold tracking-[0.03em] rounded-full px-2.5 py-1 bg-[#DCFCE7] text-[#15803D]">ACTIVE</span></div>
               <div className="text-[#A8A29E] text-right">→</div>
             </Link>
+            <form action={deleteEmployee} className="flex items-center justify-center">
+              <input type="hidden" name="id" value={emp.id} />
+              <button type="submit" className="text-[#A8A29E] hover:text-[#B3261E] transition-colors p-1" title="Delete employee" onClick={(e) => { if (!confirm(`Delete ${emp.firstName} ${emp.lastName}?`)) e.preventDefault(); }}>
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </form>
+          </div>
           ))}
         </div>
       )}

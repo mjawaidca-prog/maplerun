@@ -209,6 +209,17 @@ export async function getEmployees() {
   });
 }
 
+export async function deleteEmployee(formData: FormData) {
+  "use server";
+  const { companyId } = await requireCompany();
+  const id = formData.get("id") as string;
+  if (!id) throw new Error("Employee ID is required.");
+  const employee = await prisma.employee.findUnique({ where: { id } });
+  if (!employee || employee.companyId !== companyId) throw new Error("Employee not found.");
+  await prisma.employee.delete({ where: { id } });
+  revalidatePath("/employees");
+}
+
 export async function getEmployee(id: string) {
   const { companyId } = await requireCompany();
 
