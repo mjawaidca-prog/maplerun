@@ -71,46 +71,36 @@ export interface NavItem {
   feature?: string; // gated by can()
 }
 
+// Sidebar: only links to routes that exist today.
+// Extra items gated behind feature flags — greyed out if plan doesn't qualify.
 export const SIDEBAR_NAV: Record<Plan, NavItem[]> = {
   solo: [
     { icon: "🏠", label: "Dashboard", href: "/app" },
     { icon: "👥", label: "Employees", href: "/employees" },
     { icon: "💵", label: "Run Payroll", href: "/payroll" },
-    { icon: "📄", label: "Pay Statements", href: "/payroll" },
-    { icon: "⚙️", label: "Settings", href: "/company" },
-    { section: "Grow" },
-    { icon: "↑", label: "Add timesheets & reports", feature: "timesheets", href: "#" },
+    { icon: "📊", label: "Reports", href: "/reports" },
+    { icon: "⚙️", label: "Company", href: "/company" },
   ],
   growth: [
     { icon: "🏠", label: "Dashboard", href: "/app" },
     { icon: "👥", label: "Employees", href: "/employees" },
-    { icon: "⏱", label: "Timesheets", href: "/payroll/timesheet", feature: "timesheets" },
     { icon: "💵", label: "Run Payroll", href: "/payroll" },
-    { icon: "📄", label: "Pay Statements", href: "/payroll" },
-    { section: "Compliance" },
-    { icon: "🧾", label: "Remittances", href: "/reports", feature: "remittances" },
-    { icon: "🏦", label: "Direct Deposit", href: "/reports", feature: "eft" },
-    { icon: "📋", label: "ROE", href: "/reports/roe", feature: "roe" },
-    { section: "Analytics" },
-    { icon: "📊", label: "Reports", href: "/reports", feature: "reportsDashboard" },
-    { icon: "⚙️", label: "Settings", href: "/company" },
+    { icon: "📊", label: "Reports", href: "/reports" },
+    { icon: "📋", label: "ROE", href: "/reports/roe" },
+    { icon: "🧾", label: "T4 Slips", href: "/reports/t4" },
+    { icon: "📄", label: "Pay Summary", href: "/reports/summary" },
+    { icon: "⚙️", label: "Company", href: "/company" },
   ],
   accountant: [
     { icon: "🏠", label: "Dashboard", href: "/app" },
     { icon: "👥", label: "Employees", href: "/employees" },
-    { icon: "⏱", label: "Timesheets", href: "/payroll/timesheet", feature: "timesheets" },
     { icon: "💵", label: "Run Payroll", href: "/payroll" },
-    { icon: "📄", label: "Pay Statements", href: "/payroll" },
-    { section: "Compliance" },
-    { icon: "🧾", label: "Remittances", href: "/reports", feature: "remittances" },
-    { icon: "🏦", label: "Direct Deposit", href: "/reports", feature: "eft" },
-    { icon: "📋", label: "ROE", href: "/reports/roe", feature: "roe" },
-    { icon: "🗓", label: "Year-End", href: "/reports/t4", feature: "yearEndCentre" },
-    { section: "Analytics & System" },
-    { icon: "📊", label: "Reports", href: "/reports", feature: "reportsDashboard" },
-    { icon: "📒", label: "GL / Accounting", href: "/reports", feature: "gl" },
-    { icon: "⚙️", label: "Settings", href: "/company" },
-    { icon: "🔍", label: "Audit Log", href: "/company", feature: "auditLog" },
+    { icon: "📊", label: "Reports", href: "/reports" },
+    { icon: "📋", label: "ROE", href: "/reports/roe" },
+    { icon: "🧾", label: "T4 Slips", href: "/reports/t4" },
+    { icon: "📄", label: "Pay Summary", href: "/reports/summary" },
+    { icon: "🗓", label: "Year-End", href: "/reports/t4" },
+    { icon: "⚙️", label: "Company", href: "/company" },
   ],
 };
 
