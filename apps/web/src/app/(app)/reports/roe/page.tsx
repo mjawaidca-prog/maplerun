@@ -5,6 +5,8 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { ROE_REASON_CODES } from "@/lib/roe-constants";
+import { can, type Plan } from "@/lib/plan";
+import { UpgradePrompt } from "@/components/upgrade-prompt";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +19,19 @@ function fmtCAD(n: number): string {
 
 export default async function RoePage() {
   const { companyId } = await requireCompany();
+
+  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { plan: true } });
+  const plan: Plan = (company?.plan as Plan) ?? "growth";
+
+  if (!can(plan, "roe")) {
+    return (
+      <div className="space-y-6 max-w-lg mx-auto pt-12">
+        <div className="text-[13px] text-[#A8A29E]"><Link href="/reports" className="text-[#A8A29E] no-underline">Reports</Link> › ROE</div>
+        <h1 className="text-[28px] font-extrabold tracking-[-0.02em]">Record of Employment</h1>
+        <UpgradePrompt feature="ROE generation" requiredPlan="accountant" currentPlan={plan} />
+      </div>
+    );
+  }
 
   const employees = await prisma.employee.findMany({
     where: { companyId },

@@ -4,6 +4,7 @@
 
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { can, type Plan } from "@/lib/plan";
 import Link from "next/link";
 import { PlusCircle, ClipboardList, BarChart3 } from "lucide-react";
 
@@ -13,10 +14,20 @@ export default async function DashboardPage() {
   const user = await requireCompany();
   const firstName = (user.name ?? "").split(" ")[0];
 
-  const [employeeCount, payGroupCount] = await Promise.all([
+  const [employeeCount, payGroupCount, company] = await Promise.all([
     prisma.employee.count({ where: { companyId: user.companyId, active: true } }),
     prisma.payGroup.count({ where: { companyId: user.companyId } }),
+    prisma.company.findUnique({ where: { id: user.companyId }, select: { plan: true } }),
   ]);
+  const plan: Plan = (company?.plan as Plan) ?? "growth";
+
+  // YTD totals from finalized runs
+  const ytdRuns = await prisma.payRun.findMany({
+    where: { companyId: user.companyId, status: "FINALIZED" },
+    select: { totalGross: true, totalEmployerCost: true, totalDeductions: true, totalNetPay: true },
+  });
+  const ytdGross = ytdRuns.reduce((s, r) => s + r.totalGross, 0);
+  const ytdEmployer = ytdRuns.reduce((s, r) => s + r.totalEmployerCost, 0);
 
   const recentRuns = await prisma.payRun.findMany({
     where: { companyId: user.companyId },
@@ -40,20 +51,18 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-4 gap-4">
-        {[
-          { label: "Active employees", value: String(employeeCount), foot: "All active" },
-          { label: "Pay groups", value: String(payGroupCount), foot: "Configured" },
-          { label: "Next pay run", value: "—", foot: "Schedule one now" },
-          { label: "YTD payroll", value: fmtCAD(0), foot: "Gross, 2026" },
-        ].map((stat) => (
-          <div key={stat.label} className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">{stat.label}</p>
-            <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em]">{stat.value}</p>
-            <p className="text-xs text-muted-foreground mt-1">{stat.foot}</p>
-          </div>
-        ))}
+      {/* Stats grid — plan-aware: Solo 4, Growth+ 6 */}
+      <div className={`grid gap-4 ${can(plan, "remittances") ? "grid-cols-3 sm:grid-cols-6" : "grid-cols-4"}`}>
+        <Stat label="Active employees" value={String(employeeCount)} foot="All active" />
+        <Stat label="Pay groups" value={String(payGroupCount)} foot="Configured" />
+        <Stat label="Next pay run" value="—" foot="Schedule one now" />
+        <Stat label="YTD payroll" value={fmtCAD(ytdGross)} foot="Gross, 2026" />
+        {can(plan, "remittances") && (
+          <>
+            <Stat label="Employer cost" value={fmtCAD(ytdEmployer)} foot="CPP + EI match" />
+            <Stat label="Net deposited" value={fmtCAD(ytdGross - ytdRuns.reduce((s,r)=>s+r.totalDeductions,0))} foot="To employees" />
+          </>
+        )}
       </div>
 
       {/* Two columns */}
@@ -108,6 +117,16 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Stat({ label, value, foot }: { label: string; value: string; foot: string }) {
+  return (
+    <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">{label}</p>
+      <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em]">{value}</p>
+      <p className="text-xs text-muted-foreground mt-1">{foot}</p>
     </div>
   );
 }
