@@ -3,18 +3,24 @@
 > Update this file + commit at the end of EVERY session. Next session reads CLAUDE.md → this file → resumes. Nothing else.
 
 ## Current position
-- **Phase 0–5: DONE** — all verified, 21 routes, 137 tests.
-- **Phase 6 (Quebec + polish): IN PROGRESS** — 2026-06-11.
-  1. ✅ Quebec income tax — QPP, QPIP, federal abatement, TP-1015.3 provincial tax. All 13 provinces/territories now supported.
-  2. ✅ PDOC cross-check — formulas verified against T4127 constants; 85 goldens as regression baseline.
-  3. 🔜 AUTH_RESEND_KEY — code wired, needs Resend API key from user.
-  4. 🔜 Stripe Dashboard — code wired, needs products/prices + keys from user.
-  5. 🔜 Domain — getmaplerun.com available, needs registration.
+- **Phase 0–5: DONE** — all verified, 26 routes, 137 tests.
+- **Phase 6 (Quebec + polish): DONE** — 2026-06-11.
+- **Full redesign (June 12–14): DONE** — 24 screens pixel-matched to designer HTML.
+- **Plan tiering architecture (June 14): DONE** — Steps 0-4 implemented.
+  - ✅ Step 0: plan flag on Company, can() capability map, TIERS system
+  - ✅ Step 1: UpgradePrompt + UpgradeBanner shared components
+  - ✅ Step 2: Adaptive sidebar — 5/8/9 items per plan with colored dot badge
+  - ✅ Step 3: Payroll Summary report + plan-aware dashboard widgets (4/6 stats)
+  - ✅ Step 4: Wizard progressive disclosure (Solo simple / Growth expander / Accountant grid)
+  - ✅ P1: ROE plan gate + Stripe checkout wiring
+  - ✅ P2: ROE pages redesigned (list + detail with Service Canada layout)
 
-## Next actions (in order)
-1. **AUTH_RESEND_KEY**: Go to resend.com → sign up → create API key → paste in .env as `AUTH_RESEND_KEY="re_..."`
-2. **Stripe Dashboard**: Create products/prices for Solo ($15)/Growth ($25)/Accountant ($59) in Stripe test mode → copy keys to .env
-3. **Domain**: Register getmaplerun.com ($15/yr at any registrar)
+## Next actions
+1. **Cloudflare DNS**: Migrate from Namecheap DNS → switch to Resend live key
+2. **Stripe Dashboard**: Create products/prices in Stripe, copy keys to .env
+3. **Timesheet screens**: Build entry + CSV import per designer HTML
+4. **Year-End Centre**: Build wizard for T4/RL-1 filing season
+5. **Deploy**: Push to GitHub → Vercel → live at nexvarlab.com
 
 ## Environment facts (don't re-discover)
 - Windows 11, PowerShell (no `&&`). Node v24.16.0, npm 11.13.0, git 2.54. Repo root = `MapleRun/`, branch `main`.
