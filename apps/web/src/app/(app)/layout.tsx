@@ -72,11 +72,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
         {/* Footer */}
         <div className="border-t border-[#292524] pt-4 mt-auto space-y-3">
-          {/* Plan badge */}
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-[#E7E5E4] bg-[#292524] rounded-full px-2.5 py-1.5 ml-2">
+          {/* Plan badge — links to company settings */}
+          <Link href="/company" className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-[#E7E5E4] bg-[#292524] rounded-full px-2.5 py-1.5 ml-2 no-underline hover:bg-[#3F1413] transition-colors">
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: meta.dot }} />
             {meta.label}
-          </span>
+          </Link>
 
           {/* User row */}
           <div className="flex items-center gap-2.5 px-2">
