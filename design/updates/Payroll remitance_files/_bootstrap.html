@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<!-- saved from url=(0203)https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&_omeo=https%3A%2F%2Fclaude.ai -->
+<html data-src-ver="83061177" lang="en" data-om-id="83061177:0"><head data-om-id="83061177:1"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style data-omelette-injected="">html,body{background:transparent}</style><script data-omelette-injected="">(()=>{var j=["https://claude.ai","https://preview.claude.ai"];var x=true;var S=30000;var f=3000;document.addEventListener("DOMContentLoaded",()=>{const H=window.Babel;const G="om-src-id";if(H&&H.registerPlugin&&!(H.availablePlugins&&H.availablePlugins[G])){H.registerPlugin(G,({types:Y})=>({visitor:{JSXOpeningElement(U,Q){const J=U.node;if(J.name&&J.name.type==="JSXMemberExpression")return;for(let V=0;V<J.attributes.length;V++){const L=J.attributes[V];if(L.type==="JSXAttribute"&&L.name&&L.name.name==="data-om-id")return}const W=Q.file&&Q.file.opts&&Q.file.opts.filename||"?";const Z=J.loc&&J.loc.start;const z=`jsx:${W}:${J.start??0}:${Z?Z.line:0}:${Z?Z.column+1:0}`;J.attributes.push(Y.jsxAttribute(Y.jsxIdentifier("data-om-id"),Y.stringLiteral(z)))}}}))}const k="om-text-extract";let A=false;if(x&&H&&H.registerPlugin&&!(H.availablePlugins&&H.availablePlugins[k])){const Y=window.React;if(Y&&Y.useSyncExternalStore&&Y.createElement){A=true;const U={};const Q=new Set;let J=0;window.__omTextO=U;window.__omTextSet=(z)=>{for(const V in z){const L=z[V];if(L==null)delete U[V];else U[V]=L}J++;Q.forEach((V)=>V())};const W=(z)=>{Q.add(z);return()=>Q.delete(z)};const Z=()=>J;window.__OmT=function z(V){Y.useSyncExternalStore(W,Z,Z);return Y.createElement("span",{"data-om-text":V.i,className:"__om-t"},V.i in U?U[V.i]:V.children)};H.registerPlugin(k,({types:z})=>{const V={style:1,script:1,noscript:1,textarea:1,title:1,option:1,text:1,tspan:1,textPath:1};const L={placeholder:1,alt:1,title:1,label:1,"aria-label":1,"aria-description":1,"aria-placeholder":1};const _=($,C)=>z.logicalExpression("??",z.memberExpression(z.logicalExpression("||",z.memberExpression(z.identifier("window"),z.identifier("__omTextO")),z.objectExpression([])),z.stringLiteral($),true),C);const E=($)=>$.file&&$.file.opts&&$.file.opts.filename||"?";const B=($)=>$.file&&$.file.code||"";const b=($,C)=>{const X=(F)=>F&&F.start!=null&&F.end!=null&&(F.type==="StringLiteral"||F.type==="TemplateLiteral"&&F.expressions.length===0)?[F.start,F.end]:null;const N=X(C);if(N)return N;if(C&&C.type==="Identifier"){const F=$.scope.getBinding(C.name);if(F&&F.constant&&F.path.node.type==="VariableDeclarator"){return X(F.path.node.init)}}return null};const M=($,C,X)=>{const N=$.node;let F=false;const w=(K,q)=>{F=true;return z.jsxElement(z.jsxOpeningElement(z.jsxIdentifier("__OmT"),[z.jsxAttribute(z.jsxIdentifier("i"),z.stringLiteral(K))],false),z.jsxClosingElement(z.jsxIdentifier("__OmT")),[q],false)};const D=N.children.map((K)=>{if(K.type==="JSXText"){if(K.start==null||K.end==null)return K;const q=X.slice(K.start,K.end);const R=q.length-q.trimStart().length;const m=q.length-q.trimEnd().length;if(R+m>=q.length)return K;return w(`txt:${C}:${K.start+R}:${K.end-m}`,K)}if(K.type==="JSXExpressionContainer"){const q=b($,K.expression);if(q)return w(`str:${C}:${q[0]}:${q[1]}`,K)}return K});if(F)N.children=D};return{visitor:{JSXOpeningElement($,C){const X=$.node;const N=E(C);const F={};for(let w=0;w<X.attributes.length;w++){const D=X.attributes[w];if(D.type!=="JSXAttribute"||!D.name)continue;const K=D.name.name;if(!L[K])continue;if(!D.value||D.value.type!=="StringLiteral")continue;if(D.value.start==null||D.value.end==null)continue;const q=`txt:${N}:${D.value.start}:${D.value.end}`;F[K]=q;D.value=z.jsxExpressionContainer(_(q,z.stringLiteral(D.value.value)))}if(Object.keys(F).length){X.attributes.push(z.jsxAttribute(z.jsxIdentifier("data-om-text-attrs"),z.stringLiteral(JSON.stringify(F))))}},JSXElement($,C){const X=$.node.openingElement;const N=X&&X.name&&X.name.name;if(N==="__OmT")return;if(typeof N==="string"&&V[N])return;M($,E(C),B(C))},JSXFragment($,C){M($,E(C),B(C))}}}})}}const u=A?["transform-react-jsx-source",G,k]:["transform-react-jsx-source",G];document.querySelectorAll('script[type="text/babel"],script[type="text/jsx"]').forEach((Y,U)=>{const Q=Y.getAttribute("data-plugins")||"";const J=u.filter((W)=>Q.indexOf(W)<0);if(J.length){Y.setAttribute("data-plugins",Q?`${Q},${J.join(",")}`:J.join(","))}if(!Y.hasAttribute("data-filename")){Y.setAttribute("data-filename",Y.getAttribute("src")||`inline-${U}`)}})});var y=window.parent;if(y&&y!==window){const H=(Q,J)=>{try{y.postMessage({__omelette_log:true,type:Q,data:J},"*")}catch{}};["log","warn","error"].forEach((Q)=>{const J=console[Q];console[Q]=(...W)=>{const Z=W.map((z)=>{try{return typeof z==="object"?JSON.stringify(z):String(z)}catch{try{return String(z)}catch{return"[unstringifiable]"}}}).join(" ");H(Q,Z);J.apply(console,W)}});window.addEventListener("error",(Q)=>{const J=Q.target;if(J&&J!==window&&J.tagName){const W=J.src||J.href||"";H("resource_error",`${J.tagName} failed to load: ${W}`)}else{H("error",`${Q.message||"Unknown error"} at ${Q.filename||"?"}:${Q.lineno||0}:${Q.colno||0}`)}},true);window.addEventListener("unhandledrejection",(Q)=>{const J=Q.reason;const W=J instanceof Error?`${J.message} ${J.stack}`:String(J);H("error",`Unhandled rejection: ${W}`)});const G=()=>{try{y.postMessage({type:"omelette:height",height:document.documentElement.scrollHeight},"*")}catch{}};if(document.readyState==="complete")G();else window.addEventListener("load",G);if(window.ResizeObserver)new ResizeObserver(G).observe(document.documentElement);const k={};let A=0;window.claude={complete(Q){return new Promise((J,W)=>{if(!j.length){W(new Error("claude.complete: no parent origin"));return}const Z=`c${++A}`;const z=()=>setTimeout(()=>{delete k[Z];W(new Error(`claude.complete: no data for ${S/1000}s`))},S);const V=z();k[Z]={resolve:J,reject:W,text:"",t:V,arm:z};try{for(const L of j){y.postMessage({__om_api:true,id:Z,body:Q},L)}}catch(L){clearTimeout(V);delete k[Z];W(L)}})}};const u={};let Y=0;window.omelette={writeFile:(Q,J)=>new Promise((W,Z)=>{if(!j.length){W();return}const z=`f${++Y}`;const V=setTimeout(()=>{delete u[z];W()},f);u[z]={resolve:W,reject:Z,t:V};try{for(const L of j){y.postMessage({__om_file:true,id:z,op:"write",path:Q,content:J},L)}}catch{clearTimeout(V);delete u[z];W()}})};const U=(Q)=>{try{return JSON.stringify(Q)}catch{return JSON.stringify(String(Q))}};window.addEventListener("message",(Q)=>{if(j.indexOf(Q.origin)<0)return;if(Q.source!==y)return;const J=Q.data;if(!J)return;if(J.type==="omelette-preview-refresh"){if(typeof J.token!=="string"||!/^[0-9a-f.-]+(\.(rc|pr-[0-9]+))?(\.[0-9]+\.[0-9a-f]{16})?$/.test(J.token))return;const z=Math.max(1,Math.floor((J.expiresAt||0)-Date.now()/1000));document.cookie="__Host-omelette-preview="+J.token+"; Path=/; Secure; SameSite=None; Partitioned; Max-Age="+z;return}if(J.__om_file_r){const z=u[J.id];if(!z)return;clearTimeout(z.t);delete u[J.id];if(J.ok)z.resolve();else z.reject(new Error(J.error||"write failed"));return}if(J.__om_api_r){const z=k[J.id];if(!z)return;if(J.error!=null){clearTimeout(z.t);delete k[J.id];z.reject(new Error(J.error));return}if(J.chunk!=null){clearTimeout(z.t);z.t=z.arm();z.text+=J.chunk;return}if(J.done){clearTimeout(z.t);delete k[J.id];z.resolve(J.text!=null?J.text:z.text);return}return}if(!J.__om_eval)return;const W=J;const Z=(z)=>{Q.source.postMessage({...z,__om_eval_r:1,id:W.id},Q.origin)};try{const z=(0,eval)(W.code);if(z&&typeof z.then==="function"){z.then((V)=>Z({ok:1,v:U(V)}),(V)=>Z({ok:0,e:String(V)}))}else{Z({ok:1,v:U(z)})}}catch(z){Z({ok:0,e:String(z)})}})}})();
+</script>
+
+
+<meta name="viewport" content="width=device-width,initial-scale=1" data-om-id="83061177:3">
+<title>MapleRun — Remittance Report</title>
+<link href="./css2" rel="stylesheet" data-om-id="83061177:4">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;display:flex;min-height:100vh;color:#1c1917}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* ── Sidebar ── */
+.sidebar{width:220px;background:#1c1917;min-height:100vh;padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 8px 22px}
+.sidebar-logo-name{font-size:17px;font-weight:800;color:#fff}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;margin-bottom:2px;font-size:13.5px;font-weight:500;color:#a8a29e;cursor:pointer;text-decoration:none}
+.nav-item:hover{background:#292524;color:#e7e5e4}
+.nav-item.active{background:#3f1413;color:#fff}
+.nav-sec{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#57534e;padding:14px 12px 5px}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid #292524}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#e7e5e4;background:#292524;border-radius:20px;padding:5px 10px;margin:0 8px 12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block}
+.user-row{display:flex;align-items:center;gap:10px;padding:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fafaf9}
+.user-sub{font-size:11px;color:#78716c;cursor:pointer}
+
+/* ── Main ── */
+.main{flex:1;padding:34px 44px 80px;min-width:0}
+.breadcrumb{font-size:13px;color:#a8a29e;margin-bottom:4px}
+.breadcrumb a{color:#a8a29e;text-decoration:none}
+.breadcrumb a:hover{color:#78716c}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.page-sub{font-size:14px;color:#78716c;margin-top:5px}
+.exports{display:flex;gap:10px}
+.btn-out{padding:9px 15px;border-radius:9px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.btn-out:hover{border-color:#B3261E;color:#B3261E}
+.btn-primary{padding:9px 16px;border-radius:9px;border:none;background:#B3261E;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px}
+.btn-primary:hover{background:#9b1c18}
+
+/* ── Filter bar ── */
+.filters{display:flex;align-items:flex-end;gap:14px;background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:14px 18px;margin-bottom:22px;box-shadow:0 1px 3px rgba(0,0,0,.04);flex-wrap:wrap}
+.filt{display:flex;flex-direction:column;gap:5px}
+.filt label{font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.05em}
+.filt select{border:1px solid #d6d3d1;border-radius:8px;padding:8px 11px;font-size:13px;font-family:inherit;background:#fff;color:#1c1917;cursor:pointer}
+.filt select:focus{outline:none;border-color:#B3261E}
+.seg{display:inline-flex;gap:2px;padding:3px;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:9px}
+.seg button{font-family:inherit;font-size:12px;font-weight:600;color:#78716c;background:none;border:none;padding:6px 11px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:#fff;color:#1c1917;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.filt-spacer{flex:1}
+
+/* ── Alert banner ── */
+.alert{display:flex;align-items:flex-start;gap:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:11px;padding:14px 18px;margin-bottom:22px}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.alert-body{flex:1}
+.alert-title{font-size:13.5px;font-weight:700;color:#991b1b}
+.alert-sub{font-size:12.5px;color:#b91c1c;margin-top:3px;line-height:1.5}
+.alert-action{margin-left:auto;align-self:center}
+
+/* ── CRA summary cards ── */
+.cra-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.cra-card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.cra-card.highlight{background:#1c1917;border-color:#1c1917}
+.cra-card.highlight .cc-label{color:#78716c}
+.cra-card.highlight .cc-value{color:#fff}
+.cra-card.highlight .cc-sub{color:#57534e}
+.cc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#a8a29e;display:flex;align-items:center;gap:6px}
+.cc-value{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:8px}
+.cc-sub{font-size:12px;color:#78716c;margin-top:5px;line-height:1.4}
+.cc-due{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.03em;margin-top:9px;padding:4px 10px;border-radius:20px}
+.cc-due.urgent{background:#fef2f2;color:#B3261E}
+.cc-due.ok{background:#f0fdf4;color:#16a34a}
+
+/* ── Account info strip ── */
+.acct-strip{display:flex;gap:0;background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;margin-bottom:22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.acct-cell{flex:1;padding:14px 20px;border-right:1px solid #e7e5e4}
+.acct-cell:last-child{border-right:none}
+.acct-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#a8a29e;margin-bottom:5px}
+.acct-value{font-size:13.5px;font-weight:600;color:#1c1917}
+.acct-value .mono{font-size:13px}
+.status-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:20px}
+.chip-green{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.chip-amber{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+.chip-red{background:#fef2f2;color:#B3261E;border:1px solid #fecaca}
+.chip-blue{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
+.chip-stone{background:#f5f5f4;color:#78716c;border:1px solid #e7e5e4}
+
+/* ── Section title ── */
+.sec-title{font-size:13px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.sec-title a{font-size:12px;font-weight:600;color:#B3261E;text-decoration:none;text-transform:none;letter-spacing:0}
+
+/* ── Breakdown table ── */
+.table-wrap{background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:22px}
+table{width:100%;border-collapse:collapse}
+thead th{background:#fafaf9;font-size:11px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.04em;padding:11px 16px;text-align:right;border-bottom:1px solid #e7e5e4;white-space:nowrap}
+thead th.l{text-align:left}
+tbody td{padding:13px 16px;text-align:right;font-size:13px;border-bottom:1px solid #f0efed;white-space:nowrap;vertical-align:middle}
+tbody td.l{text-align:left}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafaf9}
+tfoot td{padding:13px 16px;text-align:right;font-size:13px;font-weight:700;background:#1c1917;color:#fff;white-space:nowrap}
+tfoot td.l{text-align:left}
+.row-group td{background:#fafaf9;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#a8a29e;padding:8px 16px;border-bottom:1px solid #e7e5e4}
+.cat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;flex-shrink:0}
+.cat-label{display:flex;align-items:center;gap:0}
+.cat-name{font-size:13px;font-weight:600}
+.cat-desc{font-size:11.5px;color:#a8a29e;margin-top:2px}
+.bar-wrap{width:120px;display:inline-block;vertical-align:middle}
+.bar-bg{background:#f0efed;border-radius:4px;height:6px;overflow:hidden}
+.bar-fill{height:6px;border-radius:4px}
+.muted{color:#a8a29e}
+.total-row td{font-weight:700;background:#fafaf9;border-top:2px solid #e7e5e4}
+
+/* ── Employee breakdown ── */
+.emp-cell{display:flex;align-items:center;gap:10px}
+.emp-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B3261E,#e56a5c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
+.emp-av.blue{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}
+.emp-av.green{background:linear-gradient(135deg,#15803d,#4ade80)}
+.emp-av.amber{background:linear-gradient(135deg,#b45309,#fbbf24)}
+.emp-av.violet{background:linear-gradient(135deg,#6d28d9,#a78bfa)}
+.emp-n{font-size:13px;font-weight:600}
+.emp-s{font-size:11px;color:#a8a29e}
+.net-col{font-weight:700;color:#B3261E}
+
+/* ── History table ── */
+.hist-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+
+/* ── Two-col layout ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px}
+
+/* ── Schedule card ── */
+.schedule-card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sched-item{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid #f0efed}
+.sched-item:last-child{border-bottom:none}
+.sched-item:hover{background:#fafaf9}
+.sched-date{flex-shrink:0;width:46px;height:46px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f5f5f4;border:1px solid #e7e5e4}
+.sched-date.urgent{background:#fef2f2;border-color:#fecaca}
+.sched-date.past{background:#f0fdf4;border-color:#bbf7d0}
+.sched-mon{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#a8a29e}
+.sched-day{font-size:18px;font-weight:800;letter-spacing:-.02em;color:#1c1917;line-height:1}
+.sched-date.urgent .sched-mon{color:#B3261E}
+.sched-date.urgent .sched-day{color:#B3261E}
+.sched-date.past .sched-day{color:#16a34a}
+.sched-body{flex:1}
+.sched-title{font-size:13px;font-weight:600}
+.sched-sub{font-size:12px;color:#78716c;margin-top:2px}
+.sched-amt{font-size:13px;font-weight:700;font-family:'Geist Mono',monospace}
+
+/* ── Remittance type legend ── */
+.legend-card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.legend-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f0efed}
+.legend-item:last-child{border-bottom:none}
+.legend-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.legend-body .legend-name{font-size:13px;font-weight:700}
+.legend-body .legend-desc{font-size:12px;color:#78716c;margin-top:3px;line-height:1.5}
+.legend-rate{margin-left:auto;text-align:right;flex-shrink:0}
+.legend-rate .rate-val{font-size:13px;font-weight:700;font-family:'Geist Mono',monospace}
+.legend-rate .rate-label{font-size:11px;color:#a8a29e;margin-top:2px}
+
+/* ── Tabs ── */
+.tab-bar{display:flex;gap:2px;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:10px;padding:3px;margin-bottom:16px;width:fit-content}
+.tab-btn{font-family:inherit;font-size:13px;font-weight:600;color:#78716c;background:none;border:none;padding:7px 15px;border-radius:7px;cursor:pointer}
+.tab-btn.on{background:#fff;color:#1c1917;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* ── Footnote ── */
+.footnote{display:flex;gap:11px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:13px 16px;margin-top:4px}
+.footnote .fi{font-size:15px}
+.footnote .ft{font-size:12.5px;color:#1e40af;line-height:1.5}
+.footnote .ft b{font-weight:700}
+
+/* ── Tab panels ── */
+.panel{display:none}
+.panel.on{display:block}
+</style>
+<style data-designer-overlay="1"></style></head>
+<body data-om-id="83061177:5">
+
+<!-- Sidebar -->
+<aside class="sidebar" data-om-id="83061177:6">
+  <div class="sidebar-logo" data-om-id="83061177:7"><span style="font-size:22px" data-om-id="83061177:8">🍁</span><span class="sidebar-logo-name" data-om-id="83061177:9">MapleRun</span></div>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:10">🏠 Dashboard</a>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:11">👥 Employees</a>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:12">⏱ Timesheets</a>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:13">💵 Run Payroll</a>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:14">📄 Pay Statements</a>
+  <div class="nav-sec" data-om-id="83061177:15">Compliance</div>
+  <a class="nav-item active" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:16">🧾 Remittances</a>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:17">🏦 Direct Deposit</a>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:18">📋 ROE</a>
+  <div class="nav-sec" data-om-id="83061177:19">Analytics</div>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:20">📊 Reports</a>
+  <a class="nav-item" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:21">⚙️ Settings</a>
+  <div class="sidebar-foot" data-om-id="83061177:22">
+    <span class="plan-badge" data-om-id="83061177:23"><span class="dot" data-om-id="83061177:24"></span>Growth plan</span>
+    <div class="user-row" data-om-id="83061177:25">
+      <div class="user-avatar" data-om-id="83061177:26">M</div>
+      <div data-om-id="83061177:27"><div class="user-name" data-om-id="83061177:28">Marcus Reid</div><div class="user-sub" data-om-id="83061177:29">Sign out</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main" data-om-id="83061177:30">
+  <div class="breadcrumb" data-om-id="83061177:31"><a href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:32">Compliance</a> › Remittances</div>
+  <div class="page-head" data-om-id="83061177:33">
+    <div data-om-id="83061177:34">
+      <div class="page-title" data-om-id="83061177:35">Remittance Report</div>
+      <div class="page-sub" data-om-id="83061177:36">CRA payroll deductions and employer contributions — Northwind Carpentry Ltd.</div>
+    </div>
+    <div class="exports" data-om-id="83061177:37">
+      <a class="btn-out" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:38">⬇︎ PDF</a>
+      <a class="btn-out" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:39">⬇︎ CSV</a>
+      <a class="btn-out" href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:40">🖨 Print</a>
+      <button class="btn-primary" data-om-id="83061177:41">Submit to CRA</button>
+    </div>
+  </div>
+
+  <!-- Alert -->
+  <div class="alert" data-om-id="83061177:42">
+    <div class="alert-icon" data-om-id="83061177:43">⚠️</div>
+    <div class="alert-body" data-om-id="83061177:44">
+      <div class="alert-title" data-om-id="83061177:45">Remittance due in 7 days — February 15, 2026</div>
+      <div class="alert-sub" data-om-id="83061177:46">January payroll deductions of <strong data-om-id="83061177:47">$15,126.32</strong> are due to CRA. Business number: <strong data-om-id="83061177:48">123456789 RP 0001</strong>. Verify amounts below before submitting.</div>
+    </div>
+    <div class="alert-action" data-om-id="83061177:49">
+      <button class="btn-primary" style="font-size:12px;padding:7px 13px;" data-om-id="83061177:50">Review &amp; Submit</button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters" data-om-id="83061177:51">
+    <div class="filt" data-om-id="83061177:52">
+      <label data-om-id="83061177:53">Period</label>
+      <div class="seg" id="periodSeg" data-om-id="83061177:54">
+        <button data-om-id="83061177:55">Current month</button>
+        <button class="on" data-om-id="83061177:56">Jan 2026</button>
+        <button data-om-id="83061177:57">Q4 2025</button>
+        <button data-om-id="83061177:58">Year to date</button>
+        <button data-om-id="83061177:59">Custom</button>
+      </div>
+    </div>
+    <div class="filt" data-om-id="83061177:60">
+      <label data-om-id="83061177:61">Remittance type</label>
+      <select data-om-id="83061177:62"><option data-om-id="83061177:63">All types</option><option data-om-id="83061177:64">CRA Federal</option><option data-om-id="83061177:65">Provincial – ON</option><option data-om-id="83061177:66">Workers' Comp</option></select>
+    </div>
+    <div class="filt" data-om-id="83061177:67">
+      <label data-om-id="83061177:68">Pay group</label>
+      <select data-om-id="83061177:69"><option data-om-id="83061177:70">All staff (Biweekly)</option><option data-om-id="83061177:71">Office</option><option data-om-id="83061177:72">Field crew</option></select>
+    </div>
+    <div class="filt-spacer" data-om-id="83061177:73"></div>
+    <button class="btn-out" style="align-self:flex-end" data-om-id="83061177:74">Apply</button>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="cra-cards" data-om-id="83061177:75">
+    <div class="cra-card highlight" data-om-id="83061177:76">
+      <div class="cc-label" data-om-id="83061177:77">Total owing to CRA</div>
+      <div class="cc-value mono" data-om-id="83061177:78">$15,126.32</div>
+      <div class="cc-sub" data-om-id="83061177:79">January 2026 · 14 employees</div>
+      <div class="cc-due urgent" data-om-id="83061177:80">Due Feb 15, 2026 · 7 days</div>
+    </div>
+    <div class="cra-card" data-om-id="83061177:81">
+      <div class="cc-label" data-om-id="83061177:82">CPP contributions</div>
+      <div class="cc-value mono" data-om-id="83061177:83">$6,149.28</div>
+      <div class="cc-sub" data-om-id="83061177:84">Employee $3,074.64 + Employer $3,074.64</div>
+    </div>
+    <div class="cra-card" data-om-id="83061177:85">
+      <div class="cc-label" data-om-id="83061177:86">EI premiums</div>
+      <div class="cc-value mono" data-om-id="83061177:87">$2,083.84</div>
+      <div class="cc-sub" data-om-id="83061177:88">Employee $867.24 + Employer $1,216.60</div>
+    </div>
+    <div class="cra-card" data-om-id="83061177:89">
+      <div class="cc-label" data-om-id="83061177:90">Income tax withheld</div>
+      <div class="cc-value mono" data-om-id="83061177:91">$6,893.20</div>
+      <div class="cc-sub" data-om-id="83061177:92">Federal $5,293.20 + Provincial $1,600.00</div>
+    </div>
+  </div>
+
+  <!-- Account strip -->
+  <div class="acct-strip" data-om-id="83061177:93">
+    <div class="acct-cell" data-om-id="83061177:94">
+      <div class="acct-label" data-om-id="83061177:95">Business number</div>
+      <div class="acct-value mono" data-om-id="83061177:96">123456789 RP 0001</div>
+    </div>
+    <div class="acct-cell" data-om-id="83061177:97">
+      <div class="acct-label" data-om-id="83061177:98">Remitter type</div>
+      <div class="acct-value" data-om-id="83061177:99">Regular remitter</div>
+    </div>
+    <div class="acct-cell" data-om-id="83061177:100">
+      <div class="acct-label" data-om-id="83061177:101">Pay period</div>
+      <div class="acct-value" data-om-id="83061177:102">Jan 1 – Jan 31, 2026</div>
+    </div>
+    <div class="acct-cell" data-om-id="83061177:103">
+      <div class="acct-label" data-om-id="83061177:104">Pay runs included</div>
+      <div class="acct-value" data-om-id="83061177:105">2 (Jan 10 &amp; Jan 24)</div>
+    </div>
+    <div class="acct-cell" data-om-id="83061177:106">
+      <div class="acct-label" data-om-id="83061177:107">Filing status</div>
+      <div class="acct-value" data-om-id="83061177:108"><span class="status-chip chip-amber" data-om-id="83061177:109">Pending review</span></div>
+    </div>
+    <div class="acct-cell" data-om-id="83061177:110">
+      <div class="acct-label" data-om-id="83061177:111">Prior month status</div>
+      <div class="acct-value" data-om-id="83061177:112"><span class="status-chip chip-green" data-om-id="83061177:113">Submitted Dec 15</span></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar" id="tabBar" data-om-id="83061177:114">
+    <button class="tab-btn on" data-tab="breakdown" data-om-id="83061177:115">Deduction breakdown</button>
+    <button class="tab-btn" data-tab="employees" data-om-id="83061177:116">By employee</button>
+    <button class="tab-btn" data-tab="history" data-om-id="83061177:117">Remittance history</button>
+    <button class="tab-btn" data-tab="schedule" data-om-id="83061177:118">Schedule &amp; rates</button>
+  </div>
+
+  <!-- Panel: Deduction breakdown -->
+  <div class="panel on" id="panel-breakdown" data-om-id="83061177:119">
+    <div class="sec-title" data-om-id="83061177:120">CRA remittance components — January 2026</div>
+    <div class="table-wrap" data-om-id="83061177:121">
+      <table data-om-id="83061177:122">
+        <thead data-om-id="83061177:123">
+          <tr data-om-id="83061177:124">
+            <th class="l" style="width:30%" data-om-id="83061177:125">Component</th>
+            <th class="l" data-om-id="83061177:126">Description</th>
+            <th data-om-id="83061177:127">Rate / basis</th>
+            <th data-om-id="83061177:128">Employee share</th>
+            <th data-om-id="83061177:129">Employer share</th>
+            <th data-om-id="83061177:130">Total</th>
+            <th data-om-id="83061177:131">% of remittance</th>
+          </tr>
+        </thead>
+        <tbody data-om-id="83061177:132">
+          <tr class="row-group" data-om-id="83061177:133"><td colspan="7" data-om-id="83061177:134">Canada Pension Plan (CPP)</td></tr>
+          <tr data-om-id="83061177:135">
+            <td class="l" data-om-id="83061177:136">
+              <div class="cat-label" data-om-id="83061177:137">
+                <span class="cat-dot" style="background:#B3261E" data-om-id="83061177:138"></span>
+                <div data-om-id="83061177:139"><div class="cat-name" data-om-id="83061177:140">CPP Employee</div><div class="cat-desc" data-om-id="83061177:141">Deducted from each paycheque</div></div>
+              </div>
+            </td>
+            <td class="l" style="color:#78716c;font-size:12.5px" data-om-id="83061177:142">Standard employee CPP deduction on pensionable earnings</td>
+            <td class="mono" data-om-id="83061177:143">5.95%</td>
+            <td class="mono" data-om-id="83061177:144">$3,074.64</td>
+            <td class="mono muted" data-om-id="83061177:145">—</td>
+            <td class="mono" data-om-id="83061177:146">$3,074.64</td>
+            <td data-om-id="83061177:147">
+              <div style="display:flex;align-items:center;gap:8px" data-om-id="83061177:148">
+                <div class="bar-bg" style="width:80px" data-om-id="83061177:149"><div class="bar-fill" style="width:40%;background:#B3261E" data-om-id="83061177:150"></div></div>
+                <span class="mono" style="font-size:12px" data-om-id="83061177:151">20.3%</span>
+              </div>
+            </td>
+          </tr>
+          <tr data-om-id="83061177:152">
+            <td class="l" data-om-id="83061177:153">
+              <div class="cat-label" data-om-id="83061177:154">
+                <span class="cat-dot" style="background:#e56a5c" data-om-id="83061177:155"></span>
+                <div data-om-id="83061177:156"><div class="cat-name" data-om-id="83061177:157">CPP Employer</div><div class="cat-desc" data-om-id="83061177:158">Employer matches employee CPP 1:1</div></div>
+              </div>
+            </td>
+            <td class="l" style="color:#78716c;font-size:12.5px" data-om-id="83061177:159">Employer matches employee contribution dollar-for-dollar</td>
+            <td class="mono" data-om-id="83061177:160">5.95%</td>
+            <td class="mono muted" data-om-id="83061177:161">—</td>
+            <td class="mono" data-om-id="83061177:162">$3,074.64</td>
+            <td class="mono" data-om-id="83061177:163">$3,074.64</td>
+            <td data-om-id="83061177:164">
+              <div style="display:flex;align-items:center;gap:8px" data-om-id="83061177:165">
+                <div class="bar-bg" style="width:80px" data-om-id="83061177:166"><div class="bar-fill" style="width:40%;background:#e56a5c" data-om-id="83061177:167"></div></div>
+                <span class="mono" style="font-size:12px" data-om-id="83061177:168">20.3%</span>
+              </div>
+            </td>
+          </tr>
+          <tr class="row-group" data-om-id="83061177:169"><td colspan="7" data-om-id="83061177:170">Employment Insurance (EI)</td></tr>
+          <tr data-om-id="83061177:171">
+            <td class="l" data-om-id="83061177:172">
+              <div class="cat-label" data-om-id="83061177:173">
+                <span class="cat-dot" style="background:#2563eb" data-om-id="83061177:174"></span>
+                <div data-om-id="83061177:175"><div class="cat-name" data-om-id="83061177:176">EI Employee</div><div class="cat-desc" data-om-id="83061177:177">Deducted from insurable earnings</div></div>
+              </div>
+            </td>
+            <td class="l" style="color:#78716c;font-size:12.5px" data-om-id="83061177:178">Employee EI premium on insurable earnings</td>
+            <td class="mono" data-om-id="83061177:179">1.66%</td>
+            <td class="mono" data-om-id="83061177:180">$867.24</td>
+            <td class="mono muted" data-om-id="83061177:181">—</td>
+            <td class="mono" data-om-id="83061177:182">$867.24</td>
+            <td data-om-id="83061177:183">
+              <div style="display:flex;align-items:center;gap:8px" data-om-id="83061177:184">
+                <div class="bar-bg" style="width:80px" data-om-id="83061177:185"><div class="bar-fill" style="width:11%;background:#2563eb" data-om-id="83061177:186"></div></div>
+                <span class="mono" style="font-size:12px" data-om-id="83061177:187">5.7%</span>
+              </div>
+            </td>
+          </tr>
+          <tr data-om-id="83061177:188">
+            <td class="l" data-om-id="83061177:189">
+              <div class="cat-label" data-om-id="83061177:190">
+                <span class="cat-dot" style="background:#60a5fa" data-om-id="83061177:191"></span>
+                <div data-om-id="83061177:192"><div class="cat-name" data-om-id="83061177:193">EI Employer</div><div class="cat-desc" data-om-id="83061177:194">Employer pays 1.4× employee premium</div></div>
+              </div>
+            </td>
+            <td class="l" style="color:#78716c;font-size:12.5px" data-om-id="83061177:195">Employer premium = employee EI × 1.4 multiplier</td>
+            <td class="mono" data-om-id="83061177:196">2.324%</td>
+            <td class="mono muted" data-om-id="83061177:197">—</td>
+            <td class="mono" data-om-id="83061177:198">$1,216.60</td>
+            <td class="mono" data-om-id="83061177:199">$1,216.60</td>
+            <td data-om-id="83061177:200">
+              <div style="display:flex;align-items:center;gap:8px" data-om-id="83061177:201">
+                <div class="bar-bg" style="width:80px" data-om-id="83061177:202"><div class="bar-fill" style="width:16%;background:#60a5fa" data-om-id="83061177:203"></div></div>
+                <span class="mono" style="font-size:12px" data-om-id="83061177:204">8.1%</span>
+              </div>
+            </td>
+          </tr>
+          <tr class="row-group" data-om-id="83061177:205"><td colspan="7" data-om-id="83061177:206">Income Tax</td></tr>
+          <tr data-om-id="83061177:207">
+            <td class="l" data-om-id="83061177:208">
+              <div class="cat-label" data-om-id="83061177:209">
+                <span class="cat-dot" style="background:#16a34a" data-om-id="83061177:210"></span>
+                <div data-om-id="83061177:211"><div class="cat-name" data-om-id="83061177:212">Federal income tax</div><div class="cat-desc" data-om-id="83061177:213">Based on TD1 claim code per employee</div></div>
+              </div>
+            </td>
+            <td class="l" style="color:#78716c;font-size:12.5px" data-om-id="83061177:214">Federal tax withheld per payroll runs using CRA Payroll Deductions Online Calculator</td>
+            <td class="mono" data-om-id="83061177:215">Varies</td>
+            <td class="mono" data-om-id="83061177:216">$5,293.20</td>
+            <td class="mono muted" data-om-id="83061177:217">—</td>
+            <td class="mono" data-om-id="83061177:218">$5,293.20</td>
+            <td data-om-id="83061177:219">
+              <div style="display:flex;align-items:center;gap:8px" data-om-id="83061177:220">
+                <div class="bar-bg" style="width:80px" data-om-id="83061177:221"><div class="bar-fill" style="width:70%;background:#16a34a" data-om-id="83061177:222"></div></div>
+                <span class="mono" style="font-size:12px" data-om-id="83061177:223">35.0%</span>
+              </div>
+            </td>
+          </tr>
+          <tr data-om-id="83061177:224">
+            <td class="l" data-om-id="83061177:225">
+              <div class="cat-label" data-om-id="83061177:226">
+                <span class="cat-dot" style="background:#4ade80" data-om-id="83061177:227"></span>
+                <div data-om-id="83061177:228"><div class="cat-name" data-om-id="83061177:229">Provincial income tax</div><div class="cat-desc" data-om-id="83061177:230">Ontario — remitted separately to CRA on behalf of ON</div></div>
+              </div>
+            </td>
+            <td class="l" style="color:#78716c;font-size:12.5px" data-om-id="83061177:231">Ontario provincial tax withheld per TD1-ON claim codes</td>
+            <td class="mono" data-om-id="83061177:232">Varies</td>
+            <td class="mono" data-om-id="83061177:233">$1,600.00</td>
+            <td class="mono muted" data-om-id="83061177:234">—</td>
+            <td class="mono" data-om-id="83061177:235">$1,600.00</td>
+            <td data-om-id="83061177:236">
+              <div style="display:flex;align-items:center;gap:8px" data-om-id="83061177:237">
+                <div class="bar-bg" style="width:80px" data-om-id="83061177:238"><div class="bar-fill" style="width:21%;background:#4ade80" data-om-id="83061177:239"></div></div>
+                <span class="mono" style="font-size:12px" data-om-id="83061177:240">10.6%</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot data-om-id="83061177:241">
+          <tr data-om-id="83061177:242">
+            <td class="l" colspan="2" data-om-id="83061177:243">Total remittance to CRA — January 2026</td>
+            <td data-om-id="83061177:244"></td>
+            <td class="mono" data-om-id="83061177:245">$10,835.08</td>
+            <td class="mono" data-om-id="83061177:246">$4,291.24</td>
+            <td class="mono" data-om-id="83061177:247">$15,126.32</td>
+            <td data-om-id="83061177:248"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="footnote" data-om-id="83061177:249">
+      <div class="fi" data-om-id="83061177:250">💡</div>
+      <div class="ft" data-om-id="83061177:251"><b data-om-id="83061177:252">How the CRA remittance is calculated.</b> CPP = (employee CPP withheld) × 2 (employer matches 1:1). EI = (employee EI withheld) + (employee EI × 1.4). Income tax = federal + provincial withheld. All three are remitted together to CRA by the 15th of the following month for regular remitters.</div>
+    </div>
+  </div>
+
+  <!-- Panel: By employee -->
+  <div class="panel" id="panel-employees" data-om-id="83061177:253">
+    <div class="sec-title" data-om-id="83061177:254">Individual contribution detail — January 2026 <a href="https://3e70bdfe-2298-4e47-be2b-bcc26e49de42.claudeusercontent.com/v1/design/projects/3e70bdfe-2298-4e47-be2b-bcc26e49de42/serve/MapleRun%20Remittance%20Report.html?srcmap=1&amp;_omeo=https%3A%2F%2Fclaude.ai#" data-om-id="83061177:255">Export</a></div>
+    <div class="table-wrap" data-om-id="83061177:256">
+      <table data-om-id="83061177:257">
+        <thead data-om-id="83061177:258">
+          <tr data-om-id="83061177:259">
+            <th class="l" data-om-id="83061177:260">Employee</th>
+            <th data-om-id="83061177:261">Gross pay</th>
+            <th data-om-id="83061177:262">CPP (ee)</th>
+            <th data-om-id="83061177:263">CPP (er)</th>
+            <th data-om-id="83061177:264">EI (ee)</th>
+            <th data-om-id="83061177:265">EI (er)</th>
+            <th data-om-id="83061177:266">Fed. tax</th>
+            <th data-om-id="83061177:267">Prov. tax</th>
+            <th data-om-id="83061177:268">Total CRA</th>
+          </tr>
+        </thead>
+        <tbody id="empRows" data-om-id="83061177:269">
+  <tr>
+    <td class="l"><div class="emp-cell"><div class="emp-av ">S</div><div><div class="emp-n">Sarah Tremblay</div><div class="emp-s">Office · Salaried</div></div></div></td>
+    <td class="mono">$5,769.24</td>
+    <td class="mono">$332.72</td>
+    <td class="mono">$332.72</td>
+    <td class="mono">$93.86</td>
+    <td class="mono">$131.40</td>
+    <td class="mono">$572.82</td>
+    <td class="mono">$156.20</td>
+    <td class="mono net-col">$1,619.72</td>
+  </tr>
+  <tr>
+    <td class="l"><div class="emp-cell"><div class="emp-av blue">D</div><div><div class="emp-n">David Chen</div><div class="emp-s">Field crew · Hourly</div></div></div></td>
+    <td class="mono">$6,200.00</td>
+    <td class="mono">$357.68</td>
+    <td class="mono">$357.68</td>
+    <td class="mono">$100.88</td>
+    <td class="mono">$141.23</td>
+    <td class="mono">$625.80</td>
+    <td class="mono">$190.40</td>
+    <td class="mono net-col">$1,773.67</td>
+  </tr>
+  <tr>
+    <td class="l"><div class="emp-cell"><div class="emp-av green">A</div><div><div class="emp-n">Amara Okonkwo</div><div class="emp-s">Field crew · Hourly</div></div></div></td>
+    <td class="mono">$5,800.00</td>
+    <td class="mono">$334.48</td>
+    <td class="mono">$334.48</td>
+    <td class="mono">$94.34</td>
+    <td class="mono">$132.08</td>
+    <td class="mono">$577.80</td>
+    <td class="mono">$171.20</td>
+    <td class="mono net-col">$1,644.38</td>
+  </tr>
+  <tr>
+    <td class="l"><div class="emp-cell"><div class="emp-av amber">L</div><div><div class="emp-n">Liam Gauthier</div><div class="emp-s">Office · Salaried</div></div></div></td>
+    <td class="mono">$4,615.38</td>
+    <td class="mono">$266.16</td>
+    <td class="mono">$266.16</td>
+    <td class="mono">$75.08</td>
+    <td class="mono">$105.11</td>
+    <td class="mono">$412.40</td>
+    <td class="mono">$118.40</td>
+    <td class="mono net-col">$1,243.31</td>
+  </tr>
+  <tr>
+    <td class="l"><div class="emp-cell"><div class="emp-av violet">P</div><div><div class="emp-n">Priya Sharma</div><div class="emp-s">Office · Salaried</div></div></div></td>
+    <td class="mono">$5,000.00</td>
+    <td class="mono">$288.40</td>
+    <td class="mono">$288.40</td>
+    <td class="mono">$81.34</td>
+    <td class="mono">$113.88</td>
+    <td class="mono">$461.20</td>
+    <td class="mono">$132.80</td>
+    <td class="mono net-col">$1,366.02</td>
+  </tr>
+  <tr>
+    <td class="l"><div class="emp-cell"><div class="emp-av ">D</div><div><div class="emp-n">Daniel Okafor</div><div class="emp-s">Field crew · Hourly</div></div></div></td>
+    <td class="mono">$4,920.00</td>
+    <td class="mono">$283.76</td>
+    <td class="mono">$283.76</td>
+    <td class="mono">$80.04</td>
+    <td class="mono">$112.06</td>
+    <td class="mono">$448.60</td>
+    <td class="mono">$129.00</td>
+    <td class="mono net-col">$1,337.22</td>
+  </tr>
+  <tr>
+    <td class="l"><div class="emp-cell"><div class="emp-av blue">E</div><div><div class="emp-n">Emma Bouchard</div><div class="emp-s">Office · Salaried</div></div></div></td>
+    <td class="mono">$4,038.46</td>
+    <td class="mono">$232.92</td>
+    <td class="mono">$232.92</td>
+    <td class="mono">$65.70</td>
+    <td class="mono">$91.98</td>
+    <td class="mono">$342.60</td>
+    <td class="mono">$98.60</td>
+    <td class="mono net-col">$1,064.72</td>
+  </tr><tr><td colspan="9" style="text-align:center;color:#a8a29e;font-size:12px;padding:12px">+ 7 more employees</td></tr></tbody>
+        <tfoot data-om-id="83061177:270">
+          <tr data-om-id="83061177:271">
+            <td class="l" data-om-id="83061177:272">Totals · 14 employees</td>
+            <td class="mono" data-om-id="83061177:273">$53,307.72</td>
+            <td class="mono" data-om-id="83061177:274">$3,074.64</td>
+            <td class="mono" data-om-id="83061177:275">$3,074.64</td>
+            <td class="mono" data-om-id="83061177:276">$867.24</td>
+            <td class="mono" data-om-id="83061177:277">$1,216.60</td>
+            <td class="mono" data-om-id="83061177:278">$5,293.20</td>
+            <td class="mono" data-om-id="83061177:279">$1,600.00</td>
+            <td class="mono" data-om-id="83061177:280">$15,126.32</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Panel: History -->
+  <div class="panel" id="panel-history" data-om-id="83061177:281">
+    <div class="sec-title" data-om-id="83061177:282">Remittance history — last 12 months</div>
+    <div class="table-wrap" data-om-id="83061177:283">
+      <table data-om-id="83061177:284">
+        <thead data-om-id="83061177:285">
+          <tr data-om-id="83061177:286">
+            <th class="l" data-om-id="83061177:287">Period</th>
+            <th class="l" data-om-id="83061177:288">Due date</th>
+            <th class="l" data-om-id="83061177:289">Submitted</th>
+            <th data-om-id="83061177:290">CPP total</th>
+            <th data-om-id="83061177:291">EI total</th>
+            <th data-om-id="83061177:292">Tax withheld</th>
+            <th data-om-id="83061177:293">Total remitted</th>
+            <th class="l" data-om-id="83061177:294">Status</th>
+            <th class="l" data-om-id="83061177:295">Reference</th>
+          </tr>
+        </thead>
+        <tbody id="histRows" data-om-id="83061177:296"><tr>
+    <td class="l" style="font-weight:600">Jan 2026</td>
+    <td class="l">Feb 15, 2026</td>
+    <td class="l" style="color:#a8a29e">Pending</td>
+    <td class="mono">$6,149.28</td>
+    <td class="mono">$2,083.84</td>
+    <td class="mono">$6,893.20</td>
+    <td class="mono net-col">$15,126.32</td>
+    <td class="l"><span class="status-chip chip-amber">Pending</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:&#39;Geist Mono&#39;,monospace">—</td>
+  </tr><tr>
+    <td class="l" style="font-weight:600">Dec 2025</td>
+    <td class="l">Jan 15, 2026</td>
+    <td class="l" style="color:#1c1917">Jan 14, 2026</td>
+    <td class="mono">$6,002.40</td>
+    <td class="mono">$2,034.80</td>
+    <td class="mono">$6,765.28</td>
+    <td class="mono net-col">$14,802.48</td>
+    <td class="l"><span class="status-chip chip-green">Submitted</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:&#39;Geist Mono&#39;,monospace">CRA-2026-00412</td>
+  </tr><tr>
+    <td class="l" style="font-weight:600">Nov 2025</td>
+    <td class="l">Dec 15, 2025</td>
+    <td class="l" style="color:#1c1917">Dec 12, 2025</td>
+    <td class="mono">$5,980.16</td>
+    <td class="mono">$2,026.30</td>
+    <td class="mono">$6,711.04</td>
+    <td class="mono net-col">$14,717.50</td>
+    <td class="l"><span class="status-chip chip-green">Submitted</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:&#39;Geist Mono&#39;,monospace">CRA-2025-09887</td>
+  </tr><tr>
+    <td class="l" style="font-weight:600">Oct 2025</td>
+    <td class="l">Nov 15, 2025</td>
+    <td class="l" style="color:#1c1917">Nov 14, 2025</td>
+    <td class="mono">$5,960.00</td>
+    <td class="mono">$2,019.20</td>
+    <td class="mono">$6,692.40</td>
+    <td class="mono net-col">$14,671.60</td>
+    <td class="l"><span class="status-chip chip-green">Submitted</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:&#39;Geist Mono&#39;,monospace">CRA-2025-09201</td>
+  </tr><tr>
+    <td class="l" style="font-weight:600">Sep 2025</td>
+    <td class="l">Oct 15, 2025</td>
+    <td class="l" style="color:#1c1917">Oct 17, 2025</td>
+    <td class="mono">$5,810.20</td>
+    <td class="mono">$1,967.80</td>
+    <td class="mono">$6,530.80</td>
+    <td class="mono net-col">$14,308.80</td>
+    <td class="l"><span class="status-chip chip-red">Late</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:&#39;Geist Mono&#39;,monospace">CRA-2025-08564</td>
+  </tr><tr>
+    <td class="l" style="font-weight:600">Aug 2025</td>
+    <td class="l">Sep 15, 2025</td>
+    <td class="l" style="color:#1c1917">Sep 13, 2025</td>
+    <td class="mono">$5,640.00</td>
+    <td class="mono">$1,909.80</td>
+    <td class="mono">$6,312.40</td>
+    <td class="mono net-col">$13,862.20</td>
+    <td class="l"><span class="status-chip chip-green">Submitted</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:&#39;Geist Mono&#39;,monospace">CRA-2025-07912</td>
+  </tr><tr>
+    <td class="l" style="font-weight:600">Jul 2025</td>
+    <td class="l">Aug 15, 2025</td>
+    <td class="l" style="color:#1c1917">Aug 14, 2025</td>
+    <td class="mono">$5,510.40</td>
+    <td class="mono">$1,866.00</td>
+    <td class="mono">$6,152.60</td>
+    <td class="mono net-col">$13,529.00</td>
+    <td class="l"><span class="status-chip chip-green">Submitted</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:&#39;Geist Mono&#39;,monospace">CRA-2025-07243</td>
+  </tr><tr>
+    <td class="l" style="font-weight:600">Jun 2025</td>
+    <td class="l">Jul 15, 2025</td>
+    <td class="l" style="color:#1c1917">Jul 14, 2025</td>
+    <td class="mono">$5,490.20</td>
+    <td class="mono">$1,859.20</td>
+    <td class="mono">$6,104.40</td>
+    <td class="mono net-col">$13,453.80</td>
+    <td class="l"><span class="status-chip chip-green">Submitted</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:&#39;Geist Mono&#39;,monospace">CRA-2025-06580</td>
+  </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Panel: Schedule & rates -->
+  <div class="panel" id="panel-schedule" data-om-id="83061177:297">
+    <div class="two-col" data-om-id="83061177:298">
+      <div data-om-id="83061177:299">
+        <div class="sec-title" data-om-id="83061177:300">Upcoming remittance schedule</div>
+        <div class="schedule-card" data-om-id="83061177:301">
+          <div class="sched-item" data-om-id="83061177:302">
+            <div class="sched-date urgent" data-om-id="83061177:303">
+              <div class="sched-mon" data-om-id="83061177:304">FEB</div>
+              <div class="sched-day" data-om-id="83061177:305">15</div>
+            </div>
+            <div class="sched-body" data-om-id="83061177:306">
+              <div class="sched-title" data-om-id="83061177:307">January 2026 remittance</div>
+              <div class="sched-sub" data-om-id="83061177:308">CRA · Regular remitter · 7 days remaining</div>
+            </div>
+            <div class="sched-amt net-col" data-om-id="83061177:309">$15,126.32</div>
+          </div>
+          <div class="sched-item" data-om-id="83061177:310">
+            <div class="sched-date" data-om-id="83061177:311">
+              <div class="sched-mon" data-om-id="83061177:312">MAR</div>
+              <div class="sched-day" data-om-id="83061177:313">15</div>
+            </div>
+            <div class="sched-body" data-om-id="83061177:314">
+              <div class="sched-title" data-om-id="83061177:315">February 2026 remittance</div>
+              <div class="sched-sub" data-om-id="83061177:316">CRA · Regular remitter · Estimated</div>
+            </div>
+            <div class="sched-amt muted" data-om-id="83061177:317">~$15,200</div>
+          </div>
+          <div class="sched-item" data-om-id="83061177:318">
+            <div class="sched-date" data-om-id="83061177:319">
+              <div class="sched-mon" data-om-id="83061177:320">APR</div>
+              <div class="sched-day" data-om-id="83061177:321">15</div>
+            </div>
+            <div class="sched-body" data-om-id="83061177:322">
+              <div class="sched-title" data-om-id="83061177:323">March 2026 remittance</div>
+              <div class="sched-sub" data-om-id="83061177:324">CRA · Regular remitter · Estimated</div>
+            </div>
+            <div class="sched-amt muted" data-om-id="83061177:325">~$15,200</div>
+          </div>
+          <div class="sched-item" data-om-id="83061177:326">
+            <div class="sched-date" data-om-id="83061177:327">
+              <div class="sched-mon" data-om-id="83061177:328">APR</div>
+              <div class="sched-day" data-om-id="83061177:329">30</div>
+            </div>
+            <div class="sched-body" data-om-id="83061177:330">
+              <div class="sched-title" data-om-id="83061177:331">T4 summary &amp; T4 slips deadline</div>
+              <div class="sched-sub" data-om-id="83061177:332">CRA annual filing · Employer copy due</div>
+            </div>
+            <div class="sched-amt muted" data-om-id="83061177:333">Filing</div>
+          </div>
+          <div class="sched-item" data-om-id="83061177:334">
+            <div class="sched-date past" data-om-id="83061177:335">
+              <div class="sched-mon" data-om-id="83061177:336">JAN</div>
+              <div class="sched-day" data-om-id="83061177:337">15</div>
+            </div>
+            <div class="sched-body" data-om-id="83061177:338">
+              <div class="sched-title" data-om-id="83061177:339">December 2025 remittance</div>
+              <div class="sched-sub" data-om-id="83061177:340">CRA · Submitted Jan 14, 2026</div>
+            </div>
+            <div class="sched-amt" style="color:#16a34a" data-om-id="83061177:341">$14,802.48</div>
+          </div>
+        </div>
+      </div>
+
+      <div data-om-id="83061177:342">
+        <div class="sec-title" data-om-id="83061177:343">2026 statutory rates in effect</div>
+        <div class="legend-card" data-om-id="83061177:344">
+          <div class="legend-item" data-om-id="83061177:345">
+            <div class="legend-icon" style="background:#fef2f2" data-om-id="83061177:346">🏦</div>
+            <div class="legend-body" data-om-id="83061177:347">
+              <div class="legend-name" data-om-id="83061177:348">CPP employee rate</div>
+              <div class="legend-desc" data-om-id="83061177:349">Applied to pensionable earnings above the basic exemption of $3,500/yr. Max annual pensionable earnings: $68,500.</div>
+            </div>
+            <div class="legend-rate" data-om-id="83061177:350"><div class="rate-val" data-om-id="83061177:351">5.95%</div><div class="rate-label" data-om-id="83061177:352">2026 rate</div></div>
+          </div>
+          <div class="legend-item" data-om-id="83061177:353">
+            <div class="legend-icon" style="background:#fef2f2" data-om-id="83061177:354">🏦</div>
+            <div class="legend-body" data-om-id="83061177:355">
+              <div class="legend-name" data-om-id="83061177:356">CPP2 additional contribution</div>
+              <div class="legend-desc" data-om-id="83061177:357">Second CPP tier on earnings between $68,500 and $73,200. Applies to higher earners.</div>
+            </div>
+            <div class="legend-rate" data-om-id="83061177:358"><div class="rate-val" data-om-id="83061177:359">4.00%</div><div class="rate-label" data-om-id="83061177:360">2026 rate</div></div>
+          </div>
+          <div class="legend-item" data-om-id="83061177:361">
+            <div class="legend-icon" style="background:#eff6ff" data-om-id="83061177:362">💼</div>
+            <div class="legend-body" data-om-id="83061177:363">
+              <div class="legend-name" data-om-id="83061177:364">EI employee premium</div>
+              <div class="legend-desc" data-om-id="83061177:365">Applied to insurable earnings up to the maximum annual insurable amount of $65,700.</div>
+            </div>
+            <div class="legend-rate" data-om-id="83061177:366"><div class="rate-val" data-om-id="83061177:367">1.66%</div><div class="rate-label" data-om-id="83061177:368">2026 rate</div></div>
+          </div>
+          <div class="legend-item" data-om-id="83061177:369">
+            <div class="legend-icon" style="background:#eff6ff" data-om-id="83061177:370">💼</div>
+            <div class="legend-body" data-om-id="83061177:371">
+              <div class="legend-name" data-om-id="83061177:372">EI employer multiplier</div>
+              <div class="legend-desc" data-om-id="83061177:373">Employer pays 1.4× the employee EI premium. Reduced multiplier available with registered wage-loss plan.</div>
+            </div>
+            <div class="legend-rate" data-om-id="83061177:374"><div class="rate-val" data-om-id="83061177:375">×1.4</div><div class="rate-label" data-om-id="83061177:376">standard</div></div>
+          </div>
+          <div class="legend-item" data-om-id="83061177:377">
+            <div class="legend-icon" style="background:#f0fdf4" data-om-id="83061177:378">📋</div>
+            <div class="legend-body" data-om-id="83061177:379">
+              <div class="legend-name" data-om-id="83061177:380">Remitter type threshold</div>
+              <div class="legend-desc" data-om-id="83061177:381">Regular remitter: average monthly withholding $1,000–$24,999. Due by 15th of following month.</div>
+            </div>
+            <div class="legend-rate" data-om-id="83061177:382"><div class="rate-val" data-om-id="83061177:383">15th</div><div class="rate-label" data-om-id="83061177:384">monthly due</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ── Period seg ── */
+document.getElementById('periodSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#periodSeg button').forEach(x => x.classList.toggle('on', x === b));
+});
+
+/* ── Tabs ── */
+document.getElementById('tabBar').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#tabBar .tab-btn').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.getElementById('panel-' + b.dataset.tab).classList.add('on');
+});
+
+/* ── Employee rows ── */
+const EMP = [
+  {n:'Sarah Tremblay', a:'S', av:'', d:'Office · Salaried', g:'5,769.24', cpp:'332.72', ei:'93.86', ft:'572.82', pt:'156.20', col:''},
+  {n:'David Chen',     a:'D', av:'blue',  d:'Field crew · Hourly', g:'6,200.00', cpp:'357.68', ei:'100.88', ft:'625.80', pt:'190.40', col:''},
+  {n:'Amara Okonkwo',  a:'A', av:'green', d:'Field crew · Hourly', g:'5,800.00', cpp:'334.48', ei:'94.34',  ft:'577.80', pt:'171.20', col:''},
+  {n:'Liam Gauthier',  a:'L', av:'amber', d:'Office · Salaried',   g:'4,615.38', cpp:'266.16', ei:'75.08',  ft:'412.40', pt:'118.40', col:''},
+  {n:'Priya Sharma',   a:'P', av:'violet',d:'Office · Salaried',   g:'5,000.00', cpp:'288.40', ei:'81.34',  ft:'461.20', pt:'132.80', col:''},
+  {n:'Daniel Okafor',  a:'D', av:'',      d:'Field crew · Hourly', g:'4,920.00', cpp:'283.76', ei:'80.04',  ft:'448.60', pt:'129.00', col:''},
+  {n:'Emma Bouchard',  a:'E', av:'blue',  d:'Office · Salaried',   g:'4,038.46', cpp:'232.92', ei:'65.70',  ft:'342.60', pt:'98.60',  col:''},
+];
+
+function eiER(ee){ return (parseFloat(ee.replace(/,/g,''))*1.4).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function total(r){
+  const cpp=parseFloat(r.cpp.replace(/,/g,''));
+  const ei=parseFloat(r.ei.replace(/,/g,''));
+  const ft=parseFloat(r.ft.replace(/,/g,''));
+  const pt=parseFloat(r.pt.replace(/,/g,''));
+  return (cpp*2 + ei*2.4 + ft + pt).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+document.getElementById('empRows').innerHTML = EMP.map(r => `
+  <tr>
+    <td class="l"><div class="emp-cell"><div class="emp-av ${r.av}">${r.a}</div><div><div class="emp-n">${r.n}</div><div class="emp-s">${r.d}</div></div></div></td>
+    <td class="mono">$${r.g}</td>
+    <td class="mono">$${r.cpp}</td>
+    <td class="mono">$${r.cpp}</td>
+    <td class="mono">$${r.ei}</td>
+    <td class="mono">$${eiER(r.ei)}</td>
+    <td class="mono">$${r.ft}</td>
+    <td class="mono">$${r.pt}</td>
+    <td class="mono net-col">$${total(r)}</td>
+  </tr>`).join('') + `<tr><td colspan="9" style="text-align:center;color:#a8a29e;font-size:12px;padding:12px">+ 7 more employees</td></tr>`;
+
+/* ── History rows ── */
+const HIST = [
+  {period:'Jan 2026', due:'Feb 15, 2026', sub:'Pending',     cpp:'6,149.28', ei:'2,083.84', tax:'6,893.20', total:'15,126.32', status:'pending',   ref:'—'},
+  {period:'Dec 2025', due:'Jan 15, 2026', sub:'Jan 14, 2026',cpp:'6,002.40', ei:'2,034.80', tax:'6,765.28', total:'14,802.48', status:'submitted', ref:'CRA-2026-00412'},
+  {period:'Nov 2025', due:'Dec 15, 2025', sub:'Dec 12, 2025',cpp:'5,980.16', ei:'2,026.30', tax:'6,711.04', total:'14,717.50', status:'submitted', ref:'CRA-2025-09887'},
+  {period:'Oct 2025', due:'Nov 15, 2025', sub:'Nov 14, 2025',cpp:'5,960.00', ei:'2,019.20', tax:'6,692.40', total:'14,671.60', status:'submitted', ref:'CRA-2025-09201'},
+  {period:'Sep 2025', due:'Oct 15, 2025', sub:'Oct 17, 2025',cpp:'5,810.20', ei:'1,967.80', tax:'6,530.80', total:'14,308.80', status:'late',      ref:'CRA-2025-08564'},
+  {period:'Aug 2025', due:'Sep 15, 2025', sub:'Sep 13, 2025',cpp:'5,640.00', ei:'1,909.80', tax:'6,312.40', total:'13,862.20', status:'submitted', ref:'CRA-2025-07912'},
+  {period:'Jul 2025', due:'Aug 15, 2025', sub:'Aug 14, 2025',cpp:'5,510.40', ei:'1,866.00', tax:'6,152.60', total:'13,529.00', status:'submitted', ref:'CRA-2025-07243'},
+  {period:'Jun 2025', due:'Jul 15, 2025', sub:'Jul 14, 2025',cpp:'5,490.20', ei:'1,859.20', tax:'6,104.40', total:'13,453.80', status:'submitted', ref:'CRA-2025-06580'},
+];
+
+const statusMap = {
+  pending:   ['chip-amber','Pending'],
+  submitted: ['chip-green','Submitted'],
+  late:      ['chip-red','Late'],
+};
+
+document.getElementById('histRows').innerHTML = HIST.map(r => {
+  const [cls, lbl] = statusMap[r.status];
+  return `<tr>
+    <td class="l" style="font-weight:600">${r.period}</td>
+    <td class="l">${r.due}</td>
+    <td class="l" style="color:${r.sub==='Pending'?'#a8a29e':'#1c1917'}">${r.sub}</td>
+    <td class="mono">$${r.cpp}</td>
+    <td class="mono">$${r.ei}</td>
+    <td class="mono">$${r.tax}</td>
+    <td class="mono net-col">$${r.total}</td>
+    <td class="l"><span class="status-chip ${cls}">${lbl}</span></td>
+    <td class="l" style="font-size:12px;color:#a8a29e;font-family:'Geist Mono',monospace">${r.ref}</td>
+  </tr>`;
+}).join('');
+</script>
+
+
+<script type="application/json" id="__om_srcmap">{"gen":"83061177","entries":[{"id":"83061177:0","tag":"html","openStart":16,"attrEnd":31,"openEnd":32,"closeStart":37024,"closeEnd":37031,"textRuns":[[32,33],[12127,12128],[37023,37024]],"parentId":null,"childIds":["83061177:1","83061177:5"]},{"id":"83061177:1","tag":"head","openStart":33,"attrEnd":38,"openEnd":39,"closeStart":12120,"closeEnd":12127,"textRuns":[[39,40],[62,63],[130,131],[176,177],[331,332],[12119,12120]],"parentId":"83061177:0","childIds":["83061177:2","83061177:3","83061177:4"]},{"id":"83061177:2","tag":"meta","openStart":40,"attrEnd":61,"openEnd":62,"closeEnd":62,"textRuns":[],"parentId":"83061177:1","childIds":[]},{"id":"83061177:3","tag":"meta","openStart":63,"attrEnd":129,"openEnd":130,"closeEnd":130,"textRuns":[],"parentId":"83061177:1","childIds":[]},{"id":"83061177:4","tag":"link","openStart":177,"attrEnd":330,"openEnd":331,"closeEnd":331,"textRuns":[],"parentId":"83061177:1","childIds":[]},{"id":"83061177:5","tag":"body","openStart":12128,"attrEnd":12133,"openEnd":12134,"closeStart":37016,"closeEnd":37023,"textRuns":[[12134,12136],[12152,12153],[13182,13184],[13197,13198],[31959,31961],[37015,37016]],"parentId":"83061177:0","childIds":["83061177:6","83061177:30"]},{"id":"83061177:6","tag":"aside","openStart":12153,"attrEnd":12175,"openEnd":12176,"closeStart":13174,"closeEnd":13182,"textRuns":[[12176,12179],[12298,12301],[12348,12351],[12398,12401],[12448,12451],[12500,12503],[12555,12558],[12595,12598],[12654,12657],[12709,12712],[12753,12756],[12792,12795],[12840,12843],[12891,12894],[13173,13174]],"parentId":"83061177:5","childIds":["83061177:7","83061177:10","83061177:11","83061177:12","83061177:13","83061177:14","83061177:15","83061177:16","83061177:17","83061177:18","83061177:19","83061177:20","83061177:21","83061177:22"]},{"id":"83061177:7","tag":"div","openStart":12179,"attrEnd":12204,"openEnd":12205,"closeStart":12292,"closeEnd":12298,"textRuns":[],"parentId":"83061177:6","childIds":["83061177:8","83061177:9"]},{"id":"83061177:8","tag":"span","openStart":12205,"attrEnd":12233,"openEnd":12234,"closeStart":12238,"closeEnd":12245,"styleAttr":[12218,12232],"textRuns":[[12234,12238]],"parentId":"83061177:7","childIds":[]},{"id":"83061177:9","tag":"span","openStart":12245,"attrEnd":12276,"openEnd":12277,"closeStart":12285,"closeEnd":12292,"textRuns":[[12277,12285]],"parentId":"83061177:7","childIds":[]},{"id":"83061177:10","tag":"a","openStart":12301,"attrEnd":12329,"openEnd":12330,"closeStart":12344,"closeEnd":12348,"textRuns":[[12330,12344]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:11","tag":"a","openStart":12351,"attrEnd":12379,"openEnd":12380,"closeStart":12394,"closeEnd":12398,"textRuns":[[12380,12394]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:12","tag":"a","openStart":12401,"attrEnd":12429,"openEnd":12430,"closeStart":12444,"closeEnd":12448,"textRuns":[[12430,12444]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:13","tag":"a","openStart":12451,"attrEnd":12479,"openEnd":12480,"closeStart":12496,"closeEnd":12500,"textRuns":[[12480,12496]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:14","tag":"a","openStart":12503,"attrEnd":12531,"openEnd":12532,"closeStart":12551,"closeEnd":12555,"textRuns":[[12532,12551]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:15","tag":"div","openStart":12558,"attrEnd":12578,"openEnd":12579,"closeStart":12589,"closeEnd":12595,"textRuns":[[12579,12589]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:16","tag":"a","openStart":12598,"attrEnd":12633,"openEnd":12634,"closeStart":12650,"closeEnd":12654,"textRuns":[[12634,12650]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:17","tag":"a","openStart":12657,"attrEnd":12685,"openEnd":12686,"closeStart":12705,"closeEnd":12709,"textRuns":[[12686,12705]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:18","tag":"a","openStart":12712,"attrEnd":12740,"openEnd":12741,"closeStart":12749,"closeEnd":12753,"textRuns":[[12741,12749]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:19","tag":"div","openStart":12756,"attrEnd":12776,"openEnd":12777,"closeStart":12786,"closeEnd":12792,"textRuns":[[12777,12786]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:20","tag":"a","openStart":12795,"attrEnd":12823,"openEnd":12824,"closeStart":12836,"closeEnd":12840,"textRuns":[[12824,12836]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:21","tag":"a","openStart":12843,"attrEnd":12871,"openEnd":12872,"closeStart":12887,"closeEnd":12891,"textRuns":[[12872,12887]],"parentId":"83061177:6","childIds":[]},{"id":"83061177:22","tag":"div","openStart":12894,"attrEnd":12919,"openEnd":12920,"closeStart":13167,"closeEnd":13173,"textRuns":[[12920,12925],[12993,12998],[13164,13167]],"parentId":"83061177:6","childIds":["83061177:23","83061177:25"]},{"id":"83061177:23","tag":"span","openStart":12925,"attrEnd":12949,"openEnd":12950,"closeStart":12986,"closeEnd":12993,"textRuns":[[12975,12986]],"parentId":"83061177:22","childIds":["83061177:24"]},{"id":"83061177:24","tag":"span","openStart":12950,"attrEnd":12967,"openEnd":12968,"closeStart":12968,"closeEnd":12975,"textRuns":[],"parentId":"83061177:23","childIds":[]},{"id":"83061177:25","tag":"div","openStart":12998,"attrEnd":13019,"openEnd":13020,"closeStart":13158,"closeEnd":13164,"textRuns":[[13020,13027],[13059,13066],[13153,13158]],"parentId":"83061177:22","childIds":["83061177:26","83061177:27"]},{"id":"83061177:26","tag":"div","openStart":13027,"attrEnd":13051,"openEnd":13052,"closeStart":13053,"closeEnd":13059,"textRuns":[[13052,13053]],"parentId":"83061177:25","childIds":[]},{"id":"83061177:27","tag":"div","openStart":13066,"attrEnd":13070,"openEnd":13071,"closeStart":13147,"closeEnd":13153,"textRuns":[],"parentId":"83061177:25","childIds":["83061177:28","83061177:29"]},{"id":"83061177:28","tag":"div","openStart":13071,"attrEnd":13093,"openEnd":13094,"closeStart":13105,"closeEnd":13111,"textRuns":[[13094,13105]],"parentId":"83061177:27","childIds":[]},{"id":"83061177:29","tag":"div","openStart":13111,"attrEnd":13132,"openEnd":13133,"closeStart":13141,"closeEnd":13147,"textRuns":[[13133,13141]],"parentId":"83061177:27","childIds":[]},{"id":"83061177:30","tag":"main","openStart":13198,"attrEnd":13216,"openEnd":13217,"closeStart":31952,"closeEnd":31959,"textRuns":[[13217,13220],[13292,13295],[13756,13760],[13774,13777],[14318,14322],[14338,14341],[15168,15172],[15194,15197],[16135,16139],[16161,16164],[17162,17166],[17179,17182],[17528,17532],[17567,17570],[24877,24881],[24908,24911],[25985,25989],[26012,26015],[26633,26637],[26669,26672],[31950,31952]],"parentId":"83061177:5","childIds":["83061177:31","83061177:33","83061177:42","83061177:51","83061177:75","83061177:93","83061177:114","83061177:119","83061177:253","83061177:281","83061177:297"]},{"id":"83061177:31","tag":"div","openStart":13220,"attrEnd":13243,"openEnd":13244,"closeStart":13286,"closeEnd":13292,"textRuns":[[13270,13286]],"parentId":"83061177:30","childIds":["83061177:32"]},{"id":"83061177:32","tag":"a","openStart":13244,"attrEnd":13255,"openEnd":13256,"closeStart":13266,"closeEnd":13270,"textRuns":[[13256,13266]],"parentId":"83061177:31","childIds":[]},{"id":"83061177:33","tag":"div","openStart":13295,"attrEnd":13317,"openEnd":13318,"closeStart":13750,"closeEnd":13756,"textRuns":[[13318,13323],[13506,13511],[13747,13750]],"parentId":"83061177:30","childIds":["83061177:34","83061177:37"]},{"id":"83061177:34","tag":"div","openStart":13323,"attrEnd":13327,"openEnd":13328,"closeStart":13500,"closeEnd":13506,"textRuns":[[13328,13335],[13382,13389],[13495,13500]],"parentId":"83061177:33","childIds":["83061177:35","83061177:36"]},{"id":"83061177:35","tag":"div","openStart":13335,"attrEnd":13358,"openEnd":13359,"closeStart":13376,"closeEnd":13382,"textRuns":[[13359,13376]],"parentId":"83061177:34","childIds":[]},{"id":"83061177:36","tag":"div","openStart":13389,"attrEnd":13410,"openEnd":13411,"closeStart":13489,"closeEnd":13495,"textRuns":[[13411,13489]],"parentId":"83061177:34","childIds":[]},{"id":"83061177:37","tag":"div","openStart":13511,"attrEnd":13531,"openEnd":13532,"closeStart":13741,"closeEnd":13747,"textRuns":[[13532,13539],[13581,13588],[13630,13637],[13679,13686],[13736,13741]],"parentId":"83061177:33","childIds":["83061177:38","83061177:39","83061177:40","83061177:41"]},{"id":"83061177:38","tag":"a","openStart":13539,"attrEnd":13566,"openEnd":13567,"closeStart":13577,"closeEnd":13581,"textRuns":[[13567,13577]],"parentId":"83061177:37","childIds":[]},{"id":"83061177:39","tag":"a","openStart":13588,"attrEnd":13615,"openEnd":13616,"closeStart":13626,"closeEnd":13630,"textRuns":[[13616,13626]],"parentId":"83061177:37","childIds":[]},{"id":"83061177:40","tag":"a","openStart":13637,"attrEnd":13664,"openEnd":13665,"closeStart":13675,"closeEnd":13679,"textRuns":[[13665,13675]],"parentId":"83061177:37","childIds":[]},{"id":"83061177:41","tag":"button","openStart":13686,"attrEnd":13713,"openEnd":13714,"closeStart":13727,"closeEnd":13736,"textRuns":[[13714,13727]],"parentId":"83061177:37","childIds":[]},{"id":"83061177:42","tag":"div","openStart":13777,"attrEnd":13795,"openEnd":13796,"closeStart":14312,"closeEnd":14318,"textRuns":[[13796,13801],[13837,13842],[14163,14168],[14309,14312]],"parentId":"83061177:30","childIds":["83061177:43","83061177:44","83061177:49"]},{"id":"83061177:43","tag":"div","openStart":13801,"attrEnd":13824,"openEnd":13825,"closeStart":13831,"closeEnd":13837,"textRuns":[[13825,13831]],"parentId":"83061177:42","childIds":[]},{"id":"83061177:44","tag":"div","openStart":13842,"attrEnd":13865,"openEnd":13866,"closeStart":14157,"closeEnd":14163,"textRuns":[[13866,13873],[13950,13957],[14152,14157]],"parentId":"83061177:42","childIds":["83061177:45","83061177:46"]},{"id":"83061177:45","tag":"div","openStart":13873,"attrEnd":13897,"openEnd":13898,"closeStart":13944,"closeEnd":13950,"textRuns":[[13898,13944]],"parentId":"83061177:44","childIds":[]},{"id":"83061177:46","tag":"div","openStart":13957,"attrEnd":13979,"openEnd":13980,"closeStart":14146,"closeEnd":14152,"textRuns":[[13980,14010],[14037,14071],[14105,14146]],"parentId":"83061177:44","childIds":["83061177:47","83061177:48"]},{"id":"83061177:47","tag":"strong","openStart":14010,"attrEnd":14017,"openEnd":14018,"closeStart":14028,"closeEnd":14037,"textRuns":[[14018,14028]],"parentId":"83061177:46","childIds":[]},{"id":"83061177:48","tag":"strong","openStart":14071,"attrEnd":14078,"openEnd":14079,"closeStart":14096,"closeEnd":14105,"textRuns":[[14079,14096]],"parentId":"83061177:46","childIds":[]},{"id":"83061177:49","tag":"div","openStart":14168,"attrEnd":14193,"openEnd":14194,"closeStart":14303,"closeEnd":14309,"textRuns":[[14194,14201],[14298,14303]],"parentId":"83061177:42","childIds":["83061177:50"]},{"id":"83061177:50","tag":"button","openStart":14201,"attrEnd":14269,"openEnd":14270,"closeStart":14289,"closeEnd":14298,"styleAttr":[14236,14268],"textRuns":[[14270,14289]],"parentId":"83061177:49","childIds":[]},{"id":"83061177:51","tag":"div","openStart":14341,"attrEnd":14361,"openEnd":14362,"closeStart":15162,"closeEnd":15168,"textRuns":[[14362,14367],[14663,14668],[14876,14881],[15052,15057],[15088,15093],[15159,15162]],"parentId":"83061177:30","childIds":["83061177:52","83061177:60","83061177:67","83061177:73","83061177:74"]},{"id":"83061177:52","tag":"div","openStart":14367,"attrEnd":14384,"openEnd":14385,"closeStart":14657,"closeEnd":14663,"textRuns":[[14385,14392],[14413,14420],[14652,14657]],"parentId":"83061177:51","childIds":["83061177:53","83061177:54"]},{"id":"83061177:53","tag":"label","openStart":14392,"attrEnd":14398,"openEnd":14399,"closeStart":14405,"closeEnd":14413,"textRuns":[[14399,14405]],"parentId":"83061177:52","childIds":[]},{"id":"83061177:54","tag":"div","openStart":14420,"attrEnd":14451,"openEnd":14452,"closeStart":14646,"closeEnd":14652,"textRuns":[[14452,14461],[14491,14500],[14536,14545],[14569,14578],[14607,14616],[14639,14646]],"parentId":"83061177:52","childIds":["83061177:55","83061177:56","83061177:57","83061177:58","83061177:59"]},{"id":"83061177:55","tag":"button","openStart":14461,"attrEnd":14468,"openEnd":14469,"closeStart":14482,"closeEnd":14491,"textRuns":[[14469,14482]],"parentId":"83061177:54","childIds":[]},{"id":"83061177:56","tag":"button","openStart":14500,"attrEnd":14518,"openEnd":14519,"closeStart":14527,"closeEnd":14536,"textRuns":[[14519,14527]],"parentId":"83061177:54","childIds":[]},{"id":"83061177:57","tag":"button","openStart":14545,"attrEnd":14552,"openEnd":14553,"closeStart":14560,"closeEnd":14569,"textRuns":[[14553,14560]],"parentId":"83061177:54","childIds":[]},{"id":"83061177:58","tag":"button","openStart":14578,"attrEnd":14585,"openEnd":14586,"closeStart":14598,"closeEnd":14607,"textRuns":[[14586,14598]],"parentId":"83061177:54","childIds":[]},{"id":"83061177:59","tag":"button","openStart":14616,"attrEnd":14623,"openEnd":14624,"closeStart":14630,"closeEnd":14639,"textRuns":[[14624,14630]],"parentId":"83061177:54","childIds":[]},{"id":"83061177:60","tag":"div","openStart":14668,"attrEnd":14685,"openEnd":14686,"closeStart":14870,"closeEnd":14876,"textRuns":[[14686,14693],[14723,14730],[14865,14870]],"parentId":"83061177:51","childIds":["83061177:61","83061177:62"]},{"id":"83061177:61","tag":"label","openStart":14693,"attrEnd":14699,"openEnd":14700,"closeStart":14715,"closeEnd":14723,"textRuns":[[14700,14715]],"parentId":"83061177:60","childIds":[]},{"id":"83061177:62","tag":"select","openStart":14730,"attrEnd":14737,"openEnd":14738,"closeStart":14856,"closeEnd":14865,"textRuns":[],"parentId":"83061177:60","childIds":["83061177:63","83061177:64","83061177:65","83061177:66"]},{"id":"83061177:63","tag":"option","openStart":14738,"attrEnd":14745,"openEnd":14746,"textRuns":[[14746,14755]],"parentId":"83061177:62","childIds":[]},{"id":"83061177:64","tag":"option","openStart":14764,"attrEnd":14771,"openEnd":14772,"textRuns":[[14772,14783]],"parentId":"83061177:62","childIds":[]},{"id":"83061177:65","tag":"option","openStart":14792,"attrEnd":14799,"openEnd":14800,"textRuns":[[14800,14817]],"parentId":"83061177:62","childIds":[]},{"id":"83061177:66","tag":"option","openStart":14826,"attrEnd":14833,"openEnd":14834,"textRuns":[[14834,14847]],"parentId":"83061177:62","childIds":[]},{"id":"83061177:67","tag":"div","openStart":14881,"attrEnd":14898,"openEnd":14899,"closeStart":15046,"closeEnd":15052,"textRuns":[[14899,14906],[14930,14937],[15041,15046]],"parentId":"83061177:51","childIds":["83061177:68","83061177:69"]},{"id":"83061177:68","tag":"label","openStart":14906,"attrEnd":14912,"openEnd":14913,"closeStart":14922,"closeEnd":14930,"textRuns":[[14913,14922]],"parentId":"83061177:67","childIds":[]},{"id":"83061177:69","tag":"select","openStart":14937,"attrEnd":14944,"openEnd":14945,"closeStart":15032,"closeEnd":15041,"textRuns":[],"parentId":"83061177:67","childIds":["83061177:70","83061177:71","83061177:72"]},{"id":"83061177:70","tag":"option","openStart":14945,"attrEnd":14952,"openEnd":14953,"textRuns":[[14953,14973]],"parentId":"83061177:69","childIds":[]},{"id":"83061177:71","tag":"option","openStart":14982,"attrEnd":14989,"openEnd":14990,"textRuns":[[14990,14996]],"parentId":"83061177:69","childIds":[]},{"id":"83061177:72","tag":"option","openStart":15005,"attrEnd":15012,"openEnd":15013,"textRuns":[[15013,15023]],"parentId":"83061177:69","childIds":[]},{"id":"83061177:73","tag":"div","openStart":15057,"attrEnd":15081,"openEnd":15082,"closeStart":15082,"closeEnd":15088,"textRuns":[],"parentId":"83061177:51","childIds":[]},{"id":"83061177:74","tag":"button","openStart":15093,"attrEnd":15144,"openEnd":15145,"closeStart":15150,"closeEnd":15159,"styleAttr":[15124,15143],"textRuns":[[15145,15150]],"parentId":"83061177:51","childIds":[]},{"id":"83061177:75","tag":"div","openStart":15197,"attrEnd":15219,"openEnd":15220,"closeStart":16129,"closeEnd":16135,"textRuns":[[15220,15225],[15498,15503],[15709,15714],[15912,15917],[16126,16129]],"parentId":"83061177:30","childIds":["83061177:76","83061177:81","83061177:85","83061177:89"]},{"id":"83061177:76","tag":"div","openStart":15225,"attrEnd":15256,"openEnd":15257,"closeStart":15492,"closeEnd":15498,"textRuns":[[15257,15264],[15310,15317],[15360,15367],[15421,15428],[15487,15492]],"parentId":"83061177:75","childIds":["83061177:77","83061177:78","83061177:79","83061177:80"]},{"id":"83061177:77","tag":"div","openStart":15264,"attrEnd":15285,"openEnd":15286,"closeStart":15304,"closeEnd":15310,"textRuns":[[15286,15304]],"parentId":"83061177:76","childIds":[]},{"id":"83061177:78","tag":"div","openStart":15317,"attrEnd":15343,"openEnd":15344,"closeStart":15354,"closeEnd":15360,"textRuns":[[15344,15354]],"parentId":"83061177:76","childIds":[]},{"id":"83061177:79","tag":"div","openStart":15367,"attrEnd":15386,"openEnd":15387,"closeStart":15415,"closeEnd":15421,"textRuns":[[15387,15415]],"parentId":"83061177:76","childIds":[]},{"id":"83061177:80","tag":"div","openStart":15428,"attrEnd":15454,"openEnd":15455,"closeStart":15481,"closeEnd":15487,"textRuns":[[15455,15481]],"parentId":"83061177:76","childIds":[]},{"id":"83061177:81","tag":"div","openStart":15503,"attrEnd":15524,"openEnd":15525,"closeStart":15703,"closeEnd":15709,"textRuns":[[15525,15532],[15577,15584],[15626,15633],[15698,15703]],"parentId":"83061177:75","childIds":["83061177:82","83061177:83","83061177:84"]},{"id":"83061177:82","tag":"div","openStart":15532,"attrEnd":15553,"openEnd":15554,"closeStart":15571,"closeEnd":15577,"textRuns":[[15554,15571]],"parentId":"83061177:81","childIds":[]},{"id":"83061177:83","tag":"div","openStart":15584,"attrEnd":15610,"openEnd":15611,"closeStart":15620,"closeEnd":15626,"textRuns":[[15611,15620]],"parentId":"83061177:81","childIds":[]},{"id":"83061177:84","tag":"div","openStart":15633,"attrEnd":15652,"openEnd":15653,"closeStart":15692,"closeEnd":15698,"textRuns":[[15653,15692]],"parentId":"83061177:81","childIds":[]},{"id":"83061177:85","tag":"div","openStart":15714,"attrEnd":15735,"openEnd":15736,"closeStart":15906,"closeEnd":15912,"textRuns":[[15736,15743],[15782,15789],[15831,15838],[15901,15906]],"parentId":"83061177:75","childIds":["83061177:86","83061177:87","83061177:88"]},{"id":"83061177:86","tag":"div","openStart":15743,"attrEnd":15764,"openEnd":15765,"closeStart":15776,"closeEnd":15782,"textRuns":[[15765,15776]],"parentId":"83061177:85","childIds":[]},{"id":"83061177:87","tag":"div","openStart":15789,"attrEnd":15815,"openEnd":15816,"closeStart":15825,"closeEnd":15831,"textRuns":[[15816,15825]],"parentId":"83061177:85","childIds":[]},{"id":"83061177:88","tag":"div","openStart":15838,"attrEnd":15857,"openEnd":15858,"closeStart":15895,"closeEnd":15901,"textRuns":[[15858,15895]],"parentId":"83061177:85","childIds":[]},{"id":"83061177:89","tag":"div","openStart":15917,"attrEnd":15938,"openEnd":15939,"closeStart":16120,"closeEnd":16126,"textRuns":[[15939,15946],[15993,16000],[16042,16049],[16115,16120]],"parentId":"83061177:75","childIds":["83061177:90","83061177:91","83061177:92"]},{"id":"83061177:90","tag":"div","openStart":15946,"attrEnd":15967,"openEnd":15968,"closeStart":15987,"closeEnd":15993,"textRuns":[[15968,15987]],"parentId":"83061177:89","childIds":[]},{"id":"83061177:91","tag":"div","openStart":16000,"attrEnd":16026,"openEnd":16027,"closeStart":16036,"closeEnd":16042,"textRuns":[[16027,16036]],"parentId":"83061177:89","childIds":[]},{"id":"83061177:92","tag":"div","openStart":16049,"attrEnd":16068,"openEnd":16069,"closeStart":16109,"closeEnd":16115,"textRuns":[[16069,16109]],"parentId":"83061177:89","childIds":[]},{"id":"83061177:93","tag":"div","openStart":16164,"attrEnd":16187,"openEnd":16188,"closeStart":17156,"closeEnd":17162,"textRuns":[[16188,16193],[16338,16343],[16480,16485],[16625,16630],[16778,16783],[16962,16967],[17153,17156]],"parentId":"83061177:30","childIds":["83061177:94","83061177:97","83061177:100","83061177:103","83061177:106","83061177:110"]},{"id":"83061177:94","tag":"div","openStart":16193,"attrEnd":16215,"openEnd":16216,"closeStart":16332,"closeEnd":16338,"textRuns":[[16216,16223],[16268,16275],[16327,16332]],"parentId":"83061177:93","childIds":["83061177:95","83061177:96"]},{"id":"83061177:95","tag":"div","openStart":16223,"attrEnd":16246,"openEnd":16247,"closeStart":16262,"closeEnd":16268,"textRuns":[[16247,16262]],"parentId":"83061177:94","childIds":[]},{"id":"83061177:96","tag":"div","openStart":16275,"attrEnd":16303,"openEnd":16304,"closeStart":16321,"closeEnd":16327,"textRuns":[[16304,16321]],"parentId":"83061177:94","childIds":[]},{"id":"83061177:97","tag":"div","openStart":16343,"attrEnd":16365,"openEnd":16366,"closeStart":16474,"closeEnd":16480,"textRuns":[[16366,16373],[16416,16423],[16469,16474]],"parentId":"83061177:93","childIds":["83061177:98","83061177:99"]},{"id":"83061177:98","tag":"div","openStart":16373,"attrEnd":16396,"openEnd":16397,"closeStart":16410,"closeEnd":16416,"textRuns":[[16397,16410]],"parentId":"83061177:97","childIds":[]},{"id":"83061177:99","tag":"div","openStart":16423,"attrEnd":16446,"openEnd":16447,"closeStart":16463,"closeEnd":16469,"textRuns":[[16447,16463]],"parentId":"83061177:97","childIds":[]},{"id":"83061177:100","tag":"div","openStart":16485,"attrEnd":16507,"openEnd":16508,"closeStart":16619,"closeEnd":16625,"textRuns":[[16508,16515],[16555,16562],[16614,16619]],"parentId":"83061177:93","childIds":["83061177:101","83061177:102"]},{"id":"83061177:101","tag":"div","openStart":16515,"attrEnd":16538,"openEnd":16539,"closeStart":16549,"closeEnd":16555,"textRuns":[[16539,16549]],"parentId":"83061177:100","childIds":[]},{"id":"83061177:102","tag":"div","openStart":16562,"attrEnd":16585,"openEnd":16586,"closeStart":16608,"closeEnd":16614,"textRuns":[[16586,16608]],"parentId":"83061177:100","childIds":[]},{"id":"83061177:103","tag":"div","openStart":16630,"attrEnd":16652,"openEnd":16653,"closeStart":16772,"closeEnd":16778,"textRuns":[[16653,16660],[16707,16714],[16767,16772]],"parentId":"83061177:93","childIds":["83061177:104","83061177:105"]},{"id":"83061177:104","tag":"div","openStart":16660,"attrEnd":16683,"openEnd":16684,"closeStart":16701,"closeEnd":16707,"textRuns":[[16684,16701]],"parentId":"83061177:103","childIds":[]},{"id":"83061177:105","tag":"div","openStart":16714,"attrEnd":16737,"openEnd":16738,"closeStart":16761,"closeEnd":16767,"textRuns":[[16738,16761]],"parentId":"83061177:103","childIds":[]},{"id":"83061177:106","tag":"div","openStart":16783,"attrEnd":16805,"openEnd":16806,"closeStart":16956,"closeEnd":16962,"textRuns":[[16806,16813],[16856,16863],[16951,16956]],"parentId":"83061177:93","childIds":["83061177:107","83061177:108"]},{"id":"83061177:107","tag":"div","openStart":16813,"attrEnd":16836,"openEnd":16837,"closeStart":16850,"closeEnd":16856,"textRuns":[[16837,16850]],"parentId":"83061177:106","childIds":[]},{"id":"83061177:108","tag":"div","openStart":16863,"attrEnd":16886,"openEnd":16887,"closeStart":16945,"closeEnd":16951,"textRuns":[],"parentId":"83061177:106","childIds":["83061177:109"]},{"id":"83061177:109","tag":"span","openStart":16887,"attrEnd":16923,"openEnd":16924,"closeStart":16938,"closeEnd":16945,"textRuns":[[16924,16938]],"parentId":"83061177:108","childIds":[]},{"id":"83061177:110","tag":"div","openStart":16967,"attrEnd":16989,"openEnd":16990,"closeStart":17147,"closeEnd":17153,"textRuns":[[16990,16997],[17045,17052],[17142,17147]],"parentId":"83061177:93","childIds":["83061177:111","83061177:112"]},{"id":"83061177:111","tag":"div","openStart":16997,"attrEnd":17020,"openEnd":17021,"closeStart":17039,"closeEnd":17045,"textRuns":[[17021,17039]],"parentId":"83061177:110","childIds":[]},{"id":"83061177:112","tag":"div","openStart":17052,"attrEnd":17075,"openEnd":17076,"closeStart":17136,"closeEnd":17142,"textRuns":[],"parentId":"83061177:110","childIds":["83061177:113"]},{"id":"83061177:113","tag":"span","openStart":17076,"attrEnd":17112,"openEnd":17113,"closeStart":17129,"closeEnd":17136,"textRuns":[[17113,17129]],"parentId":"83061177:112","childIds":[]},{"id":"83061177:114","tag":"div","openStart":17182,"attrEnd":17214,"openEnd":17215,"closeStart":17522,"closeEnd":17528,"textRuns":[[17215,17220],[17296,17301],[17366,17371],[17441,17446],[17519,17522]],"parentId":"83061177:30","childIds":["83061177:115","83061177:116","83061177:117","83061177:118"]},{"id":"83061177:115","tag":"button","openStart":17220,"attrEnd":17267,"openEnd":17268,"closeStart":17287,"closeEnd":17296,"textRuns":[[17268,17287]],"parentId":"83061177:114","childIds":[]},{"id":"83061177:116","tag":"button","openStart":17301,"attrEnd":17345,"openEnd":17346,"closeStart":17357,"closeEnd":17366,"textRuns":[[17346,17357]],"parentId":"83061177:114","childIds":[]},{"id":"83061177:117","tag":"button","openStart":17371,"attrEnd":17413,"openEnd":17414,"closeStart":17432,"closeEnd":17441,"textRuns":[[17414,17432]],"parentId":"83061177:114","childIds":[]},{"id":"83061177:118","tag":"button","openStart":17446,"attrEnd":17489,"openEnd":17490,"closeStart":17510,"closeEnd":17519,"textRuns":[[17490,17510]],"parentId":"83061177:114","childIds":[]},{"id":"83061177:119","tag":"div","openStart":17570,"attrEnd":17612,"openEnd":17613,"closeStart":24871,"closeEnd":24877,"textRuns":[[17613,17618],[17689,17694],[24471,24477],[24868,24871]],"parentId":"83061177:30","childIds":["83061177:120","83061177:121","83061177:249"]},{"id":"83061177:120","tag":"div","openStart":17618,"attrEnd":17640,"openEnd":17641,"closeStart":17683,"closeEnd":17689,"textRuns":[[17641,17683]],"parentId":"83061177:119","childIds":[]},{"id":"83061177:121","tag":"div","openStart":17694,"attrEnd":17717,"openEnd":17718,"closeStart":24465,"closeEnd":24471,"textRuns":[[17718,17725],[24460,24465]],"parentId":"83061177:119","childIds":["83061177:122"]},{"id":"83061177:122","tag":"table","openStart":17725,"attrEnd":17731,"openEnd":17732,"closeStart":24452,"closeEnd":24460,"textRuns":[[17732,17741],[18068,18077],[24119,24128],[24445,24452]],"parentId":"83061177:121","childIds":["83061177:123","83061177:132","83061177:241"]},{"id":"83061177:123","tag":"thead","openStart":17741,"attrEnd":17747,"openEnd":17748,"textRuns":[[17748,17759],[18051,18060]],"parentId":"83061177:122","childIds":["83061177:124"]},{"id":"83061177:124","tag":"tr","openStart":17759,"attrEnd":17762,"openEnd":17763,"textRuns":[[17763,17776],[17822,17835],[17865,17878],[17899,17912],[17935,17948],[17971,17984],[17998,18011],[18035,18046]],"parentId":"83061177:123","childIds":["83061177:125","83061177:126","83061177:127","83061177:128","83061177:129","83061177:130","83061177:131"]},{"id":"83061177:125","tag":"th","openStart":17776,"attrEnd":17807,"openEnd":17808,"closeStart":17817,"closeEnd":17822,"styleAttr":[17797,17806],"textRuns":[[17808,17817]],"parentId":"83061177:124","childIds":[]},{"id":"83061177:126","tag":"th","openStart":17835,"attrEnd":17848,"openEnd":17849,"closeStart":17860,"closeEnd":17865,"textRuns":[[17849,17860]],"parentId":"83061177:124","childIds":[]},{"id":"83061177:127","tag":"th","openStart":17878,"attrEnd":17881,"openEnd":17882,"closeStart":17894,"closeEnd":17899,"textRuns":[[17882,17894]],"parentId":"83061177:124","childIds":[]},{"id":"83061177:128","tag":"th","openStart":17912,"attrEnd":17915,"openEnd":17916,"closeStart":17930,"closeEnd":17935,"textRuns":[[17916,17930]],"parentId":"83061177:124","childIds":[]},{"id":"83061177:129","tag":"th","openStart":17948,"attrEnd":17951,"openEnd":17952,"closeStart":17966,"closeEnd":17971,"textRuns":[[17952,17966]],"parentId":"83061177:124","childIds":[]},{"id":"83061177:130","tag":"th","openStart":17984,"attrEnd":17987,"openEnd":17988,"closeStart":17993,"closeEnd":17998,"textRuns":[[17988,17993]],"parentId":"83061177:124","childIds":[]},{"id":"83061177:131","tag":"th","openStart":18011,"attrEnd":18014,"openEnd":18015,"closeStart":18030,"closeEnd":18035,"textRuns":[[18015,18030]],"parentId":"83061177:124","childIds":[]},{"id":"83061177:132","tag":"tbody","openStart":18077,"attrEnd":18083,"openEnd":18084,"textRuns":[[18084,18095],[18168,18179],[19120,19131],[20078,20089],[20162,20173],[21098,21109],[22050,22061],[22119,22130],[23115,23126],[24102,24111]],"parentId":"83061177:122","childIds":["83061177:133","83061177:135","83061177:152","83061177:169","83061177:171","83061177:188","83061177:205","83061177:207","83061177:224"]},{"id":"83061177:133","tag":"tr","openStart":18095,"attrEnd":18116,"openEnd":18117,"textRuns":[],"parentId":"83061177:132","childIds":["83061177:134"]},{"id":"83061177:134","tag":"td","openStart":18117,"attrEnd":18132,"openEnd":18133,"closeStart":18158,"closeEnd":18163,"textRuns":[[18133,18158]],"parentId":"83061177:133","childIds":[]},{"id":"83061177:135","tag":"tr","openStart":18179,"attrEnd":18182,"openEnd":18183,"textRuns":[[18183,18196],[18484,18497],[18610,18623],[18650,18663],[18694,18707],[18738,18751],[18782,18795],[19104,19115]],"parentId":"83061177:132","childIds":["83061177:136","83061177:142","83061177:143","83061177:144","83061177:145","83061177:146","83061177:147"]},{"id":"83061177:136","tag":"td","openStart":18196,"attrEnd":18209,"openEnd":18210,"closeStart":18479,"closeEnd":18484,"textRuns":[[18210,18225],[18466,18479]],"parentId":"83061177:135","childIds":["83061177:137"]},{"id":"83061177:137","tag":"div","openStart":18225,"attrEnd":18247,"openEnd":18248,"closeStart":18460,"closeEnd":18466,"textRuns":[[18248,18265],[18321,18338],[18445,18460]],"parentId":"83061177:136","childIds":["83061177:138","83061177:139"]},{"id":"83061177:138","tag":"span","openStart":18265,"attrEnd":18313,"openEnd":18314,"closeStart":18314,"closeEnd":18321,"styleAttr":[18294,18312],"textRuns":[],"parentId":"83061177:137","childIds":[]},{"id":"83061177:139","tag":"div","openStart":18338,"attrEnd":18342,"openEnd":18343,"closeStart":18439,"closeEnd":18445,"textRuns":[],"parentId":"83061177:137","childIds":["83061177:140","83061177:141"]},{"id":"83061177:140","tag":"div","openStart":18343,"attrEnd":18364,"openEnd":18365,"closeStart":18377,"closeEnd":18383,"textRuns":[[18365,18377]],"parentId":"83061177:139","childIds":[]},{"id":"83061177:141","tag":"div","openStart":18383,"attrEnd":18404,"openEnd":18405,"closeStart":18433,"closeEnd":18439,"textRuns":[[18405,18433]],"parentId":"83061177:139","childIds":[]},{"id":"83061177:142","tag":"td","openStart":18497,"attrEnd":18549,"openEnd":18550,"closeStart":18605,"closeEnd":18610,"styleAttr":[18518,18548],"textRuns":[[18550,18605]],"parentId":"83061177:135","childIds":[]},{"id":"83061177:143","tag":"td","openStart":18623,"attrEnd":18639,"openEnd":18640,"closeStart":18645,"closeEnd":18650,"textRuns":[[18640,18645]],"parentId":"83061177:135","childIds":[]},{"id":"83061177:144","tag":"td","openStart":18663,"attrEnd":18679,"openEnd":18680,"closeStart":18689,"closeEnd":18694,"textRuns":[[18680,18689]],"parentId":"83061177:135","childIds":[]},{"id":"83061177:145","tag":"td","openStart":18707,"attrEnd":18729,"openEnd":18730,"closeStart":18733,"closeEnd":18738,"textRuns":[[18730,18733]],"parentId":"83061177:135","childIds":[]},{"id":"83061177:146","tag":"td","openStart":18751,"attrEnd":18767,"openEnd":18768,"closeStart":18777,"closeEnd":18782,"textRuns":[[18768,18777]],"parentId":"83061177:135","childIds":[]},{"id":"83061177:147","tag":"td","openStart":18795,"attrEnd":18798,"openEnd":18799,"closeStart":19099,"closeEnd":19104,"textRuns":[[18799,18814],[19086,19099]],"parentId":"83061177:135","childIds":["83061177:148"]},{"id":"83061177:148","tag":"div","openStart":18814,"attrEnd":18866,"openEnd":18867,"closeStart":19080,"closeEnd":19086,"styleAttr":[18826,18865],"textRuns":[[18867,18884],[18994,19011],[19065,19080]],"parentId":"83061177:147","childIds":["83061177:149","83061177:151"]},{"id":"83061177:149","tag":"div","openStart":18884,"attrEnd":18922,"openEnd":18923,"closeStart":18988,"closeEnd":18994,"styleAttr":[18911,18921],"textRuns":[],"parentId":"83061177:148","childIds":["83061177:150"]},{"id":"83061177:150","tag":"div","openStart":18923,"attrEnd":18981,"openEnd":18982,"closeStart":18982,"closeEnd":18988,"styleAttr":[18952,18980],"textRuns":[],"parentId":"83061177:149","childIds":[]},{"id":"83061177:151","tag":"span","openStart":19011,"attrEnd":19052,"openEnd":19053,"closeStart":19058,"closeEnd":19065,"styleAttr":[19037,19051],"textRuns":[[19053,19058]],"parentId":"83061177:148","childIds":[]},{"id":"83061177:152","tag":"tr","openStart":19131,"attrEnd":19134,"openEnd":19135,"textRuns":[[19135,19148],[19441,19454],[19568,19581],[19608,19621],[19652,19665],[19696,19709],[19740,19753],[20062,20073]],"parentId":"83061177:132","childIds":["83061177:153","83061177:159","83061177:160","83061177:161","83061177:162","83061177:163","83061177:164"]},{"id":"83061177:153","tag":"td","openStart":19148,"attrEnd":19161,"openEnd":19162,"closeStart":19436,"closeEnd":19441,"textRuns":[[19162,19177],[19423,19436]],"parentId":"83061177:152","childIds":["83061177:154"]},{"id":"83061177:154","tag":"div","openStart":19177,"attrEnd":19199,"openEnd":19200,"closeStart":19417,"closeEnd":19423,"textRuns":[[19200,19217],[19273,19290],[19402,19417]],"parentId":"83061177:153","childIds":["83061177:155","83061177:156"]},{"id":"83061177:155","tag":"span","openStart":19217,"attrEnd":19265,"openEnd":19266,"closeStart":19266,"closeEnd":19273,"styleAttr":[19246,19264],"textRuns":[],"parentId":"83061177:154","childIds":[]},{"id":"83061177:156","tag":"div","openStart":19290,"attrEnd":19294,"openEnd":19295,"closeStart":19396,"closeEnd":19402,"textRuns":[],"parentId":"83061177:154","childIds":["83061177:157","83061177:158"]},{"id":"83061177:157","tag":"div","openStart":19295,"attrEnd":19316,"openEnd":19317,"closeStart":19329,"closeEnd":19335,"textRuns":[[19317,19329]],"parentId":"83061177:156","childIds":[]},{"id":"83061177:158","tag":"div","openStart":19335,"attrEnd":19356,"openEnd":19357,"closeStart":19390,"closeEnd":19396,"textRuns":[[19357,19390]],"parentId":"83061177:156","childIds":[]},{"id":"83061177:159","tag":"td","openStart":19454,"attrEnd":19506,"openEnd":19507,"closeStart":19563,"closeEnd":19568,"styleAttr":[19475,19505],"textRuns":[[19507,19563]],"parentId":"83061177:152","childIds":[]},{"id":"83061177:160","tag":"td","openStart":19581,"attrEnd":19597,"openEnd":19598,"closeStart":19603,"closeEnd":19608,"textRuns":[[19598,19603]],"parentId":"83061177:152","childIds":[]},{"id":"83061177:161","tag":"td","openStart":19621,"attrEnd":19643,"openEnd":19644,"closeStart":19647,"closeEnd":19652,"textRuns":[[19644,19647]],"parentId":"83061177:152","childIds":[]},{"id":"83061177:162","tag":"td","openStart":19665,"attrEnd":19681,"openEnd":19682,"closeStart":19691,"closeEnd":19696,"textRuns":[[19682,19691]],"parentId":"83061177:152","childIds":[]},{"id":"83061177:163","tag":"td","openStart":19709,"attrEnd":19725,"openEnd":19726,"closeStart":19735,"closeEnd":19740,"textRuns":[[19726,19735]],"parentId":"83061177:152","childIds":[]},{"id":"83061177:164","tag":"td","openStart":19753,"attrEnd":19756,"openEnd":19757,"closeStart":20057,"closeEnd":20062,"textRuns":[[19757,19772],[20044,20057]],"parentId":"83061177:152","childIds":["83061177:165"]},{"id":"83061177:165","tag":"div","openStart":19772,"attrEnd":19824,"openEnd":19825,"closeStart":20038,"closeEnd":20044,"styleAttr":[19784,19823],"textRuns":[[19825,19842],[19952,19969],[20023,20038]],"parentId":"83061177:164","childIds":["83061177:166","83061177:168"]},{"id":"83061177:166","tag":"div","openStart":19842,"attrEnd":19880,"openEnd":19881,"closeStart":19946,"closeEnd":19952,"styleAttr":[19869,19879],"textRuns":[],"parentId":"83061177:165","childIds":["83061177:167"]},{"id":"83061177:167","tag":"div","openStart":19881,"attrEnd":19939,"openEnd":19940,"closeStart":19940,"closeEnd":19946,"styleAttr":[19910,19938],"textRuns":[],"parentId":"83061177:166","childIds":[]},{"id":"83061177:168","tag":"span","openStart":19969,"attrEnd":20010,"openEnd":20011,"closeStart":20016,"closeEnd":20023,"styleAttr":[19995,20009],"textRuns":[[20011,20016]],"parentId":"83061177:165","childIds":[]},{"id":"83061177:169","tag":"tr","openStart":20089,"attrEnd":20110,"openEnd":20111,"textRuns":[],"parentId":"83061177:132","childIds":["83061177:170"]},{"id":"83061177:170","tag":"td","openStart":20111,"attrEnd":20126,"openEnd":20127,"closeStart":20152,"closeEnd":20157,"textRuns":[[20127,20152]],"parentId":"83061177:169","childIds":[]},{"id":"83061177:171","tag":"tr","openStart":20173,"attrEnd":20176,"openEnd":20177,"textRuns":[[20177,20190],[20481,20494],[20593,20606],[20633,20646],[20675,20688],[20719,20732],[20761,20774],[21082,21093]],"parentId":"83061177:132","childIds":["83061177:172","83061177:178","83061177:179","83061177:180","83061177:181","83061177:182","83061177:183"]},{"id":"83061177:172","tag":"td","openStart":20190,"attrEnd":20203,"openEnd":20204,"closeStart":20476,"closeEnd":20481,"textRuns":[[20204,20219],[20463,20476]],"parentId":"83061177:171","childIds":["83061177:173"]},{"id":"83061177:173","tag":"div","openStart":20219,"attrEnd":20241,"openEnd":20242,"closeStart":20457,"closeEnd":20463,"textRuns":[[20242,20259],[20315,20332],[20442,20457]],"parentId":"83061177:172","childIds":["83061177:174","83061177:175"]},{"id":"83061177:174","tag":"span","openStart":20259,"attrEnd":20307,"openEnd":20308,"closeStart":20308,"closeEnd":20315,"styleAttr":[20288,20306],"textRuns":[],"parentId":"83061177:173","childIds":[]},{"id":"83061177:175","tag":"div","openStart":20332,"attrEnd":20336,"openEnd":20337,"closeStart":20436,"closeEnd":20442,"textRuns":[],"parentId":"83061177:173","childIds":["83061177:176","83061177:177"]},{"id":"83061177:176","tag":"div","openStart":20337,"attrEnd":20358,"openEnd":20359,"closeStart":20370,"closeEnd":20376,"textRuns":[[20359,20370]],"parentId":"83061177:175","childIds":[]},{"id":"83061177:177","tag":"div","openStart":20376,"attrEnd":20397,"openEnd":20398,"closeStart":20430,"closeEnd":20436,"textRuns":[[20398,20430]],"parentId":"83061177:175","childIds":[]},{"id":"83061177:178","tag":"td","openStart":20494,"attrEnd":20546,"openEnd":20547,"closeStart":20588,"closeEnd":20593,"styleAttr":[20515,20545],"textRuns":[[20547,20588]],"parentId":"83061177:171","childIds":[]},{"id":"83061177:179","tag":"td","openStart":20606,"attrEnd":20622,"openEnd":20623,"closeStart":20628,"closeEnd":20633,"textRuns":[[20623,20628]],"parentId":"83061177:171","childIds":[]},{"id":"83061177:180","tag":"td","openStart":20646,"attrEnd":20662,"openEnd":20663,"closeStart":20670,"closeEnd":20675,"textRuns":[[20663,20670]],"parentId":"83061177:171","childIds":[]},{"id":"83061177:181","tag":"td","openStart":20688,"attrEnd":20710,"openEnd":20711,"closeStart":20714,"closeEnd":20719,"textRuns":[[20711,20714]],"parentId":"83061177:171","childIds":[]},{"id":"83061177:182","tag":"td","openStart":20732,"attrEnd":20748,"openEnd":20749,"closeStart":20756,"closeEnd":20761,"textRuns":[[20749,20756]],"parentId":"83061177:171","childIds":[]},{"id":"83061177:183","tag":"td","openStart":20774,"attrEnd":20777,"openEnd":20778,"closeStart":21077,"closeEnd":21082,"textRuns":[[20778,20793],[21064,21077]],"parentId":"83061177:171","childIds":["83061177:184"]},{"id":"83061177:184","tag":"div","openStart":20793,"attrEnd":20845,"openEnd":20846,"closeStart":21058,"closeEnd":21064,"styleAttr":[20805,20844],"textRuns":[[20846,20863],[20973,20990],[21043,21058]],"parentId":"83061177:183","childIds":["83061177:185","83061177:187"]},{"id":"83061177:185","tag":"div","openStart":20863,"attrEnd":20901,"openEnd":20902,"closeStart":20967,"closeEnd":20973,"styleAttr":[20890,20900],"textRuns":[],"parentId":"83061177:184","childIds":["83061177:186"]},{"id":"83061177:186","tag":"div","openStart":20902,"attrEnd":20960,"openEnd":20961,"closeStart":20961,"closeEnd":20967,"styleAttr":[20931,20959],"textRuns":[],"parentId":"83061177:185","childIds":[]},{"id":"83061177:187","tag":"span","openStart":20990,"attrEnd":21031,"openEnd":21032,"closeStart":21036,"closeEnd":21043,"styleAttr":[21016,21030],"textRuns":[[21032,21036]],"parentId":"83061177:184","childIds":[]},{"id":"83061177:188","tag":"tr","openStart":21109,"attrEnd":21112,"openEnd":21113,"textRuns":[[21113,21126],[21421,21434],[21540,21553],[21581,21594],[21625,21638],[21669,21682],[21713,21726],[22034,22045]],"parentId":"83061177:132","childIds":["83061177:189","83061177:195","83061177:196","83061177:197","83061177:198","83061177:199","83061177:200"]},{"id":"83061177:189","tag":"td","openStart":21126,"attrEnd":21139,"openEnd":21140,"closeStart":21416,"closeEnd":21421,"textRuns":[[21140,21155],[21403,21416]],"parentId":"83061177:188","childIds":["83061177:190"]},{"id":"83061177:190","tag":"div","openStart":21155,"attrEnd":21177,"openEnd":21178,"closeStart":21397,"closeEnd":21403,"textRuns":[[21178,21195],[21251,21268],[21382,21397]],"parentId":"83061177:189","childIds":["83061177:191","83061177:192"]},{"id":"83061177:191","tag":"span","openStart":21195,"attrEnd":21243,"openEnd":21244,"closeStart":21244,"closeEnd":21251,"styleAttr":[21224,21242],"textRuns":[],"parentId":"83061177:190","childIds":[]},{"id":"83061177:192","tag":"div","openStart":21268,"attrEnd":21272,"openEnd":21273,"closeStart":21376,"closeEnd":21382,"textRuns":[],"parentId":"83061177:190","childIds":["83061177:193","83061177:194"]},{"id":"83061177:193","tag":"div","openStart":21273,"attrEnd":21294,"openEnd":21295,"closeStart":21306,"closeEnd":21312,"textRuns":[[21295,21306]],"parentId":"83061177:192","childIds":[]},{"id":"83061177:194","tag":"div","openStart":21312,"attrEnd":21333,"openEnd":21334,"closeStart":21370,"closeEnd":21376,"textRuns":[[21334,21370]],"parentId":"83061177:192","childIds":[]},{"id":"83061177:195","tag":"td","openStart":21434,"attrEnd":21486,"openEnd":21487,"closeStart":21535,"closeEnd":21540,"styleAttr":[21455,21485],"textRuns":[[21487,21535]],"parentId":"83061177:188","childIds":[]},{"id":"83061177:196","tag":"td","openStart":21553,"attrEnd":21569,"openEnd":21570,"closeStart":21576,"closeEnd":21581,"textRuns":[[21570,21576]],"parentId":"83061177:188","childIds":[]},{"id":"83061177:197","tag":"td","openStart":21594,"attrEnd":21616,"openEnd":21617,"closeStart":21620,"closeEnd":21625,"textRuns":[[21617,21620]],"parentId":"83061177:188","childIds":[]},{"id":"83061177:198","tag":"td","openStart":21638,"attrEnd":21654,"openEnd":21655,"closeStart":21664,"closeEnd":21669,"textRuns":[[21655,21664]],"parentId":"83061177:188","childIds":[]},{"id":"83061177:199","tag":"td","openStart":21682,"attrEnd":21698,"openEnd":21699,"closeStart":21708,"closeEnd":21713,"textRuns":[[21699,21708]],"parentId":"83061177:188","childIds":[]},{"id":"83061177:200","tag":"td","openStart":21726,"attrEnd":21729,"openEnd":21730,"closeStart":22029,"closeEnd":22034,"textRuns":[[21730,21745],[22016,22029]],"parentId":"83061177:188","childIds":["83061177:201"]},{"id":"83061177:201","tag":"div","openStart":21745,"attrEnd":21797,"openEnd":21798,"closeStart":22010,"closeEnd":22016,"styleAttr":[21757,21796],"textRuns":[[21798,21815],[21925,21942],[21995,22010]],"parentId":"83061177:200","childIds":["83061177:202","83061177:204"]},{"id":"83061177:202","tag":"div","openStart":21815,"attrEnd":21853,"openEnd":21854,"closeStart":21919,"closeEnd":21925,"styleAttr":[21842,21852],"textRuns":[],"parentId":"83061177:201","childIds":["83061177:203"]},{"id":"83061177:203","tag":"div","openStart":21854,"attrEnd":21912,"openEnd":21913,"closeStart":21913,"closeEnd":21919,"styleAttr":[21883,21911],"textRuns":[],"parentId":"83061177:202","childIds":[]},{"id":"83061177:204","tag":"span","openStart":21942,"attrEnd":21983,"openEnd":21984,"closeStart":21988,"closeEnd":21995,"styleAttr":[21968,21982],"textRuns":[[21984,21988]],"parentId":"83061177:201","childIds":[]},{"id":"83061177:205","tag":"tr","openStart":22061,"attrEnd":22082,"openEnd":22083,"textRuns":[],"parentId":"83061177:132","childIds":["83061177:206"]},{"id":"83061177:206","tag":"td","openStart":22083,"attrEnd":22098,"openEnd":22099,"closeStart":22109,"closeEnd":22114,"textRuns":[[22099,22109]],"parentId":"83061177:205","childIds":[]},{"id":"83061177:207","tag":"tr","openStart":22130,"attrEnd":22133,"openEnd":22134,"textRuns":[[22134,22147],[22449,22462],[22604,22617],[22645,22658],[22689,22702],[22733,22746],[22777,22790],[23099,23110]],"parentId":"83061177:132","childIds":["83061177:208","83061177:214","83061177:215","83061177:216","83061177:217","83061177:218","83061177:219"]},{"id":"83061177:208","tag":"td","openStart":22147,"attrEnd":22160,"openEnd":22161,"closeStart":22444,"closeEnd":22449,"textRuns":[[22161,22176],[22431,22444]],"parentId":"83061177:207","childIds":["83061177:209"]},{"id":"83061177:209","tag":"div","openStart":22176,"attrEnd":22198,"openEnd":22199,"closeStart":22425,"closeEnd":22431,"textRuns":[[22199,22216],[22272,22289],[22410,22425]],"parentId":"83061177:208","childIds":["83061177:210","83061177:211"]},{"id":"83061177:210","tag":"span","openStart":22216,"attrEnd":22264,"openEnd":22265,"closeStart":22265,"closeEnd":22272,"styleAttr":[22245,22263],"textRuns":[],"parentId":"83061177:209","childIds":[]},{"id":"83061177:211","tag":"div","openStart":22289,"attrEnd":22293,"openEnd":22294,"closeStart":22404,"closeEnd":22410,"textRuns":[],"parentId":"83061177:209","childIds":["83061177:212","83061177:213"]},{"id":"83061177:212","tag":"div","openStart":22294,"attrEnd":22315,"openEnd":22316,"closeStart":22334,"closeEnd":22340,"textRuns":[[22316,22334]],"parentId":"83061177:211","childIds":[]},{"id":"83061177:213","tag":"div","openStart":22340,"attrEnd":22361,"openEnd":22362,"closeStart":22398,"closeEnd":22404,"textRuns":[[22362,22398]],"parentId":"83061177:211","childIds":[]},{"id":"83061177:214","tag":"td","openStart":22462,"attrEnd":22514,"openEnd":22515,"closeStart":22599,"closeEnd":22604,"styleAttr":[22483,22513],"textRuns":[[22515,22599]],"parentId":"83061177:207","childIds":[]},{"id":"83061177:215","tag":"td","openStart":22617,"attrEnd":22633,"openEnd":22634,"closeStart":22640,"closeEnd":22645,"textRuns":[[22634,22640]],"parentId":"83061177:207","childIds":[]},{"id":"83061177:216","tag":"td","openStart":22658,"attrEnd":22674,"openEnd":22675,"closeStart":22684,"closeEnd":22689,"textRuns":[[22675,22684]],"parentId":"83061177:207","childIds":[]},{"id":"83061177:217","tag":"td","openStart":22702,"attrEnd":22724,"openEnd":22725,"closeStart":22728,"closeEnd":22733,"textRuns":[[22725,22728]],"parentId":"83061177:207","childIds":[]},{"id":"83061177:218","tag":"td","openStart":22746,"attrEnd":22762,"openEnd":22763,"closeStart":22772,"closeEnd":22777,"textRuns":[[22763,22772]],"parentId":"83061177:207","childIds":[]},{"id":"83061177:219","tag":"td","openStart":22790,"attrEnd":22793,"openEnd":22794,"closeStart":23094,"closeEnd":23099,"textRuns":[[22794,22809],[23081,23094]],"parentId":"83061177:207","childIds":["83061177:220"]},{"id":"83061177:220","tag":"div","openStart":22809,"attrEnd":22861,"openEnd":22862,"closeStart":23075,"closeEnd":23081,"styleAttr":[22821,22860],"textRuns":[[22862,22879],[22989,23006],[23060,23075]],"parentId":"83061177:219","childIds":["83061177:221","83061177:223"]},{"id":"83061177:221","tag":"div","openStart":22879,"attrEnd":22917,"openEnd":22918,"closeStart":22983,"closeEnd":22989,"styleAttr":[22906,22916],"textRuns":[],"parentId":"83061177:220","childIds":["83061177:222"]},{"id":"83061177:222","tag":"div","openStart":22918,"attrEnd":22976,"openEnd":22977,"closeStart":22977,"closeEnd":22983,"styleAttr":[22947,22975],"textRuns":[],"parentId":"83061177:221","childIds":[]},{"id":"83061177:223","tag":"span","openStart":23006,"attrEnd":23047,"openEnd":23048,"closeStart":23053,"closeEnd":23060,"styleAttr":[23032,23046],"textRuns":[[23048,23053]],"parentId":"83061177:220","childIds":[]},{"id":"83061177:224","tag":"tr","openStart":23126,"attrEnd":23129,"openEnd":23130,"textRuns":[[23130,23143],[23466,23479],[23591,23604],[23632,23645],[23676,23689],[23720,23733],[23764,23777],[24086,24097]],"parentId":"83061177:132","childIds":["83061177:225","83061177:231","83061177:232","83061177:233","83061177:234","83061177:235","83061177:236"]},{"id":"83061177:225","tag":"td","openStart":23143,"attrEnd":23156,"openEnd":23157,"closeStart":23461,"closeEnd":23466,"textRuns":[[23157,23172],[23448,23461]],"parentId":"83061177:224","childIds":["83061177:226"]},{"id":"83061177:226","tag":"div","openStart":23172,"attrEnd":23194,"openEnd":23195,"closeStart":23442,"closeEnd":23448,"textRuns":[[23195,23212],[23268,23285],[23427,23442]],"parentId":"83061177:225","childIds":["83061177:227","83061177:228"]},{"id":"83061177:227","tag":"span","openStart":23212,"attrEnd":23260,"openEnd":23261,"closeStart":23261,"closeEnd":23268,"styleAttr":[23241,23259],"textRuns":[],"parentId":"83061177:226","childIds":[]},{"id":"83061177:228","tag":"div","openStart":23285,"attrEnd":23289,"openEnd":23290,"closeStart":23421,"closeEnd":23427,"textRuns":[],"parentId":"83061177:226","childIds":["83061177:229","83061177:230"]},{"id":"83061177:229","tag":"div","openStart":23290,"attrEnd":23311,"openEnd":23312,"closeStart":23333,"closeEnd":23339,"textRuns":[[23312,23333]],"parentId":"83061177:228","childIds":[]},{"id":"83061177:230","tag":"div","openStart":23339,"attrEnd":23360,"openEnd":23361,"closeStart":23415,"closeEnd":23421,"textRuns":[[23361,23415]],"parentId":"83061177:228","childIds":[]},{"id":"83061177:231","tag":"td","openStart":23479,"attrEnd":23531,"openEnd":23532,"closeStart":23586,"closeEnd":23591,"styleAttr":[23500,23530],"textRuns":[[23532,23586]],"parentId":"83061177:224","childIds":[]},{"id":"83061177:232","tag":"td","openStart":23604,"attrEnd":23620,"openEnd":23621,"closeStart":23627,"closeEnd":23632,"textRuns":[[23621,23627]],"parentId":"83061177:224","childIds":[]},{"id":"83061177:233","tag":"td","openStart":23645,"attrEnd":23661,"openEnd":23662,"closeStart":23671,"closeEnd":23676,"textRuns":[[23662,23671]],"parentId":"83061177:224","childIds":[]},{"id":"83061177:234","tag":"td","openStart":23689,"attrEnd":23711,"openEnd":23712,"closeStart":23715,"closeEnd":23720,"textRuns":[[23712,23715]],"parentId":"83061177:224","childIds":[]},{"id":"83061177:235","tag":"td","openStart":23733,"attrEnd":23749,"openEnd":23750,"closeStart":23759,"closeEnd":23764,"textRuns":[[23750,23759]],"parentId":"83061177:224","childIds":[]},{"id":"83061177:236","tag":"td","openStart":23777,"attrEnd":23780,"openEnd":23781,"closeStart":24081,"closeEnd":24086,"textRuns":[[23781,23796],[24068,24081]],"parentId":"83061177:224","childIds":["83061177:237"]},{"id":"83061177:237","tag":"div","openStart":23796,"attrEnd":23848,"openEnd":23849,"closeStart":24062,"closeEnd":24068,"styleAttr":[23808,23847],"textRuns":[[23849,23866],[23976,23993],[24047,24062]],"parentId":"83061177:236","childIds":["83061177:238","83061177:240"]},{"id":"83061177:238","tag":"div","openStart":23866,"attrEnd":23904,"openEnd":23905,"closeStart":23970,"closeEnd":23976,"styleAttr":[23893,23903],"textRuns":[],"parentId":"83061177:237","childIds":["83061177:239"]},{"id":"83061177:239","tag":"div","openStart":23905,"attrEnd":23963,"openEnd":23964,"closeStart":23964,"closeEnd":23970,"styleAttr":[23934,23962],"textRuns":[],"parentId":"83061177:238","childIds":[]},{"id":"83061177:240","tag":"span","openStart":23993,"attrEnd":24034,"openEnd":24035,"closeStart":24040,"closeEnd":24047,"styleAttr":[24019,24033],"textRuns":[[24035,24040]],"parentId":"83061177:237","childIds":[]},{"id":"83061177:241","tag":"tfoot","openStart":24128,"attrEnd":24134,"openEnd":24135,"textRuns":[[24135,24146],[24428,24437]],"parentId":"83061177:122","childIds":["83061177:242"]},{"id":"83061177:242","tag":"tr","openStart":24146,"attrEnd":24149,"openEnd":24150,"textRuns":[[24150,24163],[24234,24247],[24256,24269],[24301,24314],[24345,24358],[24390,24403],[24412,24423]],"parentId":"83061177:241","childIds":["83061177:243","83061177:244","83061177:245","83061177:246","83061177:247","83061177:248"]},{"id":"83061177:243","tag":"td","openStart":24163,"attrEnd":24188,"openEnd":24189,"closeStart":24229,"closeEnd":24234,"textRuns":[[24189,24229]],"parentId":"83061177:242","childIds":[]},{"id":"83061177:244","tag":"td","openStart":24247,"attrEnd":24250,"openEnd":24251,"closeStart":24251,"closeEnd":24256,"textRuns":[],"parentId":"83061177:242","childIds":[]},{"id":"83061177:245","tag":"td","openStart":24269,"attrEnd":24285,"openEnd":24286,"closeStart":24296,"closeEnd":24301,"textRuns":[[24286,24296]],"parentId":"83061177:242","childIds":[]},{"id":"83061177:246","tag":"td","openStart":24314,"attrEnd":24330,"openEnd":24331,"closeStart":24340,"closeEnd":24345,"textRuns":[[24331,24340]],"parentId":"83061177:242","childIds":[]},{"id":"83061177:247","tag":"td","openStart":24358,"attrEnd":24374,"openEnd":24375,"closeStart":24385,"closeEnd":24390,"textRuns":[[24375,24385]],"parentId":"83061177:242","childIds":[]},{"id":"83061177:248","tag":"td","openStart":24403,"attrEnd":24406,"openEnd":24407,"closeStart":24407,"closeEnd":24412,"textRuns":[],"parentId":"83061177:242","childIds":[]},{"id":"83061177:249","tag":"div","openStart":24477,"attrEnd":24498,"openEnd":24499,"closeStart":24862,"closeEnd":24868,"textRuns":[[24499,24506],[24532,24539],[24857,24862]],"parentId":"83061177:119","childIds":["83061177:250","83061177:251"]},{"id":"83061177:250","tag":"div","openStart":24506,"attrEnd":24521,"openEnd":24522,"closeStart":24526,"closeEnd":24532,"textRuns":[[24522,24526]],"parentId":"83061177:249","childIds":[]},{"id":"83061177:251","tag":"div","openStart":24539,"attrEnd":24554,"openEnd":24555,"closeStart":24851,"closeEnd":24857,"textRuns":[[24599,24851]],"parentId":"83061177:249","childIds":["83061177:252"]},{"id":"83061177:252","tag":"b","openStart":24555,"attrEnd":24557,"openEnd":24558,"closeStart":24595,"closeEnd":24599,"textRuns":[[24558,24595]],"parentId":"83061177:251","childIds":[]},{"id":"83061177:253","tag":"div","openStart":24911,"attrEnd":24950,"openEnd":24951,"closeStart":25979,"closeEnd":25985,"textRuns":[[24951,24956],[25055,25060],[25976,25979]],"parentId":"83061177:30","childIds":["83061177:254","83061177:256"]},{"id":"83061177:254","tag":"div","openStart":24956,"attrEnd":24978,"openEnd":24979,"closeStart":25049,"closeEnd":25055,"textRuns":[[24979,25027]],"parentId":"83061177:253","childIds":["83061177:255"]},{"id":"83061177:255","tag":"a","openStart":25027,"attrEnd":25038,"openEnd":25039,"closeStart":25045,"closeEnd":25049,"textRuns":[[25039,25045]],"parentId":"83061177:254","childIds":[]},{"id":"83061177:256","tag":"div","openStart":25060,"attrEnd":25083,"openEnd":25084,"closeStart":25970,"closeEnd":25976,"textRuns":[[25084,25091],[25965,25970]],"parentId":"83061177:253","childIds":["83061177:257"]},{"id":"83061177:257","tag":"table","openStart":25091,"attrEnd":25097,"openEnd":25098,"closeStart":25957,"closeEnd":25965,"textRuns":[[25098,25107],[25443,25452],[25480,25489],[25950,25957]],"parentId":"83061177:256","childIds":["83061177:258","83061177:269","83061177:270"]},{"id":"83061177:258","tag":"thead","openStart":25107,"attrEnd":25113,"openEnd":25114,"textRuns":[[25114,25125],[25426,25435]],"parentId":"83061177:257","childIds":["83061177:259"]},{"id":"83061177:259","tag":"tr","openStart":25125,"attrEnd":25128,"openEnd":25129,"textRuns":[[25129,25142],[25169,25182],[25200,25213],[25230,25243],[25260,25273],[25289,25302],[25318,25331],[25348,25361],[25379,25392],[25410,25421]],"parentId":"83061177:258","childIds":["83061177:260","83061177:261","83061177:262","83061177:263","83061177:264","83061177:265","83061177:266","83061177:267","83061177:268"]},{"id":"83061177:260","tag":"th","openStart":25142,"attrEnd":25155,"openEnd":25156,"closeStart":25164,"closeEnd":25169,"textRuns":[[25156,25164]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:261","tag":"th","openStart":25182,"attrEnd":25185,"openEnd":25186,"closeStart":25195,"closeEnd":25200,"textRuns":[[25186,25195]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:262","tag":"th","openStart":25213,"attrEnd":25216,"openEnd":25217,"closeStart":25225,"closeEnd":25230,"textRuns":[[25217,25225]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:263","tag":"th","openStart":25243,"attrEnd":25246,"openEnd":25247,"closeStart":25255,"closeEnd":25260,"textRuns":[[25247,25255]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:264","tag":"th","openStart":25273,"attrEnd":25276,"openEnd":25277,"closeStart":25284,"closeEnd":25289,"textRuns":[[25277,25284]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:265","tag":"th","openStart":25302,"attrEnd":25305,"openEnd":25306,"closeStart":25313,"closeEnd":25318,"textRuns":[[25306,25313]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:266","tag":"th","openStart":25331,"attrEnd":25334,"openEnd":25335,"closeStart":25343,"closeEnd":25348,"textRuns":[[25335,25343]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:267","tag":"th","openStart":25361,"attrEnd":25364,"openEnd":25365,"closeStart":25374,"closeEnd":25379,"textRuns":[[25365,25374]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:268","tag":"th","openStart":25392,"attrEnd":25395,"openEnd":25396,"closeStart":25405,"closeEnd":25410,"textRuns":[[25396,25405]],"parentId":"83061177:259","childIds":[]},{"id":"83061177:269","tag":"tbody","openStart":25452,"attrEnd":25471,"openEnd":25472,"textRuns":[],"parentId":"83061177:257","childIds":[]},{"id":"83061177:270","tag":"tfoot","openStart":25489,"attrEnd":25495,"openEnd":25496,"textRuns":[[25496,25507],[25933,25942]],"parentId":"83061177:257","childIds":["83061177:271"]},{"id":"83061177:271","tag":"tr","openStart":25507,"attrEnd":25510,"openEnd":25511,"textRuns":[[25511,25524],[25565,25578],[25610,25623],[25654,25667],[25698,25711],[25740,25753],[25784,25797],[25828,25841],[25872,25885],[25917,25928]],"parentId":"83061177:270","childIds":["83061177:272","83061177:273","83061177:274","83061177:275","83061177:276","83061177:277","83061177:278","83061177:279","83061177:280"]},{"id":"83061177:272","tag":"td","openStart":25524,"attrEnd":25537,"openEnd":25538,"closeStart":25560,"closeEnd":25565,"textRuns":[[25538,25560]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:273","tag":"td","openStart":25578,"attrEnd":25594,"openEnd":25595,"closeStart":25605,"closeEnd":25610,"textRuns":[[25595,25605]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:274","tag":"td","openStart":25623,"attrEnd":25639,"openEnd":25640,"closeStart":25649,"closeEnd":25654,"textRuns":[[25640,25649]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:275","tag":"td","openStart":25667,"attrEnd":25683,"openEnd":25684,"closeStart":25693,"closeEnd":25698,"textRuns":[[25684,25693]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:276","tag":"td","openStart":25711,"attrEnd":25727,"openEnd":25728,"closeStart":25735,"closeEnd":25740,"textRuns":[[25728,25735]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:277","tag":"td","openStart":25753,"attrEnd":25769,"openEnd":25770,"closeStart":25779,"closeEnd":25784,"textRuns":[[25770,25779]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:278","tag":"td","openStart":25797,"attrEnd":25813,"openEnd":25814,"closeStart":25823,"closeEnd":25828,"textRuns":[[25814,25823]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:279","tag":"td","openStart":25841,"attrEnd":25857,"openEnd":25858,"closeStart":25867,"closeEnd":25872,"textRuns":[[25858,25867]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:280","tag":"td","openStart":25885,"attrEnd":25901,"openEnd":25902,"closeStart":25912,"closeEnd":25917,"textRuns":[[25902,25912]],"parentId":"83061177:271","childIds":[]},{"id":"83061177:281","tag":"div","openStart":26015,"attrEnd":26052,"openEnd":26053,"closeStart":26627,"closeEnd":26633,"textRuns":[[26053,26058],[26124,26129],[26624,26627]],"parentId":"83061177:30","childIds":["83061177:282","83061177:283"]},{"id":"83061177:282","tag":"div","openStart":26058,"attrEnd":26080,"openEnd":26081,"closeStart":26118,"closeEnd":26124,"textRuns":[[26081,26118]],"parentId":"83061177:281","childIds":[]},{"id":"83061177:283","tag":"div","openStart":26129,"attrEnd":26152,"openEnd":26153,"closeStart":26618,"closeEnd":26624,"textRuns":[[26153,26160],[26613,26618]],"parentId":"83061177:281","childIds":["83061177:284"]},{"id":"83061177:284","tag":"table","openStart":26160,"attrEnd":26166,"openEnd":26167,"closeStart":26605,"closeEnd":26613,"textRuns":[[26167,26176],[26560,26569],[26598,26605]],"parentId":"83061177:283","childIds":["83061177:285","83061177:296"]},{"id":"83061177:285","tag":"thead","openStart":26176,"attrEnd":26182,"openEnd":26183,"textRuns":[[26183,26194],[26543,26552]],"parentId":"83061177:284","childIds":["83061177:286"]},{"id":"83061177:286","tag":"tr","openStart":26194,"attrEnd":26197,"openEnd":26198,"textRuns":[[26198,26211],[26236,26249],[26276,26289],[26317,26330],[26348,26361],[26378,26391],[26412,26425],[26448,26461],[26486,26499],[26527,26538]],"parentId":"83061177:285","childIds":["83061177:287","83061177:288","83061177:289","83061177:290","83061177:291","83061177:292","83061177:293","83061177:294","83061177:295"]},{"id":"83061177:287","tag":"th","openStart":26211,"attrEnd":26224,"openEnd":26225,"closeStart":26231,"closeEnd":26236,"textRuns":[[26225,26231]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:288","tag":"th","openStart":26249,"attrEnd":26262,"openEnd":26263,"closeStart":26271,"closeEnd":26276,"textRuns":[[26263,26271]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:289","tag":"th","openStart":26289,"attrEnd":26302,"openEnd":26303,"closeStart":26312,"closeEnd":26317,"textRuns":[[26303,26312]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:290","tag":"th","openStart":26330,"attrEnd":26333,"openEnd":26334,"closeStart":26343,"closeEnd":26348,"textRuns":[[26334,26343]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:291","tag":"th","openStart":26361,"attrEnd":26364,"openEnd":26365,"closeStart":26373,"closeEnd":26378,"textRuns":[[26365,26373]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:292","tag":"th","openStart":26391,"attrEnd":26394,"openEnd":26395,"closeStart":26407,"closeEnd":26412,"textRuns":[[26395,26407]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:293","tag":"th","openStart":26425,"attrEnd":26428,"openEnd":26429,"closeStart":26443,"closeEnd":26448,"textRuns":[[26429,26443]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:294","tag":"th","openStart":26461,"attrEnd":26474,"openEnd":26475,"closeStart":26481,"closeEnd":26486,"textRuns":[[26475,26481]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:295","tag":"th","openStart":26499,"attrEnd":26512,"openEnd":26513,"closeStart":26522,"closeEnd":26527,"textRuns":[[26513,26522]],"parentId":"83061177:286","childIds":[]},{"id":"83061177:296","tag":"tbody","openStart":26569,"attrEnd":26589,"openEnd":26590,"textRuns":[],"parentId":"83061177:284","childIds":[]},{"id":"83061177:297","tag":"div","openStart":26672,"attrEnd":26710,"openEnd":26711,"closeStart":31944,"closeEnd":31950,"textRuns":[[26711,26716],[31941,31944]],"parentId":"83061177:30","childIds":["83061177:298"]},{"id":"83061177:298","tag":"div","openStart":26716,"attrEnd":26736,"openEnd":26737,"closeStart":31935,"closeEnd":31941,"textRuns":[[26737,26744],[29234,29242],[31930,31935]],"parentId":"83061177:297","childIds":["83061177:299","83061177:342"]},{"id":"83061177:299","tag":"div","openStart":26744,"attrEnd":26748,"openEnd":26749,"closeStart":29228,"closeEnd":29234,"textRuns":[[26749,26758],[26815,26824],[29221,29228]],"parentId":"83061177:298","childIds":["83061177:300","83061177:301"]},{"id":"83061177:300","tag":"div","openStart":26758,"attrEnd":26780,"openEnd":26781,"closeStart":26809,"closeEnd":26815,"textRuns":[[26781,26809]],"parentId":"83061177:299","childIds":[]},{"id":"83061177:301","tag":"div","openStart":26824,"attrEnd":26850,"openEnd":26851,"closeStart":29215,"closeEnd":29221,"textRuns":[[26851,26862],[27331,27342],[27794,27805],[28254,28265],[28727,28738],[29206,29215]],"parentId":"83061177:299","childIds":["83061177:302","83061177:310","83061177:318","83061177:326","83061177:334"]},{"id":"83061177:302","tag":"div","openStart":26862,"attrEnd":26885,"openEnd":26886,"closeStart":27325,"closeEnd":27331,"textRuns":[[26886,26899],[27042,27055],[27254,27267],[27314,27325]],"parentId":"83061177:301","childIds":["83061177:303","83061177:306","83061177:309"]},{"id":"83061177:303","tag":"div","openStart":26899,"attrEnd":26929,"openEnd":26930,"closeStart":27036,"closeEnd":27042,"textRuns":[[26930,26945],[26977,26992],[27023,27036]],"parentId":"83061177:302","childIds":["83061177:304","83061177:305"]},{"id":"83061177:304","tag":"div","openStart":26945,"attrEnd":26967,"openEnd":26968,"closeStart":26971,"closeEnd":26977,"textRuns":[[26968,26971]],"parentId":"83061177:303","childIds":[]},{"id":"83061177:305","tag":"div","openStart":26992,"attrEnd":27014,"openEnd":27015,"closeStart":27017,"closeEnd":27023,"textRuns":[[27015,27017]],"parentId":"83061177:303","childIds":[]},{"id":"83061177:306","tag":"div","openStart":27055,"attrEnd":27078,"openEnd":27079,"closeStart":27248,"closeEnd":27254,"textRuns":[[27079,27094],[27148,27163],[27235,27248]],"parentId":"83061177:302","childIds":["83061177:307","83061177:308"]},{"id":"83061177:307","tag":"div","openStart":27094,"attrEnd":27118,"openEnd":27119,"closeStart":27142,"closeEnd":27148,"textRuns":[[27119,27142]],"parentId":"83061177:306","childIds":[]},{"id":"83061177:308","tag":"div","openStart":27163,"attrEnd":27185,"openEnd":27186,"closeStart":27229,"closeEnd":27235,"textRuns":[[27186,27229]],"parentId":"83061177:306","childIds":[]},{"id":"83061177:309","tag":"div","openStart":27267,"attrEnd":27297,"openEnd":27298,"closeStart":27308,"closeEnd":27314,"textRuns":[[27298,27308]],"parentId":"83061177:302","childIds":[]},{"id":"83061177:310","tag":"div","openStart":27342,"attrEnd":27365,"openEnd":27366,"closeStart":27788,"closeEnd":27794,"textRuns":[[27366,27379],[27515,27528],[27721,27734],[27777,27788]],"parentId":"83061177:301","childIds":["83061177:311","83061177:314","83061177:317"]},{"id":"83061177:311","tag":"div","openStart":27379,"attrEnd":27402,"openEnd":27403,"closeStart":27509,"closeEnd":27515,"textRuns":[[27403,27418],[27450,27465],[27496,27509]],"parentId":"83061177:310","childIds":["83061177:312","83061177:313"]},{"id":"83061177:312","tag":"div","openStart":27418,"attrEnd":27440,"openEnd":27441,"closeStart":27444,"closeEnd":27450,"textRuns":[[27441,27444]],"parentId":"83061177:311","childIds":[]},{"id":"83061177:313","tag":"div","openStart":27465,"attrEnd":27487,"openEnd":27488,"closeStart":27490,"closeEnd":27496,"textRuns":[[27488,27490]],"parentId":"83061177:311","childIds":[]},{"id":"83061177:314","tag":"div","openStart":27528,"attrEnd":27551,"openEnd":27552,"closeStart":27715,"closeEnd":27721,"textRuns":[[27552,27567],[27622,27637],[27702,27715]],"parentId":"83061177:310","childIds":["83061177:315","83061177:316"]},{"id":"83061177:315","tag":"div","openStart":27567,"attrEnd":27591,"openEnd":27592,"closeStart":27616,"closeEnd":27622,"textRuns":[[27592,27616]],"parentId":"83061177:314","childIds":[]},{"id":"83061177:316","tag":"div","openStart":27637,"attrEnd":27659,"openEnd":27660,"closeStart":27696,"closeEnd":27702,"textRuns":[[27660,27696]],"parentId":"83061177:314","childIds":[]},{"id":"83061177:317","tag":"div","openStart":27734,"attrEnd":27762,"openEnd":27763,"closeStart":27771,"closeEnd":27777,"textRuns":[[27763,27771]],"parentId":"83061177:310","childIds":[]},{"id":"83061177:318","tag":"div","openStart":27805,"attrEnd":27828,"openEnd":27829,"closeStart":28248,"closeEnd":28254,"textRuns":[[27829,27842],[27978,27991],[28181,28194],[28237,28248]],"parentId":"83061177:301","childIds":["83061177:319","83061177:322","83061177:325"]},{"id":"83061177:319","tag":"div","openStart":27842,"attrEnd":27865,"openEnd":27866,"closeStart":27972,"closeEnd":27978,"textRuns":[[27866,27881],[27913,27928],[27959,27972]],"parentId":"83061177:318","childIds":["83061177:320","83061177:321"]},{"id":"83061177:320","tag":"div","openStart":27881,"attrEnd":27903,"openEnd":27904,"closeStart":27907,"closeEnd":27913,"textRuns":[[27904,27907]],"parentId":"83061177:319","childIds":[]},{"id":"83061177:321","tag":"div","openStart":27928,"attrEnd":27950,"openEnd":27951,"closeStart":27953,"closeEnd":27959,"textRuns":[[27951,27953]],"parentId":"83061177:319","childIds":[]},{"id":"83061177:322","tag":"div","openStart":27991,"attrEnd":28014,"openEnd":28015,"closeStart":28175,"closeEnd":28181,"textRuns":[[28015,28030],[28082,28097],[28162,28175]],"parentId":"83061177:318","childIds":["83061177:323","83061177:324"]},{"id":"83061177:323","tag":"div","openStart":28030,"attrEnd":28054,"openEnd":28055,"closeStart":28076,"closeEnd":28082,"textRuns":[[28055,28076]],"parentId":"83061177:322","childIds":[]},{"id":"83061177:324","tag":"div","openStart":28097,"attrEnd":28119,"openEnd":28120,"closeStart":28156,"closeEnd":28162,"textRuns":[[28120,28156]],"parentId":"83061177:322","childIds":[]},{"id":"83061177:325","tag":"div","openStart":28194,"attrEnd":28222,"openEnd":28223,"closeStart":28231,"closeEnd":28237,"textRuns":[[28223,28231]],"parentId":"83061177:318","childIds":[]},{"id":"83061177:326","tag":"div","openStart":28265,"attrEnd":28288,"openEnd":28289,"closeStart":28721,"closeEnd":28727,"textRuns":[[28289,28302],[28438,28451],[28656,28669],[28710,28721]],"parentId":"83061177:301","childIds":["83061177:327","83061177:330","83061177:333"]},{"id":"83061177:327","tag":"div","openStart":28302,"attrEnd":28325,"openEnd":28326,"closeStart":28432,"closeEnd":28438,"textRuns":[[28326,28341],[28373,28388],[28419,28432]],"parentId":"83061177:326","childIds":["83061177:328","83061177:329"]},{"id":"83061177:328","tag":"div","openStart":28341,"attrEnd":28363,"openEnd":28364,"closeStart":28367,"closeEnd":28373,"textRuns":[[28364,28367]],"parentId":"83061177:327","childIds":[]},{"id":"83061177:329","tag":"div","openStart":28388,"attrEnd":28410,"openEnd":28411,"closeStart":28413,"closeEnd":28419,"textRuns":[[28411,28413]],"parentId":"83061177:327","childIds":[]},{"id":"83061177:330","tag":"div","openStart":28451,"attrEnd":28474,"openEnd":28475,"closeStart":28650,"closeEnd":28656,"textRuns":[[28475,28490],[28555,28570],[28637,28650]],"parentId":"83061177:326","childIds":["83061177:331","83061177:332"]},{"id":"83061177:331","tag":"div","openStart":28490,"attrEnd":28514,"openEnd":28515,"closeStart":28549,"closeEnd":28555,"textRuns":[[28515,28549]],"parentId":"83061177:330","childIds":[]},{"id":"83061177:332","tag":"div","openStart":28570,"attrEnd":28592,"openEnd":28593,"closeStart":28631,"closeEnd":28637,"textRuns":[[28593,28631]],"parentId":"83061177:330","childIds":[]},{"id":"83061177:333","tag":"div","openStart":28669,"attrEnd":28697,"openEnd":28698,"closeStart":28704,"closeEnd":28710,"textRuns":[[28698,28704]],"parentId":"83061177:326","childIds":[]},{"id":"83061177:334","tag":"div","openStart":28738,"attrEnd":28761,"openEnd":28762,"closeStart":29200,"closeEnd":29206,"textRuns":[[28762,28775],[28916,28929],[29115,29128],[29189,29200]],"parentId":"83061177:301","childIds":["83061177:335","83061177:338","83061177:341"]},{"id":"83061177:335","tag":"div","openStart":28775,"attrEnd":28803,"openEnd":28804,"closeStart":28910,"closeEnd":28916,"textRuns":[[28804,28819],[28851,28866],[28897,28910]],"parentId":"83061177:334","childIds":["83061177:336","83061177:337"]},{"id":"83061177:336","tag":"div","openStart":28819,"attrEnd":28841,"openEnd":28842,"closeStart":28845,"closeEnd":28851,"textRuns":[[28842,28845]],"parentId":"83061177:335","childIds":[]},{"id":"83061177:337","tag":"div","openStart":28866,"attrEnd":28888,"openEnd":28889,"closeStart":28891,"closeEnd":28897,"textRuns":[[28889,28891]],"parentId":"83061177:335","childIds":[]},{"id":"83061177:338","tag":"div","openStart":28929,"attrEnd":28952,"openEnd":28953,"closeStart":29109,"closeEnd":29115,"textRuns":[[28953,28968],[29023,29038],[29096,29109]],"parentId":"83061177:334","childIds":["83061177:339","83061177:340"]},{"id":"83061177:339","tag":"div","openStart":28968,"attrEnd":28992,"openEnd":28993,"closeStart":29017,"closeEnd":29023,"textRuns":[[28993,29017]],"parentId":"83061177:338","childIds":[]},{"id":"83061177:340","tag":"div","openStart":29038,"attrEnd":29060,"openEnd":29061,"closeStart":29090,"closeEnd":29096,"textRuns":[[29061,29090]],"parentId":"83061177:338","childIds":[]},{"id":"83061177:341","tag":"div","openStart":29128,"attrEnd":29172,"openEnd":29173,"closeStart":29183,"closeEnd":29189,"styleAttr":[29158,29171],"textRuns":[[29173,29183]],"parentId":"83061177:334","childIds":[]},{"id":"83061177:342","tag":"div","openStart":29242,"attrEnd":29246,"openEnd":29247,"closeStart":31924,"closeEnd":31930,"textRuns":[[29247,29256],[29315,29324],[31917,31924]],"parentId":"83061177:298","childIds":["83061177:343","83061177:344"]},{"id":"83061177:343","tag":"div","openStart":29256,"attrEnd":29278,"openEnd":29279,"closeStart":29309,"closeEnd":29315,"textRuns":[[29279,29309]],"parentId":"83061177:342","childIds":[]},{"id":"83061177:344","tag":"div","openStart":29324,"attrEnd":29348,"openEnd":29349,"closeStart":31911,"closeEnd":31917,"textRuns":[[29349,29360],[29872,29883],[30376,30387],[30871,30882],[31390,31401],[31902,31911]],"parentId":"83061177:342","childIds":["83061177:345","83061177:353","83061177:361","83061177:369","83061177:377"]},{"id":"83061177:345","tag":"div","openStart":29360,"attrEnd":29384,"openEnd":29385,"closeStart":29866,"closeEnd":29872,"textRuns":[[29385,29398],[29460,29473],[29739,29752],[29855,29866]],"parentId":"83061177:344","childIds":["83061177:346","83061177:347","83061177:350"]},{"id":"83061177:346","tag":"div","openStart":29398,"attrEnd":29449,"openEnd":29450,"closeStart":29454,"closeEnd":29460,"styleAttr":[29430,29448],"textRuns":[[29450,29454]],"parentId":"83061177:345","childIds":[]},{"id":"83061177:347","tag":"div","openStart":29473,"attrEnd":29497,"openEnd":29498,"closeStart":29733,"closeEnd":29739,"textRuns":[[29498,29513],[29561,29576],[29720,29733]],"parentId":"83061177:345","childIds":["83061177:348","83061177:349"]},{"id":"83061177:348","tag":"div","openStart":29513,"attrEnd":29537,"openEnd":29538,"closeStart":29555,"closeEnd":29561,"textRuns":[[29538,29555]],"parentId":"83061177:347","childIds":[]},{"id":"83061177:349","tag":"div","openStart":29576,"attrEnd":29600,"openEnd":29601,"closeStart":29714,"closeEnd":29720,"textRuns":[[29601,29714]],"parentId":"83061177:347","childIds":[]},{"id":"83061177:350","tag":"div","openStart":29752,"attrEnd":29776,"openEnd":29777,"closeStart":29849,"closeEnd":29855,"textRuns":[],"parentId":"83061177:345","childIds":["83061177:351","83061177:352"]},{"id":"83061177:351","tag":"div","openStart":29777,"attrEnd":29798,"openEnd":29799,"closeStart":29804,"closeEnd":29810,"textRuns":[[29799,29804]],"parentId":"83061177:350","childIds":[]},{"id":"83061177:352","tag":"div","openStart":29810,"attrEnd":29833,"openEnd":29834,"closeStart":29843,"closeEnd":29849,"textRuns":[[29834,29843]],"parentId":"83061177:350","childIds":[]},{"id":"83061177:353","tag":"div","openStart":29883,"attrEnd":29907,"openEnd":29908,"closeStart":30370,"closeEnd":30376,"textRuns":[[29908,29921],[29983,29996],[30243,30256],[30359,30370]],"parentId":"83061177:344","childIds":["83061177:354","83061177:355","83061177:358"]},{"id":"83061177:354","tag":"div","openStart":29921,"attrEnd":29972,"openEnd":29973,"closeStart":29977,"closeEnd":29983,"styleAttr":[29953,29971],"textRuns":[[29973,29977]],"parentId":"83061177:353","childIds":[]},{"id":"83061177:355","tag":"div","openStart":29996,"attrEnd":30020,"openEnd":30021,"closeStart":30237,"closeEnd":30243,"textRuns":[[30021,30036],[30095,30110],[30224,30237]],"parentId":"83061177:353","childIds":["83061177:356","83061177:357"]},{"id":"83061177:356","tag":"div","openStart":30036,"attrEnd":30060,"openEnd":30061,"closeStart":30089,"closeEnd":30095,"textRuns":[[30061,30089]],"parentId":"83061177:355","childIds":[]},{"id":"83061177:357","tag":"div","openStart":30110,"attrEnd":30134,"openEnd":30135,"closeStart":30218,"closeEnd":30224,"textRuns":[[30135,30218]],"parentId":"83061177:355","childIds":[]},{"id":"83061177:358","tag":"div","openStart":30256,"attrEnd":30280,"openEnd":30281,"closeStart":30353,"closeEnd":30359,"textRuns":[],"parentId":"83061177:353","childIds":["83061177:359","83061177:360"]},{"id":"83061177:359","tag":"div","openStart":30281,"attrEnd":30302,"openEnd":30303,"closeStart":30308,"closeEnd":30314,"textRuns":[[30303,30308]],"parentId":"83061177:358","childIds":[]},{"id":"83061177:360","tag":"div","openStart":30314,"attrEnd":30337,"openEnd":30338,"closeStart":30347,"closeEnd":30353,"textRuns":[[30338,30347]],"parentId":"83061177:358","childIds":[]},{"id":"83061177:361","tag":"div","openStart":30387,"attrEnd":30411,"openEnd":30412,"closeStart":30865,"closeEnd":30871,"textRuns":[[30412,30425],[30487,30500],[30738,30751],[30854,30865]],"parentId":"83061177:344","childIds":["83061177:362","83061177:363","83061177:366"]},{"id":"83061177:362","tag":"div","openStart":30425,"attrEnd":30476,"openEnd":30477,"closeStart":30481,"closeEnd":30487,"styleAttr":[30457,30475],"textRuns":[[30477,30481]],"parentId":"83061177:361","childIds":[]},{"id":"83061177:363","tag":"div","openStart":30500,"attrEnd":30524,"openEnd":30525,"closeStart":30732,"closeEnd":30738,"textRuns":[[30525,30540],[30590,30605],[30719,30732]],"parentId":"83061177:361","childIds":["83061177:364","83061177:365"]},{"id":"83061177:364","tag":"div","openStart":30540,"attrEnd":30564,"openEnd":30565,"closeStart":30584,"closeEnd":30590,"textRuns":[[30565,30584]],"parentId":"83061177:363","childIds":[]},{"id":"83061177:365","tag":"div","openStart":30605,"attrEnd":30629,"openEnd":30630,"closeStart":30713,"closeEnd":30719,"textRuns":[[30630,30713]],"parentId":"83061177:363","childIds":[]},{"id":"83061177:366","tag":"div","openStart":30751,"attrEnd":30775,"openEnd":30776,"closeStart":30848,"closeEnd":30854,"textRuns":[],"parentId":"83061177:361","childIds":["83061177:367","83061177:368"]},{"id":"83061177:367","tag":"div","openStart":30776,"attrEnd":30797,"openEnd":30798,"closeStart":30803,"closeEnd":30809,"textRuns":[[30798,30803]],"parentId":"83061177:366","childIds":[]},{"id":"83061177:368","tag":"div","openStart":30809,"attrEnd":30832,"openEnd":30833,"closeStart":30842,"closeEnd":30848,"textRuns":[[30833,30842]],"parentId":"83061177:366","childIds":[]},{"id":"83061177:369","tag":"div","openStart":30882,"attrEnd":30906,"openEnd":30907,"closeStart":31384,"closeEnd":31390,"textRuns":[[30907,30920],[30982,30995],[31258,31271],[31373,31384]],"parentId":"83061177:344","childIds":["83061177:370","83061177:371","83061177:374"]},{"id":"83061177:370","tag":"div","openStart":30920,"attrEnd":30971,"openEnd":30972,"closeStart":30976,"closeEnd":30982,"styleAttr":[30952,30970],"textRuns":[[30972,30976]],"parentId":"83061177:369","childIds":[]},{"id":"83061177:371","tag":"div","openStart":30995,"attrEnd":31019,"openEnd":31020,"closeStart":31252,"closeEnd":31258,"textRuns":[[31020,31035],[31088,31103],[31239,31252]],"parentId":"83061177:369","childIds":["83061177:372","83061177:373"]},{"id":"83061177:372","tag":"div","openStart":31035,"attrEnd":31059,"openEnd":31060,"closeStart":31082,"closeEnd":31088,"textRuns":[[31060,31082]],"parentId":"83061177:371","childIds":[]},{"id":"83061177:373","tag":"div","openStart":31103,"attrEnd":31127,"openEnd":31128,"closeStart":31233,"closeEnd":31239,"textRuns":[[31128,31233]],"parentId":"83061177:371","childIds":[]},{"id":"83061177:374","tag":"div","openStart":31271,"attrEnd":31295,"openEnd":31296,"closeStart":31367,"closeEnd":31373,"textRuns":[],"parentId":"83061177:369","childIds":["83061177:375","83061177:376"]},{"id":"83061177:375","tag":"div","openStart":31296,"attrEnd":31317,"openEnd":31318,"closeStart":31323,"closeEnd":31329,"textRuns":[[31318,31323]],"parentId":"83061177:374","childIds":[]},{"id":"83061177:376","tag":"div","openStart":31329,"attrEnd":31352,"openEnd":31353,"closeStart":31361,"closeEnd":31367,"textRuns":[[31353,31361]],"parentId":"83061177:374","childIds":[]},{"id":"83061177:377","tag":"div","openStart":31401,"attrEnd":31425,"openEnd":31426,"closeStart":31896,"closeEnd":31902,"textRuns":[[31426,31439],[31501,31514],[31768,31781],[31885,31896]],"parentId":"83061177:344","childIds":["83061177:378","83061177:379","83061177:382"]},{"id":"83061177:378","tag":"div","openStart":31439,"attrEnd":31490,"openEnd":31491,"closeStart":31495,"closeEnd":31501,"styleAttr":[31471,31489],"textRuns":[[31491,31495]],"parentId":"83061177:377","childIds":[]},{"id":"83061177:379","tag":"div","openStart":31514,"attrEnd":31538,"openEnd":31539,"closeStart":31762,"closeEnd":31768,"textRuns":[[31539,31554],[31608,31623],[31749,31762]],"parentId":"83061177:377","childIds":["83061177:380","83061177:381"]},{"id":"83061177:380","tag":"div","openStart":31554,"attrEnd":31578,"openEnd":31579,"closeStart":31602,"closeEnd":31608,"textRuns":[[31579,31602]],"parentId":"83061177:379","childIds":[]},{"id":"83061177:381","tag":"div","openStart":31623,"attrEnd":31647,"openEnd":31648,"closeStart":31743,"closeEnd":31749,"textRuns":[[31648,31743]],"parentId":"83061177:379","childIds":[]},{"id":"83061177:382","tag":"div","openStart":31781,"attrEnd":31805,"openEnd":31806,"closeStart":31879,"closeEnd":31885,"textRuns":[],"parentId":"83061177:377","childIds":["83061177:383","83061177:384"]},{"id":"83061177:383","tag":"div","openStart":31806,"attrEnd":31827,"openEnd":31828,"closeStart":31832,"closeEnd":31838,"textRuns":[[31828,31832]],"parentId":"83061177:382","childIds":[]},{"id":"83061177:384","tag":"div","openStart":31838,"attrEnd":31861,"openEnd":31862,"closeStart":31873,"closeEnd":31879,"textRuns":[[31862,31873]],"parentId":"83061177:382","childIds":[]}],"literals":[[32026,32035],[32056,32061],[32101,32107],[32156,32173],[32209,32211],[32280,32286],[32307,32312],[32352,32358],[32407,32423],[32459,32461],[32504,32510],[32546,32548],[32580,32586],[32620,32622],[32685,32699],[32705,32706],[32713,32713],[32719,32737],[32743,32751],[32759,32765],[32772,32777],[32784,32790],[32797,32803],[32811,32811],[32821,32831],[32841,32842],[32849,32853],[32860,32880],[32886,32894],[32902,32908],[32915,32921],[32928,32934],[32941,32947],[32955,32955],[32965,32978],[32985,32986],[32993,32998],[33004,33024],[33030,33038],[33046,33052],[33059,33064],[33072,33078],[33085,33091],[33099,33099],[33109,33122],[33129,33130],[33137,33142],[33148,33166],[33174,33182],[33190,33196],[33203,33208],[33216,33222],[33229,33235],[33243,33243],[33253,33265],[33273,33274],[33281,33287],[33292,33310],[33318,33326],[33334,33340],[33347,33352],[33360,33366],[33373,33379],[33387,33387],[33397,33410],[33417,33418],[33425,33425],[33436,33456],[33462,33470],[33478,33484],[33491,33496],[33504,33510],[33517,33523],[33531,33531],[33541,33554],[33561,33562],[33569,33573],[33580,33598],[33606,33614],[33622,33628],[33635,33640],[33648,33654],[33661,33666],[33675,33675],[33738,33738],[33763,33768],[33886,33886],[33932,33932],[33978,33978],[34024,34024],[34081,34086],[34168,34175],[34204,34271],[34278,34280],[34286,34316],[34322,34347],[34353,34399],[34405,34433],[34441,34469],[34477,34505],[34512,34540],[34553,34581],[34588,34616],[34623,34659],[34670,34683],[34692,34692],[34698,34814],[34877,34885],[34893,34905],[34913,34920],[34932,34940],[34947,34955],[34963,34971],[34981,34990],[35001,35008],[35018,35021],[35036,35044],[35052,35064],[35072,35084],[35091,35099],[35106,35114],[35122,35130],[35140,35149],[35160,35169],[35177,35191],[35206,35214],[35222,35234],[35242,35254],[35261,35269],[35276,35284],[35292,35300],[35310,35319],[35330,35339],[35347,35361],[35376,35384],[35392,35404],[35412,35424],[35431,35439],[35446,35454],[35462,35470],[35480,35489],[35500,35509],[35517,35531],[35546,35554],[35562,35574],[35582,35594],[35601,35609],[35616,35624],[35632,35640],[35650,35659],[35670,35674],[35687,35701],[35716,35724],[35732,35744],[35752,35764],[35771,35779],[35786,35794],[35802,35810],[35820,35829],[35840,35849],[35857,35871],[35886,35894],[35902,35914],[35922,35934],[35941,35949],[35956,35964],[35972,35980],[35990,35999],[36010,36019],[36027,36041],[36056,36064],[36072,36084],[36092,36104],[36111,36119],[36126,36134],[36142,36150],[36160,36169],[36180,36189],[36197,36211],[36254,36264],[36267,36274],[36293,36303],[36306,36315],[36334,36342],[36345,36349],[36382,36390],[36473,36520],[36531,36555],[36563,36600],[36611,36618],[36621,36628],[36631,36638],[36640,36642],[36650,36678],[36686,36714],[36721,36749],[36757,36793],[36803,36852],[36858,36860],[36866,36969],[36977,36990],[37002,37002]]}</script></body></html>
