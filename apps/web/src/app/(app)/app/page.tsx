@@ -86,13 +86,34 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       {/* ═══ GROWTH — standard operating dashboard ═══ */}
       {plan === "growth" && (
         <>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
-            <Stat label="Employees" value={String(employeeCount)} foot="Active" />
+          <div className="grid grid-cols-4 gap-4">
+            <Stat label="Active employees" value={String(employeeCount)} foot="All in {province}" />
             <Stat label="Pay groups" value={String(payGroupCount)} foot="Configured" />
-            <Stat label="Free runs" value={String(remainingFree)} foot="Remaining" />
-            <Stat label="YTD gross" value={fmtCAD(ytdGross)} foot="2026" />
-            <Stat label="YTD net" value={fmtCAD(ytdNet)} foot="Deposited" />
-            <Stat label="YTD employer" value={fmtCAD(ytdRuns.reduce((s,r)=>s+r.totalEmployerCost,0))} foot="CPP + EI match" />
+            <Stat label="Next pay run" value="—" foot="Schedule now" />
+            <Stat label="YTD payroll" value={fmtCAD(ytdGross)} foot="Gross, 2026" />
+          </div>
+
+          {/* Remittance + EFT row */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">CRA remittance due</p>
+              <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em] text-[#D97706]">
+                {fmtCAD(ytdRuns.reduce((s,r)=>s+r.totalDeductions+r.totalEmployerCost,0))}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">Next deadline · 15th</p>
+            </div>
+            <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">EFT / Direct Deposit</p>
+              <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em] text-[#16A34A]">{recentRuns.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">Runs processed</p>
+            </div>
+            <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">Employer cost YTD</p>
+              <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em]">
+                {fmtCAD(ytdRuns.reduce((s,r)=>s+r.totalEmployerCost,0))}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">CPP + EI match</p>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-5">
@@ -100,7 +121,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[0.06em] mb-3">Quick actions</p>
               <div className="space-y-3">
                 {[
-                  { icon: PlusCircle, title: "Add an employee", desc: "Set up personal details, TD1, and pay group.", href: "/employees/new" },
+                  { icon: PlusCircle, title: "Add an employee", desc: "Set up TD1 and payroll details.", href: "/employees/new" },
                   { icon: ClipboardList, title: "Run payroll", desc: "Calculate deductions and finalize a pay run.", href: "/payroll/new" },
                   { icon: BarChart3, title: "View reports", desc: "T4 slips, PD7A, ROE, payroll summary.", href: "/reports" },
                 ].map((qa) => (
@@ -135,34 +156,60 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       {/* ═══ ACCOUNTANT — full compliance + year-end ═══ */}
       {plan === "accountant" && (
         <>
-          {/* Action-required alert */}
-          <div className="flex gap-3.5 bg-[#FFF7ED] border border-[#FED7AA] rounded-xl px-5 py-4">
-            <AlertTriangle className="h-5 w-5 text-[#C2410C] mt-0.5 flex-shrink-0" />
-            <div className="flex-1">
-              <p className="text-[13px] font-bold text-[#9A3412]">1 action required</p>
-              <p className="text-[13px] text-[#C2410C] mt-0.5">T4 filing deadline approaching — Feb 28, 2027. <Link href="/reports/t4" className="font-semibold underline">Prepare T4s now →</Link></p>
+          <div className="grid grid-cols-4 gap-4">
+            <Stat label="Active employees" value={String(employeeCount)} foot="All active" />
+            <Stat label="Next pay run" value="—" foot="Schedule now" />
+            <Stat label="YTD payroll" value={fmtCAD(ytdGross)} foot="Gross, 2026" />
+            <Stat label="YTD net deposited" value={fmtCAD(ytdNet)} foot="To employees" />
+          </div>
+
+          {/* Remittance + EFT + Employer row */}
+          <div className="grid grid-cols-4 gap-4">
+            <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">CRA remittance due</p>
+              <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em] text-[#D97706]">
+                {fmtCAD(ytdRuns.reduce((s,r)=>s+r.totalDeductions+r.totalEmployerCost,0))}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">Due by 15th of next month</p>
+            </div>
+            <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">EFT files</p>
+              <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em] text-[#16A34A]">{recentRuns.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">Ready for upload</p>
+            </div>
+            <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">Employer cost YTD</p>
+              <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em]">{fmtCAD(ytdRuns.reduce((s,r)=>s+r.totalEmployerCost,0))}</p>
+              <p className="text-xs text-muted-foreground mt-1">CPP + EI match</p>
+            </div>
+            <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">YTD net deposited</p>
+              <p className="text-[30px] font-bold mt-2 font-mono tabular-nums tracking-[-0.02em]">{fmtCAD(ytdNet)}</p>
+              <p className="text-xs text-muted-foreground mt-1">To employees</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
-            <Stat label="Active employees" value={String(employeeCount)} foot="All active" />
-            <Stat label="Pay groups" value={String(payGroupCount)} foot="Configured" />
-            <Stat label="YTD gross" value={fmtCAD(ytdGross)} foot="2026" />
-            <Stat label="YTD net" value={fmtCAD(ytdNet)} foot="Deposited" />
-            <Stat label="YTD employer" value={fmtCAD(ytdRuns.reduce((s,r)=>s+r.totalEmployerCost,0))} foot="CPP + EI" />
-            <Stat label="Remittance due" value={fmtCAD(ytdRuns.reduce((s,r)=>s+r.totalEmployerCost,0) + ytdRuns.reduce((s,r)=>s+r.totalDeductions,0))} foot="Next deadline" />
-            <Stat label="Compliance" value="✓" foot="All filings current" />
-            <Stat label="Year-end" value="Ready" foot={`${recentRuns.length} runs finalized`} />
+          {/* Action-required alert */}
+          <div className="flex gap-3.5 bg-[#FFF7ED] border border-[#FED7AA] rounded-xl px-5 py-4">
+            <AlertTriangle className="h-5 w-5 text-[#C2410C] mt-0.5 flex-shrink-0" />
+            <div className="space-y-2 w-full">
+              <p className="text-[13px] font-bold text-[#9A3412]">1 action required</p>
+              <div className="grid grid-cols-3 gap-4 text-[13px] text-[#C2410C]">
+                <span>T4 filing deadline · Feb 28, 2027</span>
+                <span>PD7A remittance · Up to date</span>
+                <span>Year-end wizard · <Link href="/reports/t4" className="font-semibold underline">Prepare T4s →</Link></span>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-5">
-            {/* Quick actions */}
             <div>
               <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[0.06em] mb-3">Quick actions</p>
               <div className="space-y-3">
                 {[
-                  { icon: PlusCircle, title: "Add employee", desc: "TD1 + pay group setup.", href: "/employees/new" },
-                  { icon: ClipboardList, title: "Run payroll", desc: "Calculate + finalize deductions.", href: "/payroll/new" },
+                  { icon: PlusCircle, title: "Add employee", desc: "TD1 + pay group.", href: "/employees/new" },
+                  { icon: ClipboardList, title: "Run payroll", desc: "Calculate + finalize.", href: "/payroll/new" },
+                  { icon: BarChart3, title: "Reports", desc: "Full report suite.", href: "/reports" },
                 ].map((qa) => (
                   <Link key={qa.title} href={qa.href} className="flex gap-3.5 items-start p-[18px] border border-[#E7E5E4] rounded-xl bg-white hover:border-[#B3261E] shadow-[0_1px_3px_rgba(0,0,0,0.04)] no-underline text-inherit transition-colors">
                     <div className="w-11 h-11 rounded-[11px] bg-[#FEF2F2] flex items-center justify-center text-xl flex-shrink-0"><qa.icon className="h-5 w-5 text-[#B3261E]" /></div>
@@ -172,31 +219,21 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 ))}
               </div>
             </div>
-
-            {/* Compliance status */}
             <div>
               <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[0.06em] mb-3">Compliance</p>
               <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                {[
-                  ["T4 slips", "Ready", true], ["PD7A remittance", "Up to date", true],
-                  ["ROE filings", "0 pending", true], ["Year-end wizard", "Available", true],
-                ].map(([label, status, ok]) => (
-                  <div key={label as string} className="flex justify-between items-center px-5 py-3 border-b border-[#F0EFED] last:border-b-0">
-                    <span className="text-[13px]">{label as string}</span>
-                    <span className={`text-xs font-semibold ${ok ? "text-[#15803D]" : "text-[#92400E]"}`}>{status as string}</span>
-                  </div>
+                {[["T4 slips","Ready"],["PD7A","Current"],["ROE","0 pending"],["Year-end","Available"]].map(([l,s])=>(
+                  <div key={l} className="flex justify-between px-5 py-3 border-b border-[#F0EFED] last:border-b-0 text-[13px]"><span>{l}</span><span className="text-xs font-semibold text-[#15803D]">{s}</span></div>
                 ))}
               </div>
             </div>
-
-            {/* Recent runs */}
             <div>
               <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[0.06em] mb-3">Recent pay runs</p>
               <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
                 {recentRuns.length === 0 ? (
                   <div className="p-8 text-center text-sm text-muted-foreground">No pay runs yet.</div>
                 ) : recentRuns.map((run) => (
-                  <Link key={run.id} href={`/payroll/${run.id}`} className="flex items-center justify-between px-5 py-3 border-b border-[#F0EFED] last:border-b-0 hover:bg-[#FAFAF9] no-underline text-inherit">
+                  <Link key={run.id} href={`/payroll/${run.id}`} className="flex justify-between px-5 py-3 border-b border-[#F0EFED] last:border-b-0 hover:bg-[#FAFAF9] no-underline text-inherit">
                     <div><p className="text-[13px] font-semibold">{run.payDate}</p><p className="text-[11px] text-[#A8A29E]">{run.payGroup.name}</p></div>
                     <span className="text-[13px] font-semibold font-mono tabular-nums">{fmtCAD(run.totalNetPay)}</span>
                   </Link>
