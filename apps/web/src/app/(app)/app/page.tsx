@@ -122,7 +122,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <div className="space-y-3">
                 {[
                   { icon: PlusCircle, title: "Add an employee", desc: "Set up TD1 and payroll details.", href: "/employees/new" },
-                  { icon: ClipboardList, title: "Run payroll", desc: "Calculate deductions and finalize a pay run.", href: "/payroll/new" },
+                  { icon: ClipboardList, title: "Run payroll", desc: "Enter amounts → preview deductions → finalize.", href: "/payroll/new" },
+                  { icon: BarChart3, title: "Post to payroll", desc: "Review and finalize draft pay runs.", href: "/payroll" },
                   { icon: BarChart3, title: "View reports", desc: "T4 slips, PD7A, ROE, payroll summary.", href: "/reports" },
                 ].map((qa) => (
                   <Link key={qa.title} href={qa.href} className="flex gap-3.5 items-start p-[18px] border border-[#E7E5E4] rounded-xl bg-white hover:border-[#B3261E] shadow-[0_1px_3px_rgba(0,0,0,0.04)] no-underline text-inherit transition-colors">
@@ -207,9 +208,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[0.06em] mb-3">Quick actions</p>
               <div className="space-y-3">
                 {[
-                  { icon: PlusCircle, title: "Add employee", desc: "TD1 + pay group.", href: "/employees/new" },
-                  { icon: ClipboardList, title: "Run payroll", desc: "Calculate + finalize.", href: "/payroll/new" },
-                  { icon: BarChart3, title: "Reports", desc: "Full report suite.", href: "/reports" },
+                  { icon: PlusCircle, title: "Add employee", desc: "TD1 + pay group setup.", href: "/employees/new" },
+                  { icon: ClipboardList, title: "Run payroll", desc: "Enter amounts → preview → finalize.", href: "/payroll/new" },
+                  { icon: ClipboardList, title: "Post to payroll", desc: "Review & finalize draft pay runs.", href: "/payroll" },
+                  { icon: BarChart3, title: "View reports", desc: "T4, PD7A, ROE, journals.", href: "/reports" },
                 ].map((qa) => (
                   <Link key={qa.title} href={qa.href} className="flex gap-3.5 items-start p-[18px] border border-[#E7E5E4] rounded-xl bg-white hover:border-[#B3261E] shadow-[0_1px_3px_rgba(0,0,0,0.04)] no-underline text-inherit transition-colors">
                     <div className="w-11 h-11 rounded-[11px] bg-[#FEF2F2] flex items-center justify-center text-xl flex-shrink-0"><qa.icon className="h-5 w-5 text-[#B3261E]" /></div>
