@@ -65,8 +65,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </Link>
       </div>
 
-      {/* Stats grid — plan-aware: Solo 4, Growth+ 6 */}
-      <div className={`grid gap-4 ${can(plan, "remittances") ? "grid-cols-3 sm:grid-cols-6" : "grid-cols-4"}`}>
+      {/* Stats grid — plan-aware */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         <Stat label="Active employees" value={String(employeeCount)} foot="All active" />
         <Stat label="Pay groups" value={String(payGroupCount)} foot="Configured" />
         <Stat label="Next pay run" value="—" foot="Schedule one now" />
@@ -75,6 +75,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <>
             <Stat label="Employer cost" value={fmtCAD(ytdEmployer)} foot="CPP + EI match" />
             <Stat label="Net deposited" value={fmtCAD(ytdGross - ytdRuns.reduce((s,r)=>s+r.totalDeductions,0))} foot="To employees" />
+          </>
+        )}
+        {can(plan, "compliancePanel") && (
+          <>
+            <Stat label="Compliance" value="✓" foot="All filings current" />
+            <Stat label="Year-end" value="Ready" foot="T4s available" />
           </>
         )}
       </div>

@@ -70,6 +70,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
+        {/* New company */}
+        <Link href="/onboarding" className="flex items-center gap-2.5 px-3 py-2.5 rounded-[9px] text-sm font-medium text-[#A8A29E] hover:bg-[#292524] hover:text-[#E7E5E4] transition-colors no-underline">
+          <span className="text-base">＋</span> New company
+        </Link>
+
         {/* Footer */}
         <div className="border-t border-[#292524] pt-4 mt-auto space-y-3">
           {/* Plan badge — links to company settings */}
