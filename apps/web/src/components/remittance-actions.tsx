@@ -46,24 +46,25 @@ export function RemittanceActions({ totalCRA, period }: Props) {
   }
 
   async function handleSubmit() {
-    if (!confirm(`Submit $${totalCRA.toFixed(2)} to CRA for ${period}?`)) return;
+    if (!confirm(`Mark remittance as submitted for ${period}?\n\nAmount: $${totalCRA.toFixed(2)}\n\nThis records the filing in MapleRun. You must remit the actual payment through your CRA business account or online banking.`)) return;
     setSubmitting(true);
-    // Simulate submission — in production this calls an API
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      await fetch("/api/remittance/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ period }) });
+      setSubmitted(true);
+    } catch { /* fall through */ }
     setSubmitting(false);
-    setSubmitted(true);
   }
 
   if (submitted) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.04em] bg-[#F0FDF4] border border-[#BBF7D0] text-[#16A34A] rounded-full px-3 py-1.5">
-        ✓ Submitted
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.04em] bg-[#F0FDF4] border border-[#BBF7D0] text-[#16A34A] rounded-full px-3 py-1.5 mt-1">
+        ✓ Marked as submitted
       </span>
     );
   }
 
   return (
-    <div className="flex gap-2.5">
+    <div className="flex gap-2.5 print:hidden">
       <button onClick={handlePDF} className="rounded-[9px] border border-[#D6D3D1] bg-white text-[#1C1917] text-[13px] font-semibold px-[15px] py-2.5 inline-flex items-center gap-[7px] hover:border-[#B3261E] hover:text-[#B3261E] transition-colors">
         ⬇︎ PDF
       </button>
@@ -77,8 +78,9 @@ export function RemittanceActions({ totalCRA, period }: Props) {
         onClick={handleSubmit}
         disabled={submitting || totalCRA <= 0}
         className="rounded-[9px] bg-[#B3261E] hover:bg-[#9B1C18] text-white text-[13px] font-semibold px-4 py-2.5 inline-flex items-center gap-[7px] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        title="Records the filing in MapleRun. Remit actual payment through your CRA account."
       >
-        {submitting ? "Submitting…" : "Submit to CRA"}
+        {submitting ? "Submitting…" : "Mark as submitted"}
       </button>
     </div>
   );

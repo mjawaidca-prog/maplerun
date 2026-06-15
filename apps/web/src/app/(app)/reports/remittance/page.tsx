@@ -59,12 +59,19 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
   const isUrgent = daysLeft <= 14 && daysLeft > 0 && totalCRA > 0;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 print:space-y-3">
       {/* Breadcrumb */}
-      <div className="text-[13px] text-[#A8A29E]"><Link href="/reports" className="text-[#A8A29E] no-underline">Compliance</Link> › Remittances</div>
+      <div className="text-[13px] text-[#A8A29E] print:hidden"><Link href="/reports" className="text-[#A8A29E] no-underline">Compliance</Link> › Remittances</div>
+
+      {/* Print-only header */}
+      <div className="hidden print:block text-center border-b-2 border-black pb-4 mb-4">
+        <h1 className="text-xl font-bold">MapleRun — Remittance Report</h1>
+        <p className="text-sm">{currentPeriod} · Regular Remitter · Due {dueDate.toISOString().slice(0,10)}</p>
+        <p className="text-sm font-bold mt-1">Total Owing to CRA: {fmtCAD(totalCRA)}</p>
+      </div>
 
       {/* Page Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start print:hidden">
         <div>
           <h1 className="text-[26px] font-extrabold tracking-[-0.02em] text-[#1C1917]">Remittance Report</h1>
           <p className="text-sm text-[#78716C] mt-1">Source deductions owing to the CRA — {currentPeriod} · {employeeSet.size} employees</p>
@@ -85,7 +92,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
       )}
 
       {/* Filter Bar */}
-      <div className="flex items-end gap-3.5 bg-white border border-[#E7E5E4] rounded-xl px-[18px] py-3.5 flex-wrap shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <div className="flex items-end gap-3.5 bg-white border border-[#E7E5E4] rounded-xl px-[18px] py-3.5 flex-wrap shadow-[0_1px_3px_rgba(0,0,0,0.04)] print:hidden">
         <div className="flex flex-col gap-[5px]">
           <span className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em]">Period</span>
           <div className="inline-flex gap-0.5 bg-[#F5F5F4] border border-[#E7E5E4] rounded-[9px] p-[3px]">
@@ -148,7 +155,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
       </div>
 
       {/* Tab Bar — pill style from spec */}
-      <div className="inline-flex gap-0.5 bg-[#F5F5F4] border border-[#E7E5E4] rounded-[10px] p-[3px]">
+      <div className="inline-flex gap-0.5 bg-[#F5F5F4] border border-[#E7E5E4] rounded-[10px] p-[3px] print:hidden">
         {(["breakdown","employees","history","schedule"] as Tab[]).map((t)=>(
           <Link key={t} href={`/reports/remittance?tab=${t}`} className={`text-[13px] font-semibold px-[15px] py-[7px] rounded-[7px] no-underline capitalize ${activeTab===t?"bg-white text-[#1C1917] shadow-[0_1px_3px_rgba(0,0,0,0.08)]":"text-[#78716C]"}`}>{t==="breakdown"?"Deduction breakdown":t==="employees"?"By employee":t==="history"?"Remittance history":"Schedule & rates"}</Link>
         ))}
