@@ -210,7 +210,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 {[
                   { icon: PlusCircle, title: "Add employee", desc: "TD1 + pay group setup.", href: "/employees/new" },
                   { icon: ClipboardList, title: "Run payroll", desc: "Enter amounts → preview → finalize.", href: "/payroll/new" },
-                  { icon: ClipboardList, title: "Post to payroll", desc: "Review & finalize draft pay runs.", href: "/payroll" },
+                  { icon: BarChart3, title: "GL Journal", desc: "Payroll journal entries for accounting.", href: "/reports/summary" },
                   { icon: BarChart3, title: "View reports", desc: "T4, PD7A, ROE, journals.", href: "/reports" },
                 ].map((qa) => (
                   <Link key={qa.title} href={qa.href} className="flex gap-3.5 items-start p-[18px] border border-[#E7E5E4] rounded-xl bg-white hover:border-[#B3261E] shadow-[0_1px_3px_rgba(0,0,0,0.04)] no-underline text-inherit transition-colors">
