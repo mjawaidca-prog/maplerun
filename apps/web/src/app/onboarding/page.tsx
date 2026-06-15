@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -20,10 +20,15 @@ export default function OnboardingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!session?.user) { router.push("/sign-in"); return; }
+    if (session.user.companyId) { router.push("/app"); return; }
+  }, [status, session, router]);
+
   if (status === "loading") return <div className="min-h-screen flex items-center justify-center"><p className="text-[#A8A29E]">Loading…</p></div>;
-  if (!session?.user) { router.push("/sign-in"); return null; }
-  // If user already has a company, redirect to /app
-  if (session.user.companyId) { router.push("/app"); return null; }
+  if (!session?.user) return null;
+  if (session.user.companyId) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); if (submitting) return;

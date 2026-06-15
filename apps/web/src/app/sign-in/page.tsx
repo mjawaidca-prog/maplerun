@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,14 @@ function SignInForm() {
   const { data: session, status: sessionStatus } = useSession();
 
   // Already signed in — redirect
-  if (sessionStatus === "authenticated" && session?.user) {
-    const dest = session.user.companyId ? "/app" : "/onboarding";
-    if (typeof window !== "undefined") { window.location.href = dest; return null; }
-    return null;
-  }
+  useEffect(() => {
+    if (sessionStatus === "authenticated" && session?.user) {
+      const dest = session.user.companyId ? "/app" : "/onboarding";
+      window.location.href = dest;
+    }
+  }, [sessionStatus, session]);
+
+  if (sessionStatus === "authenticated" && session?.user) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); if (loading) return;
