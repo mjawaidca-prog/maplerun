@@ -4,6 +4,7 @@
  */
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { RemittanceActions } from "@/components/remittance-actions";
 import Link from "next/link";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
@@ -68,12 +69,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
           <h1 className="text-[26px] font-extrabold tracking-[-0.02em] text-[#1C1917]">Remittance Report</h1>
           <p className="text-sm text-[#78716C] mt-1">Source deductions owing to the CRA — {currentPeriod} · {employeeSet.size} employees</p>
         </div>
-        <div className="flex gap-2.5">
-          <button className="rounded-[9px] border border-[#D6D3D1] bg-white text-[#1C1917] text-[13px] font-semibold px-[15px] py-2.5 inline-flex items-center gap-[7px] hover:border-[#B3261E] hover:text-[#B3261E]">⬇︎ PDF</button>
-          <button className="rounded-[9px] border border-[#D6D3D1] bg-white text-[#1C1917] text-[13px] font-semibold px-[15px] py-2.5 inline-flex items-center gap-[7px] hover:border-[#B3261E] hover:text-[#B3261E]">⬇︎ CSV</button>
-          <button className="rounded-[9px] border border-[#D6D3D1] bg-white text-[#1C1917] text-[13px] font-semibold px-[15px] py-2.5 inline-flex items-center gap-[7px] hover:border-[#B3261E] hover:text-[#B3261E]">🖨 Print</button>
-          <button className="rounded-[9px] bg-[#B3261E] hover:bg-[#9B1C18] text-white text-[13px] font-semibold px-4 py-2.5 inline-flex items-center gap-[7px]">Submit to CRA</button>
-        </div>
+        <RemittanceActions totalCRA={totalCRA} period={currentPeriod} />
       </div>
 
       {/* Alert Banner */}
