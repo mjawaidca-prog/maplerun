@@ -19,12 +19,19 @@ export default async function GlJournalPage() {
 
   // Build GL entries per run
   const journals = runs.map((run) => {
-    const wageExpense = run.totalGross; // DEBIT
-    const cppPayable = run.totalCpp + run.totalEmployerCpp; // CREDIT
+    // DEBITS (expenses)
+    const wageExpense = run.totalGross;
+    const employerCppExpense = run.totalEmployerCpp;
+    const employerCpp2Expense = run.totalEmployerCpp2;
+    const employerEiExpense = run.totalEmployerEi;
+    const totalDebit = wageExpense + employerCppExpense + employerCpp2Expense + employerEiExpense;
+
+    // CREDITS (liabilities + cash)
+    const cppPayable = run.totalCpp + run.totalEmployerCpp;
     const cpp2Payable = run.totalCpp2 + run.totalEmployerCpp2;
     const eiPayable = run.totalEi + run.totalEmployerEi;
-    const taxPayable = run.totalFederalTax + run.totalProvincialTax; // CREDIT
-    const netCash = run.totalNetPay; // CREDIT
+    const taxPayable = run.totalFederalTax + run.totalProvincialTax;
+    const netCash = run.totalNetPay;
     const totalCredit = cppPayable + cpp2Payable + eiPayable + taxPayable + netCash;
 
     return {
@@ -33,13 +40,16 @@ export default async function GlJournalPage() {
       payGroup: run.payGroup.name,
       entries: [
         { account: "Wages & Salaries Expense", debit: wageExpense, credit: 0 },
+        { account: "Employer CPP Expense", debit: employerCppExpense, credit: 0 },
+        { account: "Employer CPP2 Expense", debit: employerCpp2Expense, credit: 0 },
+        { account: "Employer EI Expense (1.4×)", debit: employerEiExpense, credit: 0 },
         { account: "CPP Payable (CRA)", debit: 0, credit: cppPayable },
         { account: "CPP2 Payable (CRA)", debit: 0, credit: cpp2Payable },
         { account: "EI Payable (CRA)", debit: 0, credit: eiPayable },
         { account: "Income Tax Payable (CRA)", debit: 0, credit: taxPayable },
         { account: "Net Pay — Cash", debit: 0, credit: netCash },
       ].filter((e) => Math.abs(e.debit) > 0.005 || Math.abs(e.credit) > 0.005),
-      totalDebit: wageExpense,
+      totalDebit,
       totalCredit,
     };
   });
