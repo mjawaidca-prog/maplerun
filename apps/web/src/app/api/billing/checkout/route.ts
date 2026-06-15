@@ -45,8 +45,13 @@ export async function POST(request: Request) {
       customer_email: undefined, // will be set by Checkout
       line_items: [
         {
-          price: plan.stripePriceId,
-          quantity: 1, // base fee
+          price_data: {
+            currency: "cad",
+            product_data: { name: `MapleRun ${plan.name}` },
+            unit_amount: plan.basePriceCents,
+            recurring: { interval: "month" as const },
+          },
+          quantity: 1,
         },
       ],
       metadata: {
