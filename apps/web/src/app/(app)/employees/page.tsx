@@ -4,8 +4,8 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { deleteEmployee } from "@/lib/actions/employee";
+import { DeleteEmployeeButton } from "@/components/delete-employee-button";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
 
@@ -52,12 +52,7 @@ export default async function EmployeesPage() {
               <div><span className="inline-flex items-center text-[11px] font-bold tracking-[0.03em] rounded-full px-2.5 py-1 bg-[#DCFCE7] text-[#15803D]">ACTIVE</span></div>
               <div className="text-[#A8A29E] text-right">→</div>
             </Link>
-            <form action={deleteEmployee} className="flex items-center justify-center">
-              <input type="hidden" name="id" value={emp.id} />
-              <button type="submit" className="text-[#A8A29E] hover:text-[#B3261E] transition-colors p-1" title="Delete employee" onClick={(e) => { if (!confirm(`Delete ${emp.firstName} ${emp.lastName}?`)) e.preventDefault(); }}>
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </form>
+            <DeleteEmployeeButton id={emp.id} name={`${emp.firstName} ${emp.lastName}`} />
           </div>
           ))}
         </div>
