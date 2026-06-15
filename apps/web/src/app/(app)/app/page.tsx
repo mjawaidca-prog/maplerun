@@ -6,13 +6,27 @@ import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { can, type Plan } from "@/lib/plan";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PlusCircle, ClipboardList, BarChart3 } from "lucide-react";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ checkout?: string; plan?: string }> }) {
   const user = await requireCompany();
   const firstName = (user.name ?? "").split(" ")[0];
+  const params = await searchParams;
+
+  // Handle Stripe checkout success — upgrade plan immediately
+  if (params.checkout === "success" && params.plan) {
+    const validPlans: Plan[] = ["solo", "growth", "accountant"];
+    if (validPlans.includes(params.plan as Plan)) {
+      await prisma.company.update({
+        where: { id: user.companyId },
+        data: { plan: params.plan },
+      });
+      redirect("/app");
+    }
+  }
 
   const [employeeCount, payGroupCount, company] = await Promise.all([
     prisma.employee.count({ where: { companyId: user.companyId, active: true } }),
