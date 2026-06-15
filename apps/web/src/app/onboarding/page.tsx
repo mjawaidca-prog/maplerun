@@ -23,12 +23,11 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (status === "loading") return;
     if (!session?.user) { router.push("/sign-in"); return; }
-    if (session.user.companyId) { router.push("/app"); return; }
+    // Allow creating additional companies — don't redirect
   }, [status, session, router]);
 
   if (status === "loading") return <div className="min-h-screen flex items-center justify-center"><p className="text-[#A8A29E]">Loading…</p></div>;
   if (!session?.user) return null;
-  if (session.user.companyId) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); if (submitting) return;

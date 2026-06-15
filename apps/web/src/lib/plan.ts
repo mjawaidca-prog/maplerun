@@ -108,9 +108,9 @@ export const SIDEBAR_NAV: Record<Plan, NavItem[]> = {
     { icon: "🗓", label: "Year-End", href: "/reports/t4" },
     { section: "Analytics & System" },
     { icon: "📊", label: "Reports", href: "/reports" },
-    { icon: "📒", label: "GL / Accounting", href: "/reports/summary" },
+    { icon: "📒", label: "GL / Accounting", href: "/reports/gl" },
     { icon: "⚙️", label: "Settings", href: "/company" },
-    { icon: "🔍", label: "Audit Log", href: "/company" },
+    { icon: "🔍", label: "Audit Log", href: "/company/audit" },
   ],
 };
 
