@@ -75,7 +75,14 @@ export default async function PayStubPage({ params }: Props) {
           <div>
             <p className="text-xs font-bold text-[#78716C] dark:text-[#A8A29E] uppercase tracking-[0.08em] mb-2.5">Earnings</p>
             <div className="bg-[#F0FDF4] dark:bg-[#0F2A17] border border-[#BBF7D0] dark:border-[#166534] rounded-xl p-4 flex justify-between items-center">
-              <span className="text-sm text-[#15803D] dark:text-[#4ADE80] font-medium">Gross Pay</span>
+              <div>
+                <span className="text-sm text-[#15803D] dark:text-[#4ADE80] font-medium">Gross Pay</span>
+                {item.hours > 0 && (
+                  <p className="text-[11px] text-[#15803D]/70 dark:text-[#4ADE80]/70 mt-0.5">
+                    {item.hours} hours · {fmtCAD(item.gross / item.hours)}/hr
+                  </p>
+                )}
+              </div>
               <span className="text-xl font-semibold text-[#15803D] dark:text-[#4ADE80] font-mono tabular-nums">{fmtCAD(item.gross)}</span>
             </div>
           </div>
