@@ -70,11 +70,11 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   const router = useRouter();
   const showExtendedPayTypes = plan === "growth" || plan === "accountant";
   const showFullPayGrid = plan === "accountant";
-  const saved = typeof window !== "undefined" ? loadWizardState() : null;
   const [step, setStep] = useState<Step>("input");
   const [isPending, startTransition] = useTransition();
 
-  // Step 1 state — restore from sessionStorage if available
+  // Step 1 state — restore from sessionStorage only if found
+  const saved = typeof window !== "undefined" ? loadWizardState() : null;
   const [payGroupId, setPayGroupId] = useState(saved?.payGroupId ?? "");
   const [payDate, setPayDate] = useState(saved?.payDate ?? new Date().toISOString().slice(0, 10));
   const [grossAmounts, setGrossAmounts] = useState<Record<string, string>>(
@@ -85,10 +85,10 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   // Step 2 state
   const [preview, setPreview] = useState<PayRunPreview | null>(null);
 
-  // Persist step 1 fields on change
-  function updatePayGroupId(v: string) { setPayGroupId(v); saveWizardState({ payGroupId: v, payDate, grossAmounts }); }
-  function updatePayDate(v: string) { setPayDate(v); saveWizardState({ payGroupId, payDate: v, grossAmounts }); }
-  function updateGrossAmounts(v: Record<string,string>) { setGrossAmounts(v); saveWizardState({ payGroupId, payDate, grossAmounts: v }); }
+  // Save state on demand (call before navigating away)
+  function persistState() {
+    saveWizardState({ payGroupId, payDate, grossAmounts });
+  }
 
   // ── Step 1 → Step 2 ──────────────────────────────────────────────────────
 
@@ -119,6 +119,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
     formData.set("payDate", payDate);
     formData.set("grossAmounts", JSON.stringify(amounts));
 
+    persistState(); // Save before navigating to preview
     startTransition(async () => {
       try {
         const result = await previewAction(formData);
@@ -184,7 +185,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Pay group</Label>
-                  <Select value={payGroupId} onValueChange={(v) => updatePayGroupId(v ?? "")}>
+                  <Select value={payGroupId} onValueChange={(v) => setPayGroupId(v ?? "")}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select pay group…" />
                     </SelectTrigger>
@@ -203,7 +204,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                     id="payDate"
                     type="date"
                     value={payDate}
-                    onChange={(e) => updatePayDate(e.target.value)}
+                    onChange={(e) => setPayDate(e.target.value)}
                   />
                 </div>
               </div>
@@ -240,7 +241,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                             type="number" min="0" step="0.01" placeholder="0.00"
                             className="pl-7 tabular-nums"
                             value={grossAmounts[emp.id] ?? ""}
-                            onChange={(e) => { const next = { ...grossAmounts, [emp.id]: e.target.value }; updateGrossAmounts(next); }}
+                            onChange={(e) => { const next = { ...grossAmounts, [emp.id]: e.target.value }; setGrossAmounts(next); }}
                           />
                         </div>
                       </div>
