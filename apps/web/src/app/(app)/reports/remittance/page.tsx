@@ -185,10 +185,10 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
                 ))}
                 {/* EI group */}
                 <tr className="bg-[#FAFAF9]"><td colSpan={6} className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em] px-4 py-1.5">Employment Insurance</td></tr>
-                {[["EI Employee",`${totalCRA>0?pct(t.eiEe,totalCRA):0}%`,t.eiEe,0,"#2563EB"],["EI Employer",`${totalCRA>0?pct(t.eiEr,totalCRA):0}%`,0,t.eiEr,"#60A5FA"]].map(([label,pctVal,ee,er,dot],i)=>(
+                {[["EI Employee",`${totalCRA>0?pct(t.eiEe,totalCRA):0}%`,t.eiEe,0,"#2563EB","1.63%"],["EI Employer",`${totalCRA>0?pct(t.eiEr,totalCRA):0}%`,0,t.eiEr,"#60A5FA","2.28% (×1.4)"]].map(([label,pctVal,ee,er,dot,rateStr],i)=>(
                   <tr key={label as string} className="border-b border-[#F0EFED] hover:bg-[#FAFAF9] text-[13px]">
                     <td className="px-4 py-[13px] font-semibold"><span className="inline-block w-2 h-2 rounded-full mr-2" style={{background:dot as string}}/>{label as string}</td>
-                    <td className="text-right px-4 py-[13px]">1.63% / 2.28%</td>
+                    <td className="text-right px-4 py-[13px]">{rateStr as string}</td>
                     <td className="text-right px-4 py-[13px] font-mono tabular-nums">{ee as number>0?fmtCAD(ee as number):"—"}</td>
                     <td className="text-right px-4 py-[13px] font-mono tabular-nums">{er as number>0?fmtCAD(er as number):"—"}</td>
                     <td className="text-right px-4 py-[13px] font-mono tabular-nums font-semibold">{fmtCAD((ee as number)+(er as number))}</td>
