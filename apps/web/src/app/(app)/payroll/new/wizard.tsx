@@ -56,7 +56,7 @@ type Step = "input" | "preview" | "finalizing";
 // ─── sessionStorage key ───────────────────────────────────────────────────
 const STORAGE_KEY = "maplerun-wizard";
 
-function saveWizardState(state: { payGroupId?: string; payDate?: string; grossAmounts?: Record<string,string> }) {
+function saveWizardState(state: { payGroupId?: string; payDate?: string; actualPayDate?: string; grossAmounts?: Record<string,string> }) {
   try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
 }
 function loadWizardState() {
@@ -77,6 +77,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   const saved = typeof window !== "undefined" ? loadWizardState() : null;
   const [payGroupId, setPayGroupId] = useState(saved?.payGroupId ?? "");
   const [payDate, setPayDate] = useState(saved?.payDate ?? new Date().toISOString().slice(0, 10));
+  const [actualPayDate, setActualPayDate] = useState(saved?.actualPayDate ?? "");
   const [grossAmounts, setGrossAmounts] = useState<Record<string, string>>(
     saved?.grossAmounts ?? Object.fromEntries(employees.map((e) => [e.id, ""]))
   );
@@ -87,7 +88,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
 
   // Save state on demand (call before navigating away)
   function persistState() {
-    saveWizardState({ payGroupId, payDate, grossAmounts });
+    saveWizardState({ payGroupId, payDate, grossAmounts, actualPayDate });
   }
 
   // ── Step 1 → Step 2 ──────────────────────────────────────────────────────
@@ -182,7 +183,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
               <CardTitle className="text-lg">Pay run details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Pay group</Label>
                   <Select value={payGroupId} onValueChange={(v) => setPayGroupId(v ?? "")}>
@@ -190,22 +191,27 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                       <SelectValue placeholder="Select pay group…" />
                     </SelectTrigger>
                     <SelectContent>
-                      {payGroups.map((pg) => (
-                        <SelectItem key={pg.id} value={pg.id}>
-                          {pg.name} ({pg.frequency.toLowerCase()}, {pg.defaultProvince})
-                        </SelectItem>
-                      ))}
+                      {payGroups.length === 0 ? (
+                        <div className="px-2 py-4 text-sm text-muted-foreground text-center">No pay groups. Create one first.</div>
+                      ) : (
+                        payGroups.map((pg) => (
+                          <SelectItem key={pg.id} value={pg.id}>
+                            {pg.name} ({pg.frequency.toLowerCase()}, {pg.defaultProvince})
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="payDate">Pay period end date</Label>
-                  <Input
-                    id="payDate"
-                    type="date"
-                    value={payDate}
-                    onChange={(e) => setPayDate(e.target.value)}
-                  />
+                  <Label htmlFor="payDate">Period end date</Label>
+                  <Input id="payDate" type="date" value={payDate} onChange={(e) => setPayDate(e.target.value)} />
+                  <p className="text-[11px] text-[#A8A29E]">Last day of the pay period</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="actualPayDate">Pay date</Label>
+                  <Input id="actualPayDate" type="date" value={actualPayDate} onChange={(e) => setActualPayDate(e.target.value)} />
+                  <p className="text-[11px] text-[#A8A29E]">When employees receive pay</p>
                 </div>
               </div>
             </CardContent>

@@ -151,7 +151,6 @@
 @media print {
   aside { display: none !important; }
   body { background: #fff !important; }
-  .print\\:hidden { display: none !important; }
   main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
   main > div { padding: 16px !important; }
   table { font-size: 10px !important; }
