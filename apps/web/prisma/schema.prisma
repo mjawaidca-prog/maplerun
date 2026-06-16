@@ -262,6 +262,10 @@ model PayRunItem {
   warnings        String   @default("")
   /// Insurable hours for this period (required for ROE Block 15A)
   hours           Float    @default(0)
+  /// Vacation pay paid this period (4%/6% of gross)
+  vacationPay     Float    @default(0)
+  /// Vacation pay rate used (e.g. 0.04 = 4%)
+  vacationPayRate Float    @default(0)
 
   payRun   PayRun   @relation(fields: [payRunId], references: [id], onDelete: Cascade)
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)

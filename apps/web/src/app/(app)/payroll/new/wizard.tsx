@@ -84,10 +84,23 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   const [hours, setHours] = useState<Record<string, string>>(
     saved?.hours ?? Object.fromEntries(employees.map((e) => [e.id, "75"]))
   );
+  const [vacationEnabled, setVacationEnabled] = useState<Record<string, boolean>>(
+    Object.fromEntries(employees.map((e) => [e.id, false]))
+  );
+  const [vacationRate, setVacationRate] = useState<Record<string, string>>(
+    Object.fromEntries(employees.map((e) => [e.id, "4"]))
+  );
   const [error, setError] = useState<string | null>(null);
 
   // Step 2 state
   const [preview, setPreview] = useState<PayRunPreview | null>(null);
+
+  function fmtVacation(empId: string): string {
+    const gross = parseFloat(grossAmounts[empId] ?? "0");
+    const rate = parseFloat(vacationRate[empId] ?? "4");
+    if (isNaN(gross) || gross <= 0) return "$0.00";
+    return `$${(gross * rate / 100).toFixed(2)}`;
+  }
 
   // Save state on demand (call before navigating away)
   function persistState() {
@@ -264,6 +277,34 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                           />
                         </div>
                       </div>
+                      {/* Vacation pay toggle */}
+                      <div className="flex items-center gap-3 mt-2 ml-[13.5rem]">
+                        <label className="flex items-center gap-2 text-xs text-[#78716C] cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={vacationEnabled[emp.id] ?? false}
+                            onChange={(e) => setVacationEnabled((prev) => ({ ...prev, [emp.id]: e.target.checked }))}
+                            className="rounded"
+                          />
+                          Vacation pay
+                        </label>
+                        {vacationEnabled[emp.id] && (
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="number"
+                              min="0" max="10" step="0.5"
+                              value={vacationRate[emp.id] ?? "4"}
+                              onChange={(e) => setVacationRate((prev) => ({ ...prev, [emp.id]: e.target.value }))}
+                              className="w-14 border border-[#D6D3D1] rounded-md px-2 py-1 text-xs text-right"
+                            />
+                            <span className="text-xs text-[#A8A29E]">% of gross</span>
+                            <span className="text-[11px] text-[#16A34A] font-semibold">
+                              +{fmtVacation(emp.id)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
                       {/* Growth expander */}
                       {showExtendedPayTypes && (
                         <details className="group ml-[13.5rem] mt-2">

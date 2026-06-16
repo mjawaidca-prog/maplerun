@@ -82,6 +82,11 @@ export default async function PayStubPage({ params }: Props) {
                     {item.hours} hours · {fmtCAD(item.gross / item.hours)}/hr
                   </p>
                 )}
+              {item.vacationPay > 0 && (
+                <p className="text-[11px] text-[#15803D]/70 dark:text-[#4ADE80]/70 mt-0.5">
+                  Incl. {fmtCAD(item.vacationPay)} vacation pay ({(item.vacationPayRate * 100).toFixed(1)}%)
+                </p>
+              )}
               </div>
               <span className="text-xl font-semibold text-[#15803D] dark:text-[#4ADE80] font-mono tabular-nums">{fmtCAD(item.gross)}</span>
             </div>
