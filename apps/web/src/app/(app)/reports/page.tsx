@@ -19,7 +19,7 @@ export default async function ReportsDashboardPage() {
 
   const allCards = [
     { href: "/reports/t4", icon: "📄", title: "T4 slips", desc: "Statement of remuneration paid for each employee.", metric: `${year} · available`, metricVal: "Ready", feature: null },
-    { href: "/reports", icon: "🧾", title: "PD7A remittance", desc: "Source deductions owed to the CRA this period.", metric: pd7aTotal > 0 ? `YTD ${year}` : "No data", metricVal: pd7aTotal > 0 ? fmtCAD(pd7aTotal) : "—", feature: null },
+    { href: "/reports/remittance", icon: "🧾", title: "PD7A remittance", desc: "Source deductions owed to the CRA this period.", metric: pd7aTotal > 0 ? `YTD ${year}` : "No data", metricVal: pd7aTotal > 0 ? fmtCAD(pd7aTotal) : "—", feature: null },
     { href: "/reports/summary", icon: "📄", title: "Payroll summary", desc: "Aggregated wages, deductions, and employer costs.", metric: "All runs", metricVal: "View", feature: "reportsCore" },
     { href: "/reports/gl", icon: "📒", title: "GL journal", desc: "Debit/credit entries ready for accounting software.", metric: "Per pay run", metricVal: "View", feature: "payrollJournal" },
     { href: "/reports/roe", icon: "📋", title: "Record of Employment (ROE)", desc: "Generate ROEs for terminations and leaves.", metric: "Service Canada", metricVal: "View", feature: "roe" },

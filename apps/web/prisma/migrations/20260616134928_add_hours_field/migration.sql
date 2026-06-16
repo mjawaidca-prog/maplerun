@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "PayRunItem" ADD COLUMN     "hours" DOUBLE PRECISION NOT NULL DEFAULT 0;

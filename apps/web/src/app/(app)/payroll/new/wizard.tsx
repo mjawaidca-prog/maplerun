@@ -56,7 +56,7 @@ type Step = "input" | "preview" | "finalizing";
 // ─── sessionStorage key ───────────────────────────────────────────────────
 const STORAGE_KEY = "maplerun-wizard";
 
-function saveWizardState(state: { payGroupId?: string; payDate?: string; actualPayDate?: string; grossAmounts?: Record<string,string> }) {
+function saveWizardState(state: { payGroupId?: string; payDate?: string; actualPayDate?: string; grossAmounts?: Record<string,string>; hours?: Record<string,string> }) {
   try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
 }
 function loadWizardState() {
@@ -81,6 +81,9 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   const [grossAmounts, setGrossAmounts] = useState<Record<string, string>>(
     saved?.grossAmounts ?? Object.fromEntries(employees.map((e) => [e.id, ""]))
   );
+  const [hours, setHours] = useState<Record<string, string>>(
+    saved?.hours ?? Object.fromEntries(employees.map((e) => [e.id, "75"]))
+  );
   const [error, setError] = useState<string | null>(null);
 
   // Step 2 state
@@ -88,7 +91,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
 
   // Save state on demand (call before navigating away)
   function persistState() {
-    saveWizardState({ payGroupId, payDate, grossAmounts, actualPayDate });
+    saveWizardState({ payGroupId, payDate, grossAmounts, actualPayDate, hours });
   }
 
   // ── Step 1 → Step 2 ──────────────────────────────────────────────────────
@@ -237,9 +240,19 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                   {employees.map((emp) => (
                     <div key={emp.id}>
                       <div className="flex items-center gap-4">
-                        <Label className="w-48 text-sm truncate" htmlFor={`gross-${emp.id}`}>
+                        <Label className="w-40 text-sm truncate" htmlFor={`gross-${emp.id}`}>
                           {emp.name}
                         </Label>
+                        <div className="relative w-20">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">hrs</span>
+                          <Input
+                            id={`hours-${emp.id}`}
+                            type="number" min="0" step="0.5" placeholder="75"
+                            className="pl-8 tabular-nums text-xs h-8"
+                            value={hours[emp.id] ?? "75"}
+                            onChange={(e) => { const next = { ...hours, [emp.id]: e.target.value }; setHours(next); }}
+                          />
+                        </div>
                         <div className="relative flex-1 max-w-xs">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
                           <Input
