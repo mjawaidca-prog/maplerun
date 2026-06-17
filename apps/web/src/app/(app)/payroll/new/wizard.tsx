@@ -81,8 +81,32 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   const [grossAmounts, setGrossAmounts] = useState<Record<string, string>>(
     saved?.grossAmounts ?? Object.fromEntries(employees.map((e) => [e.id, ""]))
   );
+  // Try importing hours from timesheet upload (sessionStorage)
+  const importedHours = (() => {
+    try {
+      const raw = sessionStorage.getItem("maplerun-timesheet-hours");
+      return raw ? JSON.parse(raw) as Record<string, string> : null;
+    } catch { return null; }
+  })();
+
   const [hours, setHours] = useState<Record<string, string>>(
-    saved?.hours ?? Object.fromEntries(employees.map((e) => [e.id, "75"]))
+    saved?.hours ?? (() => {
+      // Map imported hours to employee IDs by matching names
+      if (importedHours) {
+        const mapped: Record<string, string> = {};
+        for (const emp of employees) {
+          const fullName = emp.name.toLowerCase().trim();
+          const match = Object.entries(importedHours).find(
+            ([name]) => name.toLowerCase().trim() === fullName
+          );
+          mapped[emp.id] = match?.[1] ?? "75";
+        }
+        // Clear after reading so it doesn't persist across sessions
+        try { sessionStorage.removeItem("maplerun-timesheet-hours"); } catch {}
+        return mapped;
+      }
+      return Object.fromEntries(employees.map((e) => [e.id, "75"]));
+    })()
   );
   const [vacationEnabled, setVacationEnabled] = useState<Record<string, boolean>>(
     Object.fromEntries(employees.map((e) => [e.id, false]))
@@ -292,7 +316,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                           <div className="flex items-center gap-1.5">
                             <input
                               type="number"
-                              min="0" max="10" step="0.5"
+                              min="0" max="100" step="0.1"
                               value={vacationRate[emp.id] ?? "4"}
                               onChange={(e) => setVacationRate((prev) => ({ ...prev, [emp.id]: e.target.value }))}
                               className="w-14 border border-[#D6D3D1] rounded-md px-2 py-1 text-xs text-right"
