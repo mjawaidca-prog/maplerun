@@ -90,8 +90,8 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   })();
 
   const [hours, setHours] = useState<Record<string, string>>(
-    saved?.hours ?? (() => {
-      // Map imported hours to employee IDs by matching names
+    (() => {
+      // Imported hours from timesheet take priority over saved wizard state
       if (importedHours) {
         const mapped: Record<string, string> = {};
         for (const emp of employees) {
@@ -101,11 +101,11 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
           );
           mapped[emp.id] = match?.[1] ?? "75";
         }
-        // Clear after reading so it doesn't persist across sessions
         try { sessionStorage.removeItem("maplerun-timesheet-hours"); } catch {}
         return mapped;
       }
-      return Object.fromEntries(employees.map((e) => [e.id, "75"]));
+      // Fall back to saved wizard state, then default 75
+      return saved?.hours ?? Object.fromEntries(employees.map((e) => [e.id, "75"]));
     })()
   );
   const [vacationEnabled, setVacationEnabled] = useState<Record<string, boolean>>(
