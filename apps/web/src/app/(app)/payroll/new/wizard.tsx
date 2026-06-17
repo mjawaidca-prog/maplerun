@@ -159,8 +159,21 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
     formData.set("payGroupId", payGroupId);
     formData.set("payDate", payDate);
     formData.set("grossAmounts", JSON.stringify(amounts));
+    // Pass hours and vacation data
+    const hoursData: Record<string, number> = {};
+    const vacationData: Record<string, { enabled: boolean; rate: number; amount: number }> = {};
+    for (const emp of employees) {
+      hoursData[emp.id] = parseFloat(hours[emp.id] ?? "0") || 0;
+      if (vacationEnabled[emp.id]) {
+        const val = parseFloat(grossAmounts[emp.id] ?? "0") || 0;
+        const rate = parseFloat(vacationRate[emp.id] ?? "4") || 4;
+        vacationData[emp.id] = { enabled: true, rate: rate / 100, amount: val * rate / 100 };
+      }
+    }
+    formData.set("hours", JSON.stringify(hoursData));
+    formData.set("vacation", JSON.stringify(vacationData));
 
-    persistState(); // Save before navigating to preview
+    persistState();
     startTransition(async () => {
       try {
         const result = await previewAction(formData);

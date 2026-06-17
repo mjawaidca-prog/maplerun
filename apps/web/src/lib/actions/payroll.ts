@@ -78,6 +78,12 @@ export async function previewPayRun(formData: FormData): Promise<PayRunPreview> 
   // Parse gross amounts per employee (JSON: { [employeeId]: amount })
   const grossAmounts: Record<string, number> = JSON.parse(grossAmountsStr);
 
+  // Parse hours and vacation data from wizard
+  const hoursStr = formData.get("hours") as string;
+  const vacationStr = formData.get("vacation") as string;
+  const hoursData: Record<string, number> = hoursStr ? JSON.parse(hoursStr) : {};
+  const vacationData: Record<string, { enabled: boolean; rate: number; amount: number }> = vacationStr ? JSON.parse(vacationStr) : {};
+
   // Load active employees with YTD and TD1
   const employees = await prisma.employee.findMany({
     where: { companyId, active: true },
@@ -143,13 +149,22 @@ export async function previewPayRun(formData: FormData): Promise<PayRunPreview> 
       ytd,
     });
 
+    // Attach hours + vacation for finalize step
+    const empVacation = vacationData[emp.id];
+    (result as any)._hours = hoursData[emp.id] ?? 0;
+    (result as any)._vacationPay = empVacation?.amount ?? 0;
+    (result as any)._vacationRate = empVacation?.rate ?? 0;
+
     items.push({
       employeeId: emp.id,
       employeeName: `${emp.firstName} ${emp.lastName}`,
       gross,
       result,
       ytdBefore: ytd,
-    });
+      hours: hoursData[emp.id] ?? 0,
+      vacationPay: empVacation?.amount ?? 0,
+      vacationRate: empVacation?.rate ?? 0,
+    } as any);
 
     totals.gross += result.gross;
     totals.cpp += result.cpp;
@@ -256,6 +271,9 @@ export async function finalizePayRun(formData: FormData) {
         ytdInsurable: newYtd.insurableEarnings,
         ytdEi: newYtd.ei,
         warnings: item.result.warnings.join("; "),
+        hours: (item as any).hours ?? 0,
+        vacationPay: (item as any).vacationPay ?? 0,
+        vacationPayRate: (item as any).vacationRate ?? 0,
       },
     });
 
