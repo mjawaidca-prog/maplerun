@@ -80,6 +80,7 @@ export const SIDEBAR_NAV: Record<Plan, NavItem[]> = {
     { icon: "💵", label: "Run Payroll", href: "/payroll" },
     { icon: "📊", label: "Reports", href: "/reports" },
     { icon: "⚙️", label: "Company", href: "/company" },
+    { icon: "❓", label: "Help & FAQ", href: "/help" },
   ],
   growth: [
     { icon: "🏠", label: "Dashboard", href: "/app" },
@@ -94,6 +95,7 @@ export const SIDEBAR_NAV: Record<Plan, NavItem[]> = {
     { section: "Analytics" },
     { icon: "📊", label: "Reports", href: "/reports" },
     { icon: "⚙️", label: "Settings", href: "/company" },
+    { icon: "❓", label: "Help & FAQ", href: "/help" },
   ],
   accountant: [
     { icon: "🏠", label: "Dashboard", href: "/app" },
@@ -111,6 +113,7 @@ export const SIDEBAR_NAV: Record<Plan, NavItem[]> = {
     { icon: "📒", label: "GL / Accounting", href: "/reports/gl" },
     { icon: "⚙️", label: "Settings", href: "/company" },
     { icon: "🔍", label: "Audit Log", href: "/company/audit" },
+    { icon: "❓", label: "Help & FAQ", href: "/help" },
   ],
 };
 
