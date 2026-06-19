@@ -1,5 +1,4 @@
 {
-  "buildCommand": "npm run build --workspace=web",
-  "installCommand": "npm install",
-  "outputDirectory": "apps/web/.next"
+  "buildCommand": "npm install && npx prisma generate && next build",
+  "outputDirectory": ".next"
 }
