@@ -8,6 +8,7 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export type AuthenticatedUser = {
@@ -47,6 +48,26 @@ export async function requireCompany(): Promise<AuthenticatedUser> {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/sign-in");
+  }
+
+  // Check for active company cookie (set by company switcher)
+  const cookieStore = await cookies();
+  const switchedCompanyId = cookieStore.get("maplerun-active-company")?.value;
+
+  // If user switched companies, verify membership and use that
+  if (switchedCompanyId) {
+    const membership = await prisma.membership.findFirst({
+      where: { userId: session.user.id, companyId: switchedCompanyId },
+      select: { companyId: true },
+    });
+    if (membership) {
+      return {
+        id: session.user.id,
+        email: session.user.email ?? "",
+        name: session.user.name,
+        companyId: membership.companyId,
+      };
+    }
   }
 
   // If the JWT already has a companyId, use it

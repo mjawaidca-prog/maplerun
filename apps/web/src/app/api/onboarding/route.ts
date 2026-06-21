@@ -32,11 +32,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "This URL slug is already taken. Try another." }, { status: 409 });
   }
 
+  // Promo code: MAPLE2026 gives Accountant plan + unlimited free runs
+  const isPromo = slug.toUpperCase().includes("MAPLE2026") || name.toUpperCase().includes("MAPLE2026");
+
   const company = await prisma.company.create({
     data: {
       name,
       slug,
       active: true,
+      plan: isPromo ? "accountant" : "growth",
+      maxFreePayRuns: isPromo ? 999 : 2,
       memberships: {
         create: {
           userId: session.user.id,

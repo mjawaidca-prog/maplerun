@@ -5,6 +5,7 @@ import { requireCompany } from "@/lib/session";
 import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SIDEBAR_NAV, can, PLAN_META, REQUIRES as REQ_MAP, type NavItem, type Plan } from "@/lib/plan";
+import { CompanySwitcher } from "@/components/company-switcher";
 import Link from "next/link";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -13,11 +14,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const email = session?.user?.email ?? user.email;
   const initial = (user.name ?? email ?? "U")[0].toUpperCase();
 
-  // Get company plan
-  const company = await prisma.company.findUnique({
-    where: { id: user.companyId },
-    select: { plan: true },
-  });
+  // Get company plan + all user companies for switcher
+  const [company, allCompanies] = await Promise.all([
+    prisma.company.findUnique({ where: { id: user.companyId }, select: { plan: true } }),
+    prisma.company.findMany({
+      where: { memberships: { some: { userId: session?.user?.id } } },
+      select: { id: true, name: true },
+      orderBy: { createdAt: "asc" },
+    }),
+  ]);
   const plan: Plan = (company?.plan as Plan) ?? "growth";
   const meta = PLAN_META[plan];
   const nav = SIDEBAR_NAV[plan];
@@ -74,6 +79,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Link href="/onboarding" className="flex items-center gap-2.5 px-3 py-2.5 rounded-[9px] text-sm font-medium text-[#A8A29E] hover:bg-[#292524] hover:text-[#E7E5E4] transition-colors no-underline">
           <span className="text-base">＋</span> New company
         </Link>
+
+        {/* Company switcher (Accountant plan only) */}
+        {can(plan, "roe") ? (
+          <CompanySwitcher companies={allCompanies} activeId={user.companyId} />
+        ) : (
+          allCompanies.length > 1 && (
+            <div className="px-2">
+              <p className="text-[10px] font-bold tracking-[0.08em] uppercase text-[#57534E] mb-1.5">Companies</p>
+              <CompanySwitcher companies={allCompanies} activeId={user.companyId} />
+            </div>
+          )
+        )}
 
         {/* Footer */}
         <div className="border-t border-[#292524] pt-4 mt-auto space-y-3">
