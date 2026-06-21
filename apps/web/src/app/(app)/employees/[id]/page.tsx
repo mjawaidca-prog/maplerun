@@ -8,10 +8,11 @@ import { notFound } from "next/navigation";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string }> };
 
-export default async function EmployeeDetailPage({ params }: Props) {
+export default async function EmployeeDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { tab: activeTab } = await searchParams;
   const { companyId } = await requireCompany();
   const emp = await prisma.employee.findUnique({
     where: { id },
@@ -39,9 +40,17 @@ export default async function EmployeeDetailPage({ params }: Props) {
       </div>
 
       <div className="flex gap-6 border-b border-[#E7E5E4] mt-[22px] mb-6">
-        {["Overview","TD1 & tax","YTD ledger"].map(t=><span key={t} className={`text-sm font-semibold pb-3 border-b-2 -mb-[1px] ${t==="Overview"?"text-[#B3261E] border-[#B3261E]":"text-[#A8A29E] border-transparent"}`}>{t}</span>)}
+        {[
+          { key: "overview", label: "Overview" },
+          { key: "td1", label: "TD1 & tax" },
+          { key: "ytd", label: "YTD ledger" },
+        ].map(t=>(
+          <Link key={t.key} href={`/employees/${id}?tab=${t.key}`} className={`text-sm font-semibold pb-3 border-b-2 -mb-[1px] no-underline ${(activeTab??"overview")===t.key?"text-[#B3261E] border-[#B3261E]":"text-[#A8A29E] border-transparent hover:text-[#1C1917]"}`}>{t.label}</Link>
+        ))}
       </div>
 
+      {/* Overview tab */}
+      {(activeTab ?? "overview") === "overview" && (
       <div className="grid grid-cols-2 gap-5 items-start">
         <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="px-5 py-4 border-b border-[#F0EFED] flex justify-between items-center"><span className="text-[15px] font-bold">Personal</span></div>
@@ -83,6 +92,38 @@ export default async function EmployeeDetailPage({ params }: Props) {
           </div>
         )}
       </div>
+      )}
+
+      {/* TD1 tab */}
+      {activeTab === "td1" && (
+        <div className="col-span-2 bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="px-5 py-4 border-b border-[#F0EFED] flex justify-between items-center"><span className="text-[15px] font-bold">TD1 claim <small className="font-medium text-[#A8A29E] ml-1.5">federal & provincial</small></span></div>
+          <div className="grid grid-cols-2">
+            {[["Federal claim",td1?.federalClaim?fmtCAD(td1.federalClaim):`$${16452} (default BPA)`],["Provincial claim",td1?.provincialClaim?fmtCAD(td1.provincialClaim):"Default BPA"],["Additional tax/period",td1?.extraTaxPerPeriod?fmtCAD(td1.extraTaxPerPeriod):"$0.00"],["CPP/EI exempt",`${td1?.cppExempt?"Yes":"No"} · ${td1?.eiExempt?"Yes":"No"}`]].map(([k,v])=>(
+              <div key={k as string} className="bg-white p-3.5 px-5"><p className="text-[11px] text-[#A8A29E] uppercase tracking-[0.05em]">{k as string}</p><p className="text-[15px] font-bold mt-1.5 font-mono tabular-nums">{v as string}</p></div>
+            ))}
+          </div>
+          <div className="px-5 py-3 bg-[#EFF6FF] border-t border-[#BFDBFE] text-xs text-[#1E40AF]">ℹ️ To change TD1 values, edit the employee or update the TD1 profile directly from the employee list.</div>
+        </div>
+      )}
+
+      {/* YTD tab */}
+      {activeTab === "ytd" && ytd && (
+        <div className="col-span-2 bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="px-5 py-4 border-b border-[#F0EFED] flex justify-between items-center"><span className="text-[15px] font-bold">2026 YTD ledger</span></div>
+          <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-2.5 px-5 py-[11px] bg-[#FAFAF9] border-b border-[#E7E5E4] text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.04em]">
+            <div>Box</div><div className="text-right">YTD</div><div className="text-right">This period</div><div className="text-right">Remaining room</div>
+          </div>
+          {[["Pensionable (CPP)",ytd.pensionableEarnings,0,(74600-ytd.pensionableEarnings)],["Insurable (EI)",ytd.insurableEarnings,0,(68900-ytd.insurableEarnings)],["CPP withheld",ytd.cpp,0,(4230.45-ytd.cpp)],["EI withheld",ytd.ei,0,(1123.07-ytd.ei)]].map(([label,ytdVal,,room])=>(
+            <div key={label as string} className="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-2.5 px-5 py-3 text-[13px] border-b border-[#F0EFED] last:border-b-0 items-center">
+              <div>{label as string}</div><div className="text-right font-mono tabular-nums">{fmtCAD(ytdVal as number)}</div><div className="text-right font-mono tabular-nums">—</div><div className="text-right font-mono tabular-nums">{fmtCAD(room as number)}</div>
+            </div>
+          ))}
+          <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-2.5 px-5 py-3 text-[13px] font-bold bg-[#1C1917] text-white items-center">
+            <div>Income tax withheld</div><div className="text-right font-mono tabular-nums">—</div><div className="text-right font-mono tabular-nums">—</div><div className="text-right font-mono tabular-nums">—</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
