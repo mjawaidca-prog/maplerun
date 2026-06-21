@@ -64,7 +64,8 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
               <Text>🍁</Text>
               <Text style={styles.headerName}>{data.companyName}</Text>
             </View>
-            <Text style={{ fontSize: 11, opacity: 0.85, marginTop: 4 }}>{data.companyName}</Text>
+            <Text style={{ fontSize: 14, fontFamily: "Helvetica-Bold", opacity: 1, marginTop: 6, color: "#FFF" }}>{data.companyName}</Text>
+            <Text style={{ fontSize: 10, opacity: 0.7, marginTop: 2 }}>Employer payroll statement</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.headerLabel}>PAY STUB</Text>

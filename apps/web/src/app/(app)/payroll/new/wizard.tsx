@@ -154,6 +154,16 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
       setError("Enter gross pay for at least one employee.");
       return;
     }
+    // Block $0 gross — all employees with amounts must have positive gross
+    const zeroEmployees = Object.entries(amounts).filter(([, v]) => v <= 0).map(([id]) => employees.find(e => e.id === id)?.name ?? id);
+    if (zeroEmployees.length > 0 && Object.values(amounts).every(v => v <= 0)) {
+      setError("At least one employee must have gross pay above $0.00. Zero-dollar pay runs are not supported.");
+      return;
+    }
+    if (zeroEmployees.length > 0) {
+      setError(`${zeroEmployees[0]} has $0.00 gross pay. Remove them or enter a positive amount.`);
+      return;
+    }
 
     const formData = new FormData();
     formData.set("payGroupId", payGroupId);
@@ -420,6 +430,11 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
       {/* ── Step 2: Preview ─────────────────────────────────────────────── */}
       {step === "preview" && preview && (
         <div className="space-y-6">
+          {/* Finalize warning */}
+          <div className="flex gap-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-[10px] px-4 py-3 text-[13px] text-[#92400E]">
+            <span className="text-base">⚠️</span>
+            <span><b>Important:</b> Finalizing makes this pay run <b>permanent and read-only</b>. You won't be able to edit it after this step. Verify all amounts below before continuing.</span>
+          </div>
           {/* Totals card */}
           <Card className="border-border/60">
             <CardHeader>
