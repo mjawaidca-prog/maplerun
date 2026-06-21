@@ -5,6 +5,7 @@ import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { PLAN_META, type Plan } from "@/lib/plan";
 import { UpgradePlanButton } from "@/components/upgrade-plan-button";
+import { PlanSwitcher } from "@/components/plan-switcher";
 import Link from "next/link";
 
 type SearchParams = Promise<{ tab?: string }>;
@@ -73,15 +74,8 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
 
           <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="px-[22px] py-[18px] border-b border-[#F0EFED]"><span className="text-base font-bold">Plan</span></div>
-            <div className="p-[22px] space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full" style={{ background: meta.dot }} />
-                <span className="text-lg font-bold">{plan.charAt(0).toUpperCase() + plan.slice(1)}</span>
-                <span className="text-sm text-[#78716C]">{meta.price}/mo base</span>
-              </div>
-              <p className="text-[13px] text-muted-foreground leading-relaxed">
-                Your current plan determines which features are available. Upgrade anytime from the Billing tab.
-              </p>
+            <div className="p-[22px]">
+              <PlanSwitcher currentPlan={plan} companyId={company.id} />
             </div>
           </div>
         </div>
