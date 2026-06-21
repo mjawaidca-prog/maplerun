@@ -141,6 +141,11 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
       return;
     }
 
+    if (employees.length === 0) {
+      setError("No active employees found. Add at least one employee before running payroll.");
+      return;
+    }
+
     // Build gross amounts JSON
     const amounts: Record<string, number> = {};
     for (const emp of employees) {
@@ -251,7 +256,9 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                   <Label>Pay group</Label>
                   <Select value={payGroupId} onValueChange={(v) => setPayGroupId(v ?? "")}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select pay group…" />
+                      <SelectValue placeholder="Select pay group…">
+                        {payGroups.find(pg => pg.id === payGroupId)?.name ?? "Select pay group…"}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {payGroups.length === 0 ? (

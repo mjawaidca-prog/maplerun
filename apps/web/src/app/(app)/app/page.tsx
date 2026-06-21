@@ -87,7 +87,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       {plan === "growth" && (
         <>
           <div className="grid grid-cols-4 gap-4">
-            <Stat label="Active employees" value={String(employeeCount)} foot="All in {province}" />
+            <Stat label="Active employees" value={String(employeeCount)} foot="All active" />
             <Stat label="Pay groups" value={String(payGroupCount)} foot="Configured" />
             <Stat label="Next pay run" value="—" foot="Schedule now" />
             <Stat label="YTD payroll" value={fmtCAD(ytdGross)} foot="Gross, 2026" />
