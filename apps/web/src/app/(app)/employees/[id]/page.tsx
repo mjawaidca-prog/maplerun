@@ -34,7 +34,7 @@ export default async function EmployeeDetailPage({ params, searchParams }: Props
           </p>
         </div>
         <div className="flex gap-2.5">
-          <Link href={`/payroll/${emp.id}/stub`} className="rounded-[10px] border border-[#D6D3D1] bg-white px-4 py-2.5 text-sm font-semibold no-underline text-[#1C1917]">View latest stub</Link>
+          <Link href="/payroll" className="rounded-[10px] border border-[#D6D3D1] bg-white px-4 py-2.5 text-sm font-semibold no-underline text-[#1C1917]">View pay history</Link>
           <Link href={`/employees/${emp.id}/edit`} className="rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-white px-[18px] py-2.5 text-sm font-semibold no-underline">Edit</Link>
         </div>
       </div>
@@ -69,7 +69,7 @@ export default async function EmployeeDetailPage({ params, searchParams }: Props
         <div className="col-span-2 bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="px-5 py-4 border-b border-[#F0EFED] flex justify-between items-center"><span className="text-[15px] font-bold">TD1 claim <small className="font-medium text-[#A8A29E] ml-1.5">federal & provincial</small></span></div>
           <div className="grid grid-cols-2">
-            {[["Federal claim",td1?.federalClaim?fmtCAD(td1.federalClaim):"$16,129 (default)"],["Provincial claim",td1?.provincialClaim?fmtCAD(td1.provincialClaim):"Default BPA"],["Additional tax/period",td1?.extraTaxPerPeriod?fmtCAD(td1.extraTaxPerPeriod):"$0.00"],["CPP/EI exempt",`${td1?.cppExempt?"Yes":"No"} · ${td1?.eiExempt?"Yes":"No"}`]].map(([k,v])=>(
+            {[["Federal claim",td1?.federalClaim?fmtCAD(td1.federalClaim):"$16,452 (default BPA)"],["Provincial claim",td1?.provincialClaim?fmtCAD(td1.provincialClaim):"Default BPA"],["Additional tax/period",td1?.extraTaxPerPeriod?fmtCAD(td1.extraTaxPerPeriod):"$0.00"],["CPP/EI exempt",`${td1?.cppExempt?"Yes":"No"} · ${td1?.eiExempt?"Yes":"No"}`]].map(([k,v])=>(
               <div key={k} className="bg-white p-3.5 px-5"><p className="text-[11px] text-[#A8A29E] uppercase tracking-[0.05em]">{k}</p><p className="text-[15px] font-bold mt-1.5 font-mono tabular-nums">{v}</p></div>
             ))}
           </div>
