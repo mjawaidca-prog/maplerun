@@ -190,7 +190,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             </div>
           </div>
 
-          {/* Action-required alert */}
+          {/* Action-required alert — only if payroll data exists */}
+          {ytdGross > 0 && (
           <div className="flex gap-3.5 bg-[#FFF7ED] border border-[#FED7AA] rounded-xl px-5 py-4">
             <AlertTriangle className="h-5 w-5 text-[#C2410C] mt-0.5 flex-shrink-0" />
             <div className="space-y-2 w-full">
@@ -202,6 +203,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               </div>
             </div>
           </div>
+          )}
 
           <div className="grid grid-cols-3 gap-5">
             <div>

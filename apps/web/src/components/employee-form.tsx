@@ -21,6 +21,8 @@ export function EmployeeForm({ payGroups }: Props) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedPayGroup, setSelectedPayGroup] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -59,6 +61,8 @@ export function EmployeeForm({ payGroups }: Props) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
+        <input type="hidden" name="province" value={selectedProvince} />
+        <input type="hidden" name="payGroupId" value={selectedPayGroup} />
         <Card className="border-border/60">
           <CardHeader>
             <CardTitle className="text-lg">Personal information</CardTitle>
@@ -115,7 +119,7 @@ export function EmployeeForm({ payGroups }: Props) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="province">Province</Label>
-                <Select name="province">
+                <Select value={selectedProvince} onValueChange={(v) => setSelectedProvince(v ?? "")}>
                   <SelectTrigger id="province">
                     <SelectValue placeholder="Select…" />
                   </SelectTrigger>
@@ -144,7 +148,7 @@ export function EmployeeForm({ payGroups }: Props) {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="payGroupId">Pay group</Label>
-              <Select name="payGroupId">
+              <Select value={selectedPayGroup} onValueChange={(v) => setSelectedPayGroup(v ?? "")}>
                 <SelectTrigger id="payGroupId">
                   <SelectValue placeholder="Select a pay group…" />
                 </SelectTrigger>

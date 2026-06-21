@@ -78,8 +78,8 @@ export async function createEmployee(formData: FormData) {
     },
   });
 
-  revalidatePath("/app/employees");
-  redirect("/app/employees");
+  revalidatePath("/employees");
+  redirect("/employees");
 }
 
 export async function updateEmployee(formData: FormData) {
@@ -133,8 +133,8 @@ export async function updateEmployee(formData: FormData) {
     data: updateData,
   });
 
-  revalidatePath("/app/employees");
-  redirect("/app/employees");
+  revalidatePath("/employees");
+  redirect("/employees");
 }
 
 export async function terminateEmployee(formData: FormData) {

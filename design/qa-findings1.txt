@@ -1,0 +1,184 @@
+MapleRun Payroll Software — Detailed QA Report
+Date Tested: June 20, 2026 | Company Tested: A Jays Accounting | Tester: Claude
+
+Executive Summary
+MapleRun is a well-structured Canadian payroll application. The core payroll mathematics are accurate and CRA-compliant. However, several bugs ranging from critical data inconsistencies to minor UI issues were found that should be addressed before launch.
+
+✅ WHAT WORKS WELL
+1. Core Payroll Math — ACCURATE
+Both finalized pay runs were mathematically verified:
+Pay RunGrossDeductionsNet PayCheckRun 1$3,000.00$726.25$2,273.75✅Run 2$2,700.00$614.78$2,085.22✅
+2. CRA Remittance Totals — ACCURATE
+
+Total CPP: $646.26 (Employee $323.13 + Employer $323.13) ✅
+Total EI: $222.98 (Employee $92.91 + Employer $130.07) ✅
+Total Income Tax: $924.99 (Federal $622.59 + Provincial $302.40) ✅
+Grand Total to CRA: $1,794.23 = $646.26 + $222.98 + $924.99 ✅
+
+3. GL Journal Entries — ACCURATE & BALANCED
+Both journal entries were fully verified — debits equal credits for each run, and when summed, all lines reconcile perfectly with the remittance report.
+Run 1 (Gross $3000)Run 2 (Gross $2700)SumCPP Payable$340.98$305.28$646.26 ✅EI Payable$117.36$105.62$222.98 ✅Tax Payable$506.86$418.13$924.99 ✅Net Pay$2,273.75$2,085.22$4,358.97 ✅
+4. Dashboard Summary Totals — ACCURATE
+
+YTD Payroll: $5,700.00 = $3,000 + $2,700 ✅
+YTD Net Deposited: $4,358.97 = $2,273.75 + $2,085.22 ✅
+Employer Cost YTD: $453.20 = $238.95 + $214.25 ✅
+
+5. 2026 Statutory Tax Rates — CORRECT
+Rates match CRA T4127 123rd edition (July 2026):
+
+CPP: 5.95%, max pensionable $74,600 ✅
+CPP2: 4.00%, ceiling $85,000 ✅
+EI employee: 1.63%, max insurable $68,900 ✅
+EI employer multiplier: 1.4× ✅
+Federal BPA: $16,452 ✅
+
+6. Date Entry — FUNCTIONAL
+Date pickers on New Pay Run, Timesheets, and Remittances work correctly. Dates accept and validate input properly.
+
+🔴 CRITICAL BUGS
+BUG #1 — Payroll Summary Shows No Data Despite 2 Finalized Runs
+Location: Reports → Payroll Summary
+Observed: "No payroll data yet — Finalize pay runs to see the summary here"
+Expected: Should display aggregated wages, deductions, and employer costs from the 2 finalized runs.
+Impact: A core reporting feature is broken and unusable.
+BUG #2 — "By Employee" Tab in Remittances Shows Wrong Data
+Location: Remittances → By Employee tab
+Observed: Message says "No pay runs finalized for this period" and the table shows 0 employees with $0.00 in all columns, yet the footer Total CRA column shows $1,794.23 — a contradiction.
+Impact: Data inconsistency destroys user trust; the two values directly contradict each other in the same UI.
+BUG #3 — Active Employees Shows "0" Despite Finalized Pay Runs
+Location: Dashboard, Employees page, and Payroll Run detail pages
+Observed: Dashboard shows "0 Active Employees" and Employees page says "No employees yet." However, 2 finalized pay runs each show "1 employee" in the payroll list. The payroll detail view shows "0 employees" and an empty employee table.
+Impact: Critical data loss/integrity issue — either the employees were deleted after pay runs were finalized, or there's a referential integrity bug where employee records are not properly linked to historical pay runs.
+
+🟠 MODERATE BUGS
+BUG #4 — Pay Group Dropdown Displays Internal Database ID After Selection
+Location: New Pay Run → Pay Group combobox
+Observed: When the dropdown opens, it shows the human-readable label "Default (biweekly, AB)". After clicking to select it, the field displays the raw database ID: cmq9uee8r0002k4fw0ab76745 instead of the label.
+Impact: Confusing and unprofessional; users cannot confirm their selection.
+BUG #5 — PD7A Amount Inconsistency Between Reports Page and Remittance Page
+Location: Reports hub card vs. Remittances page
+Observed: The Reports page shows PD7A remittance as $869.24 (YTD 2026), while the Remittances page consistently shows $1,794.23 for the same period.
+Impact: Two screens show different totals for the same figure with no explanation — a user would not know which to trust.
+BUG #6 — Audit Log is Empty Despite Activity
+Location: Company → Audit Log
+Observed: Shows "Audit trail will be populated as you use MapleRun" with no entries, even though 2 pay runs have been finalized, which should generate audit events.
+Impact: Audit trail is a compliance feature; if it doesn't log pay run finalizations, it cannot be relied upon.
+
+🟡 MINOR BUGS & UX ISSUES
+BUG #7 — Unresolved Template Variable {province} on Dashboard
+Location: AJays Accounting company → Dashboard
+Observed: Active Employees card subtitle reads "All in {province}" — a raw template placeholder that was never replaced with the actual province value.
+Impact: Unprofessional; will be visible to all users of companies where the province variable is not populated.
+BUG #8 — Direct Deposit Navigation Link Points to Wrong Page
+Location: Sidebar navigation → "Direct Deposit"
+Observed: The "Direct Deposit" link has href="/payroll" — the same destination as "Run Payroll" and "Pay Statements." Navigating to it just loads the payroll history page.
+Impact: Direct Deposit is listed as a feature but is either not implemented or has a broken route.
+BUG #9 — Duplicate "YTD Net Deposited" Widget on Dashboard
+Location: Dashboard
+Observed: The "YTD Net Deposited — $4,358.97" widget appears twice on the same dashboard — once in the top row and once in the bottom row.
+Impact: Clutters the UI and suggests a copy-paste error in layout code. The bottom row likely should have shown a different metric (e.g., YTD Employee Deductions).
+BUG #10 — Two Duplicate "northwind" Companies in Account List
+Location: Sidebar company switcher
+Observed: Two entries both named "northwind" appear in the company list.
+Impact: Could cause user confusion about which company they are operating in; data may have been duplicated.
+BUG #11 — No Validation Error When Calculating Deductions With No Employees
+Location: New Pay Run → Calculate Deductions button
+Observed: Clicking "Calculate deductions" when there are no active employees silently does nothing (just scrolls the page slightly). No error toast, alert, or message is shown.
+Impact: Poor UX — users are left wondering why nothing happened. A clear message like "Add at least one active employee to run payroll" should appear.
+
+Summary Table
+#BugSeverityModule1Payroll Summary shows no data🔴 CriticalReports2"By Employee" shows $0 but footer shows $1,794.23🔴 CriticalRemittances3Employees show 0 despite finalized pay runs🔴 CriticalEmployees/Payroll4Pay Group shows DB ID after selection🟠 ModerateNew Pay Run5PD7A amount mismatch ($869.24 vs $1,794.23)🟠 ModerateReports6Audit Log empty despite pay run activity🟠 ModerateAudit Log7{province} unresolved template variable🟡 MinorDashboard8Direct Deposit nav links to wrong page🟡 MinorNavigation9Duplicate YTD Net Deposited widget🟡 MinorDashboard10Two "northwind" duplicate companies🟡 MinorCompany Switcher11No error shown when calculating with no employees🟡 MinorNew Pay Run
+
+Recommendations
+Before Launch (Critical): Fix bugs #1, #2, and #3 — these involve real financial data either missing or contradicting itself, which are unacceptable in a payroll compliance product.
+Before Beta (Moderate): Fix bugs #4, #5, and #6. The pay group ID display and audit log are visible to all users; the PD7A mismatch could cause compliance confusion.
+Polish (Minor): Bugs #7–11 should be resolved for a clean production release but don't block core functionality.
+The underlying payroll engine — tax calculations, GL journal generation, and CRA rate tables — appears solid and accurate. The issues are primarily in data display, cross-page consistency, and missing features rather than in the calculation engine itself.can you check the above issue again also check  how it handles the TD1 info and in the accountant plan switching between companies92 steps92 stepsMapleRun — Full Re-Check & Extended QA Report
+Date: June 20, 2026 | Tester: Claude | Focus: All prior bugs re-verified + TD1 handling + Company switching
+
+🔴 CRITICAL BUGS — ALL CONFIRMED STILL PRESENT + NEW ONES FOUND
+
+BUG #1 — Payroll Summary Shows No Data ✅ CONFIRMED
+Status: Still broken. Navigating to Reports → Payroll Summary for "A Jays Accounting" (which has 2 finalized pay runs) still shows "No payroll data yet — Finalize pay runs to see the summary here." The report is completely non-functional.
+
+BUG #2 — "By Employee" Remittance Tab Shows $0 But Footer Shows $1,794.23 ✅ CONFIRMED
+Status: Still present. The By Employee tab shows "No pay runs finalized for this period" with all $0.00 values across the table, yet the totals footer row still shows $1,794.23 in the Total CRA column. This is a direct contradiction on the same screen.
+
+BUG #3 — Employees Show 0 Despite Finalized Pay Runs ✅ CONFIRMED
+Status: Confirmed as a data integrity issue. The existing pay runs were processed for 1 employee but that employee record no longer exists in the system. After we created a new test employee (Jane Smith), Active Employees correctly updated to "1" — which confirms the prior employee's record was deleted or orphaned, but their historical payroll data remains. This is a referential integrity issue.
+
+🆕 BUG #12 — Employee Creation Redirects to 404 Page (CRITICAL)
+Location: Add Employee → Create employee button
+Observed: After successfully filling out the form and clicking "Create employee", the app redirects to /app/employees which returns a 404 "This page could not be found" error. The base URL prefix is wrong — it should redirect to /employees (which works), not /app/employees.
+Note: The employee IS created successfully in the background (Jane Smith appeared when navigating manually to /employees), but the user sees a 404 error and has no indication of success. This is a jarring, broken UX flow for a core user journey.
+
+🆕 BUG #13 — Employee Edit Page Returns 404 (CRITICAL)
+Location: Employee detail → Edit button
+Observed: Clicking "Edit" on an employee's profile navigates to /employees/{id}/edit which returns 404 "This page could not be found". Employees cannot be edited at all — their personal details, TD1, pay group, province, and all other settings cannot be modified after creation. This is a showstopper for any real-world use.
+
+🟠 MODERATE BUGS — ALL CONFIRMED + NEW ONES
+
+BUG #4 — Pay Group Dropdown Shows Raw Database ID After Selection ✅ CONFIRMED
+Status: Fully confirmed in two separate tests. The dropdown opens showing "Default (biweekly, AB)" but after selecting it, the combobox field displays the internal database ID cmq9uee8r0002k4fw0ab76745. This happens both on New Pay Run and on Add Employee pages. It's a consistent component-level bug.
+
+BUG #5 — PD7A Amount Mismatch ($869.24 vs $1,794.23) ✅ CONFIRMED
+Status: The Reports hub card shows PD7A as $869.24 while Remittances page consistently shows $1,794.23. No explanation is given for the discrepancy.
+
+BUG #6 — Audit Log Is Empty Despite Activity ✅ CONFIRMED
+Status: The Audit Log shows no entries even after 2 pay run finalizations and the creation of a new employee during this test session. Either events are not being logged or the log display is broken.
+
+🆕 BUG #14 — Employee Tab Navigation Non-Functional (TD1 & YTD Tabs)
+Location: Employee detail page → "TD1 & tax" and "YTD ledger" tabs
+Observed: The three tabs on the employee page ("Overview", "TD1 & tax", "YTD ledger") appear as visual tabs but are non-functional generic elements with no href. Clicking "TD1 & tax" or "YTD ledger" does nothing — the page stays on Overview. There is no way for a user to navigate to the TD1 or YTD sections through the UI. Combined with Bug #13 (Edit page 404), the TD1 information is completely read-only and inaccessible for editing.
+
+🆕 BUG #15 — TD1 Federal Claim Amount Mismatch ($16,129 vs $16,452)
+Location: Employee detail → TD1 claim section
+Observed: The auto-generated TD1 profile shows a Federal Claim of $16,129 (default), but the Company Settings → Payroll tab shows the 2026 Federal Basic Personal Amount as $16,452. These should match since a default TD1 uses the BPA. The $323 discrepancy means income tax will be over-withheld by approximately ($323 × 2026 federal marginal rate) per period for each employee.
+Tax Impact: The federal income tax withholding will be slightly higher than it should be, meaning employees receive less take-home pay than legally required under the default TD1.
+
+🆕 BUG #16 — Employee Province and Pay Group Not Saved After Creation
+Location: Employee list and Employee detail → Pay settings
+Observed: During creation, "Default (biweekly, AB)" was selected as the Pay Group. After creation, the employee's Province shows "—" and Pay Group shows "—" in both the employee list and the detail page's Pay settings panel. The pay group selection from the creation form was not persisted. This means the employee has no pay group assigned and cannot be included in a payroll run.
+
+🆕 BUG #17 — "1 Action Required / T4 Filing Deadline" Shown on Companies With Zero Payroll
+Location: Dashboard for companies with no pay runs (e.g., MAPLE2026)
+Observed: The alert "1 action required — T4 filing deadline · Feb 28, 2027" appears on company dashboards that have $0.00 YTD Payroll and no employees. T4s are only required when remuneration was paid — if a company has run zero payroll, this alert is factually incorrect and could cause confusion.
+
+🆕 BUG #18 — Start Date Auto-Set to Tomorrow (2026-06-21) Instead of Today
+Location: Employee detail → Pay settings → Start date
+Observed: Jane Smith was created on 2026-06-20 (today), but her Start Date was auto-set to 2026-06-21 (tomorrow). The hire/start date should default to the current date, not the next day.
+
+🟡 MINOR BUGS — ALL CONFIRMED
+BUG #7 — {province} Unresolved Template Variable ✅ CONFIRMED
+Still present on AJays Accounting dashboard: "Active Employees — All in {province}".
+BUG #8 — Direct Deposit Link Points to /payroll ✅ CONFIRMED
+Still confirmed via read_page: href="/payroll" on the Direct Deposit nav item.
+BUG #9 — Duplicate "YTD Net Deposited" Widget on Dashboard ✅ CONFIRMED
+The widget appears in both the first row (correct position) and second row (should be a different metric) for companies with payroll data.
+BUG #10 — Two Duplicate "northwind" Companies in Account List ✅ CONFIRMED
+Both entries remain in the sidebar company switcher.
+BUG #11 — No Validation Error When Calculating With No Employees ✅ CONFIRMED
+Button click produces no feedback.
+
+🔵 COMPANY SWITCHING — DETAILED FINDINGS (NEW SECTION)
+This is an important area for an Accountant plan product where switching between client companies is a core workflow.
+What Works: The company data does load correctly when you click a company in the sidebar. The main content area (dashboard heading, statistics, pay runs) all update to the selected company's data. ✓
+Bug #19 — Sidebar Highlight Does Not Update on Company Switch (Moderate)
+When you click a different company in the sidebar, the red highlight (active indicator) on the sidebar does NOT update to the newly selected company. It remains on whichever company was last fully page-loaded, not the one that was just clicked. For an accountant managing 9+ companies, this creates a dangerous situation where they cannot tell at a glance which company's data they're viewing. The only reliable way to know is to look at the heading text in the main content area.
+Bug #20 — Rapid Clicking Causes Incorrect Company to Load (Moderate)
+When clicking multiple companies quickly, the sidebar and content area can get out of sync. For example, the content may load Company A's data while the sidebar shows Company B's highlight. This was directly observed during testing.
+Observations Across Companies:
+CompanyDashboard Layout{province} BugDuplicate YTD WidgetA Jays Accounting8-widget layout✅ No✅ YesAJays Accounting7-widget layout🔴 YES✅ NoABC7-widget layout✅ No✅ NoMAPLE20268-widget layout✅ No✅ Yes
+Inconsistent dashboard layouts between companies suggest the layout is conditional on data presence but has different bugs per configuration.
+
+TD1 HANDLING — FULL ASSESSMENT
+TD1 AspectStatusNotesAuto-creation on employee setup✅ WorksTD1 profile created automaticallyFederal BPA value🔴 WRONGShows $16,129 vs correct $16,452 (−$323)Provincial BPA⚠️ IncompleteShows "Default BPA" text with no dollar valueCPP/EI Exempt flags✅ WorksDefaults to No/No correctlyAdditional tax per period✅ WorksDefaults to $0.00 correctlyTD1 tab on employee page🔴 BROKENTab click does nothing (Bug #14)TD1 editing🔴 BROKENEdit page returns 404 (Bug #13)TD1 values used in tax calc⚠️ UNTESTABLECannot run payroll without pay group (Bug #16)
+Summary: TD1 is auto-generated but the default Federal BPA is incorrect, the provincial BPA displays no dollar amount, and — most critically — there is no way to edit the TD1 after an employee is created because both the Edit page and the TD1 tab are broken (404 and non-functional respectively). This means customized TD1 inputs (e.g., spouse amount, disability amount, multiple employers) cannot be entered at all.
+
+Updated Bug Summary Table
+#BugSeverityStatus1Payroll Summary shows no data🔴 CriticalCONFIRMED2By Employee tab — $0 vs $1,794.23 contradiction🔴 CriticalCONFIRMED30 employees despite finalized pay runs🔴 CriticalCONFIRMED12Employee creation → 404 redirect🔴 CriticalNEW13Employee Edit page → 404🔴 CriticalNEW4Pay Group shows DB ID after selection🟠 ModerateCONFIRMED5PD7A amount mismatch ($869 vs $1,794)🟠 ModerateCONFIRMED6Audit Log empty despite activity🟠 ModerateCONFIRMED14TD1 & YTD tabs non-functional🟠 ModerateNEW15Federal TD1 claim wrong ($16,129 vs $16,452)🟠 ModerateNEW16Pay Group not saved on employee create🟠 ModerateNEW17T4 deadline alert on $0 companies🟠 ModerateNEW19Sidebar highlight doesn't update on switch🟠 ModerateNEW20Rapid clicking causes company data mismatch🟠 ModerateNEW7{province} unresolved template variable🟡 MinorCONFIRMED8Direct Deposit nav links to wrong page🟡 MinorCONFIRMED9Duplicate YTD Net Deposited widget🟡 MinorCONFIRMED10Two duplicate "northwind" companies🟡 MinorCONFIRMED11No validation error with no employees🟡 MinorCONFIRMED18Employee start date defaults to tomorrow🟡 MinorNEW
+
+Priority Recommendation
+Stop-ship issues (fix before any user can access): Bugs 12, 13, and 16 together mean the entire employee management workflow is broken — employees cannot be properly created, their pay group is not saved, and they cannot be edited. Without a working employee lifecycle, no payroll can run for new data.
+Fix next (compliance risk): Bug 15 (wrong TD1 federal BPA) causes incorrect tax withholding, which is a CRA compliance issue. Bug 2 (contradictory remittance data) would cause confusion in an actual accountant workflow.
