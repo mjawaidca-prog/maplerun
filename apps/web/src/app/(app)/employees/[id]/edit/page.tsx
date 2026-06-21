@@ -4,6 +4,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { updateEmployee } from "@/lib/actions/employee";
+import { decrypt } from "@/lib/encryption";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,12 @@ export default async function EditEmployeePage({ params }: Props) {
   });
 
   const td1 = employee.td1Profiles[0];
+
+  // Decrypt bank details
+  let bankInfo = { transit: "", institution: "", account: "" };
+  if (employee.bankEncrypted) {
+    try { bankInfo = JSON.parse(decrypt(employee.bankEncrypted)); } catch {}
+  }
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -102,6 +109,27 @@ export default async function EditEmployeePage({ params }: Props) {
                 <Input id="postalCode" name="postalCode" defaultValue={employee.postalCode ?? ""} />
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60">
+          <CardHeader><CardTitle className="text-lg">Bank details (Direct Deposit)</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="bankTransit">Transit # (5 digits)</Label>
+                <Input id="bankTransit" name="bankTransit" defaultValue={bankInfo.transit} maxLength={5} pattern="\d{5}" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bankInstitution">Institution # (3 digits)</Label>
+                <Input id="bankInstitution" name="bankInstitution" defaultValue={bankInfo.institution} maxLength={3} pattern="\d{3}" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bankAccount">Account #</Label>
+                <Input id="bankAccount" name="bankAccount" defaultValue={bankInfo.account} maxLength={12} />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">Encrypted at rest. Used for CPA-005 direct deposit files.</p>
           </CardContent>
         </Card>
 
