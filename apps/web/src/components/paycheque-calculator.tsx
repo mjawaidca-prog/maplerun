@@ -52,8 +52,13 @@ export default function PaychequeCalculator() {
     setError(null);
     setResult(null);
 
-    if (!province || !frequency || !grossIncome) {
-      setError("Please fill in province, pay frequency, and gross income.");
+    // Validate fields
+    const missing: string[] = [];
+    if (!province) missing.push("province");
+    if (!frequency) missing.push("pay frequency");
+    if (!grossIncome) missing.push("gross income");
+    if (missing.length > 0) {
+      setError(`Please select: ${missing.join(", ")}.`);
       return;
     }
 
@@ -77,14 +82,22 @@ export default function PaychequeCalculator() {
         ytd: ZERO_YTD,
       });
 
+      // Check if annual caps would be hit (no YTD provided)
+      const P = PERIODS_PER_YEAR[frequency as PayFrequency];
+      const annualCPP = payResult.cpp * P;
+      const annualEI = payResult.ei * P;
+      const cppMax = 4034.10; // 2026 CPP1 max
+      const eiMax = 1123.07; // 2026 EI max
+      if (annualCPP > cppMax || annualEI > eiMax) {
+        payResult.warnings.push(
+          `CPP/EI annual caps not applied (no YTD). At this rate, annual CPP ≈ $${annualCPP.toFixed(0)} (max $${cppMax.toFixed(0)}) and EI ≈ $${annualEI.toFixed(0)} (max $${eiMax.toFixed(0)}). Mid-year caps would reduce actual deductions.`
+        );
+      }
+
       setResult(payResult);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "An unexpected error occurred.";
-      if (msg.includes("Quebec")) {
-        setError("Quebec provincial income tax is coming in Phase 2. Try another province for now — the calculator works for all other provinces and territories.");
-      } else {
-        setError(msg);
-      }
+      setError(msg);
     } finally {
       setCalculating(false);
     }
@@ -248,6 +261,11 @@ export default function PaychequeCalculator() {
                   ? `Annual taxable ~ ${fmtCAD(result.annualTaxableIncome)}`
                   : ""}
               </p>
+              {result.annualTaxableIncome > 0 && (
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Annual taxable = gross × periods minus CPP/EI deduction (CRA T4127 formula)
+                </p>
+              )}
             </div>
 
             {/* Employee deductions */}
@@ -259,6 +277,7 @@ export default function PaychequeCalculator() {
                 <DeductionRow label="CPP / QPP" amount={result.cpp} />
                 <DeductionRow label="CPP2 (enhancement)" amount={result.cpp2} />
                 <DeductionRow label="EI premiums" amount={result.ei} />
+                {province === "QC" && <DeductionRow label="QPIP (Quebec)" amount={result.totalDeductions - result.cpp - result.cpp2 - result.ei - result.federalTax - result.provincialTax} />}
                 <Separator />
                 <DeductionRow label="Federal income tax" amount={result.federalTax} />
                 <DeductionRow label="Provincial income tax" amount={result.provincialTax} />
