@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createEmployee } from "@/lib/actions/employee";
+import { CANADIAN_BANKS } from "@/lib/canadian-banks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -181,14 +182,27 @@ export function EmployeeForm({ payGroups }: Props) {
             <CardDescription>For CPA-005 EFT files. Encrypted at rest.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Bank</Label>
+              <select
+                className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white"
+                value={CANADIAN_BANKS.find(b=>b.institution===bankInstitution)?.name ?? "Select bank..."}
+                onChange={(e) => {
+                  const bank = CANADIAN_BANKS.find(b=>b.name===e.target.value);
+                  if (bank) setBankInstitution(bank.institution);
+                }}
+              >
+                {CANADIAN_BANKS.map(b=><option key={b.name} value={b.name}>{b.name}</option>)}
+              </select>
+            </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Transit # (5 digits)</Label>
                 <Input maxLength={5} placeholder="12345" value={bankTransit} onChange={(e) => setBankTransit(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>Institution # (3 digits)</Label>
-                <Input maxLength={3} placeholder="001" value={bankInstitution} onChange={(e) => setBankInstitution(e.target.value)} />
+                <Label>Institution #</Label>
+                <Input value={bankInstitution} disabled className="bg-[#F5F5F4]" />
               </div>
               <div className="space-y-2">
                 <Label>Account #</Label>
