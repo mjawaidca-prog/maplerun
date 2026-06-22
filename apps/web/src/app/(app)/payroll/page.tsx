@@ -3,6 +3,7 @@
  */
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { DeletePayRunButton } from "@/components/delete-payrun-button";
 import Link from "next/link";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
@@ -35,19 +36,21 @@ export default async function PayrollHistoryPage() {
         </div>
       ) : (
         <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <div className="grid grid-cols-[1.3fr_1.4fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3 bg-[#FAFAF9] border-b border-[#E7E5E4]">
+          <div className="grid grid-cols-[1.3fr_1.4fr_1fr_1fr_1fr_1fr_80px] gap-3 px-5 py-3 bg-[#FAFAF9] border-b border-[#E7E5E4]">
             {["Pay date","Pay period","Employees","Gross","Net","Status",""].map(h=><div key={h} className={`text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em] ${["Gross","Net"].includes(h)?"text-right":""}`}>{h}</div>)}
           </div>
           {runs.map(run=>(
-            <Link key={run.id} href={run.status === "DRAFT" ? "/payroll/new" : `/payroll/${run.id}`} className="grid grid-cols-[1.3fr_1.4fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-[15px] border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
+            <div key={run.id} className="grid grid-cols-[1.3fr_1.4fr_1fr_1fr_1fr_1fr_80px] gap-3 px-5 py-[15px] border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9]">
+              <Link href={run.status === "DRAFT" ? "/payroll/new" : `/payroll/${run.id}`} className="contents no-underline text-inherit">
               <div className="text-sm font-semibold">{run.payDate}</div>
               <div className="text-[13px] text-[#57534E]">{run.payGroup.name} · {run.payGroup.frequency.toLowerCase()}</div>
               <div className="text-[13px] font-mono tabular-nums">{run.itemCount}</div>
               <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(run.totalGross)}</div>
               <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(run.totalNetPay)}</div>
               <div><span className={`inline-flex items-center text-[11px] font-bold tracking-[0.03em] rounded-full px-2.5 py-1 ${run.status==="FINALIZED"?"bg-[#DCFCE7] text-[#15803D]":"bg-[#FEF3C7] text-[#92400E]"}`}>{run.status}</span></div>
-              <div className="text-[#A8A29E] text-right">→</div>
-            </Link>
+              </Link>
+              <div className="flex justify-end"><DeletePayRunButton id={run.id} date={run.payDate} /></div>
+            </div>
           ))}
         </div>
       )}

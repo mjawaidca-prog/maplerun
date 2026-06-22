@@ -331,6 +331,18 @@ export async function getPayRuns() {
 /**
  * Get a single pay run with all items.
  */
+export async function deletePayRun(formData: FormData) {
+  "use server";
+  const { companyId } = await requireCompany();
+  const id = formData.get("id") as string;
+  if (!id) throw new Error("Pay run ID required.");
+  const run = await prisma.payRun.findUnique({ where: { id } });
+  if (!run || run.companyId !== companyId) throw new Error("Pay run not found.");
+  await prisma.payRun.delete({ where: { id } });
+  revalidatePath("/payroll");
+  redirect("/payroll");
+}
+
 export async function getPayRun(id: string) {
   const { companyId } = await requireCompany();
 

@@ -4,6 +4,7 @@
 import { getPayRun } from "@/lib/actions/payroll";
 import { requireCompany } from "@/lib/session";
 import { StubPrintButton } from "@/components/stub-actions";
+import { DeletePayRunButton } from "@/components/delete-payrun-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -28,7 +29,10 @@ export default async function PayRunDetailPage({ params }: Props) {
           </h1>
           <p className="text-sm text-muted-foreground mt-1">{run.payGroup.name} · {run.payGroup.frequency.toLowerCase()} · {run.items.length} employees</p>
         </div>
-        <StubPrintButton />
+        <div className="flex gap-2.5 items-center">
+          <DeletePayRunButton id={run.id} date={run.payDate} />
+          <StubPrintButton />
+        </div>
       </div>
 
       <div className="grid grid-cols-4 border border-[#E7E5E4] rounded-[14px] overflow-hidden">
