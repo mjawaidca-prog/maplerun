@@ -115,35 +115,35 @@ export default function Home() {
       </section>
 
       {/* Calculator */}
-      <section id="calculator" className="bg-[#070D14] py-20 px-8">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-[1fr_1.35fr] gap-16 items-center max-[1050px]:grid-cols-1">
+      <section id="calculator" className="bg-[#070D14] py-16 sm:py-20 px-4 sm:px-8">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.35fr] gap-8 lg:gap-16 items-start lg:items-center">
           {/* Hero */}
           <div className="text-white max-w-[560px]">
-            <h2 className="text-[52px] font-extrabold leading-[1.18] tracking-[-0.03em] m-0 mb-7 max-[1050px]:text-[40px]">
+            <h2 className="text-[32px] sm:text-[42px] lg:text-[52px] font-extrabold leading-[1.15] tracking-[-0.03em] m-0 mb-5 sm:mb-7">
               Estimate Canadian take-home pay in seconds
             </h2>
-            <p className="text-[22px] leading-relaxed text-[#D7DDE5] mb-[42px]">
+            <p className="text-base sm:text-lg lg:text-[22px] leading-relaxed text-[#D7DDE5] mb-8 sm:mb-[42px]">
               NEXVAR shows employee deductions, employer cost, and total remittance before you run payroll.
             </p>
 
-            <div className="grid gap-[22px] mb-12">
-              <div className="flex items-center gap-4 text-xl text-[#F3F5F7]">
-                <div className="w-11 h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-base">✓</div>
+            <div className="grid gap-4 sm:gap-[22px] mb-8 sm:mb-12">
+              <div className="flex items-center gap-3 sm:gap-4 text-base sm:text-lg lg:text-xl text-[#F3F5F7]">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-sm sm:text-base">✓</div>
                 Uses 2026 CRA payroll deduction tables
               </div>
-              <div className="flex items-center gap-4 text-xl text-[#F3F5F7]">
-                <div className="w-11 h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-base">✓</div>
+              <div className="flex items-center gap-3 sm:gap-4 text-base sm:text-lg lg:text-xl text-[#F3F5F7]">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-sm sm:text-base">✓</div>
                 Includes CPP, EI, federal and provincial tax
               </div>
-              <div className="flex items-center gap-4 text-xl text-[#F3F5F7]">
-                <div className="w-11 h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-base">✓</div>
+              <div className="flex items-center gap-3 sm:gap-4 text-base sm:text-lg lg:text-xl text-[#F3F5F7]">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-sm sm:text-base">✓</div>
                 No account required
               </div>
             </div>
 
             <Link
               href="/sign-in"
-              className="inline-block px-[34px] py-[18px] border border-white/35 rounded-lg text-white text-lg no-underline hover:bg-white/10 transition-colors"
+              className="inline-block px-6 sm:px-[34px] py-3.5 sm:py-[18px] border border-white/35 rounded-lg text-white text-base sm:text-lg no-underline hover:bg-white/10 transition-colors"
             >
               See NEXVAR payroll
             </Link>

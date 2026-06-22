@@ -99,21 +99,21 @@ export default function PaychequeCalculator() {
   const provinceLabel = PROVINCES.find((p) => p.code === province)?.label ?? "";
 
   return (
-    <div className="bg-white rounded-[14px] p-[34px] shadow-[0_28px_70px_rgba(0,0,0,0.35)] max-w-[600px] w-full">
-      <h2 className="text-[32px] font-extrabold tracking-[-0.02em] m-0">Canadian payroll calculator</h2>
-      <p className="text-[#5D6673] text-base mt-2 mb-7">
-        Uses 2026 CRA T4127 payroll deduction tables for federal and provincial estimates.
+    <div className="bg-white rounded-[14px] p-[34px] shadow-[0_28px_70px_rgba(0,0,0,0.35)]">
+      <h2 className="text-[28px] sm:text-[32px] font-extrabold tracking-[-0.02em] m-0">Canadian payroll calculator</h2>
+      <p className="text-[#5D6673] text-sm sm:text-base mt-1.5 mb-6">
+        Uses 2026 CRA T4127 payroll deduction tables.
       </p>
 
       {/* Form */}
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-2 gap-4">
         {/* Province */}
-        <div className="flex flex-col gap-2">
-          <label className="font-semibold text-[15px] text-[#0F1419]">Province of employment</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">Province of employment</label>
           <select
             value={province}
             onChange={(e) => setProvince(e.target.value as ProvinceCode)}
-            className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-base bg-white text-[#0F1419]"
+            className="w-full h-11 sm:h-12 border border-[#CFD6DF] rounded-md px-3 sm:px-4 text-sm sm:text-base bg-white text-[#0F1419]"
           >
             <option value="">Select province…</option>
             {PROVINCES.map((p) => (
@@ -123,12 +123,12 @@ export default function PaychequeCalculator() {
         </div>
 
         {/* Frequency */}
-        <div className="flex flex-col gap-2">
-          <label className="font-semibold text-[15px] text-[#0F1419]">Pay frequency</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">Pay frequency</label>
           <select
             value={frequency}
             onChange={(e) => setFrequency(e.target.value as PayFrequency)}
-            className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-base bg-white text-[#0F1419]"
+            className="w-full h-11 sm:h-12 border border-[#CFD6DF] rounded-md px-3 sm:px-4 text-sm sm:text-base bg-white text-[#0F1419]"
           >
             <option value="">Select frequency…</option>
             {FREQUENCIES.map((f) => (
@@ -138,10 +138,10 @@ export default function PaychequeCalculator() {
         </div>
 
         {/* Gross pay */}
-        <div className="col-span-2 flex flex-col gap-2">
-          <label className="font-semibold text-[15px] text-[#0F1419]">Gross pay before deductions</label>
+        <div className="col-span-2 flex flex-col gap-1.5">
+          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">Gross pay before deductions</label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5D6673] text-base font-medium">$</span>
+            <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#5D6673] font-medium text-sm sm:text-base">$</span>
             <input
               type="number"
               min="0"
@@ -149,7 +149,7 @@ export default function PaychequeCalculator() {
               placeholder="2,500.00"
               value={grossIncome}
               onChange={(e) => setGrossIncome(e.target.value)}
-              className="w-full h-12 border border-[#CFD6DF] rounded-md pl-8 pr-4 text-base bg-white text-[#0F1419] font-mono tabular-nums"
+              className="w-full h-11 sm:h-12 border border-[#CFD6DF] rounded-md pl-7 sm:pl-8 pr-3 sm:pr-4 text-sm sm:text-base bg-white text-[#0F1419] font-mono tabular-nums"
             />
           </div>
         </div>
@@ -158,20 +158,20 @@ export default function PaychequeCalculator() {
         <button
           type="button"
           onClick={() => setAdvancedOpen(!advancedOpen)}
-          className="col-span-2 border border-[#D7DDE4] rounded-lg p-4 flex justify-between items-center bg-[#FAFBFC] cursor-pointer hover:bg-[#F4F6F8] transition-colors"
+          className="col-span-2 border border-[#D7DDE4] rounded-lg p-3 sm:p-4 flex justify-between items-center bg-[#FAFBFC] cursor-pointer hover:bg-[#F4F6F8] transition-colors"
         >
           <div className="text-left">
-            <strong className="block text-base text-[#0F1419]">Advanced options</strong>
-            <span className="text-sm text-[#66707D]">TD1 amounts, pension/RRSP deductions, union dues</span>
+            <strong className="block text-sm sm:text-base text-[#0F1419]">Advanced options</strong>
+            <span className="text-xs sm:text-sm text-[#66707D]">TD1 amounts, pension/RRSP deductions, union dues</span>
           </div>
           <span className={`text-[#66707D] text-lg transition-transform ${advancedOpen ? "rotate-180" : ""}`}>⌄</span>
         </button>
 
         {/* Advanced fields */}
         {advancedOpen && (
-          <div className="col-span-2 grid grid-cols-3 gap-4 pt-2">
-            <div className="flex flex-col gap-2">
-              <label className="font-semibold text-[14px] text-[#0F1419]">Period deductions</label>
+          <div className="col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-semibold text-[13px] text-[#0F1419]">Period deductions</label>
               <input
                 type="number"
                 min="0"
@@ -179,11 +179,11 @@ export default function PaychequeCalculator() {
                 placeholder="0.00"
                 value={periodDeductions}
                 onChange={(e) => setPeriodDeductions(e.target.value)}
-                className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-sm bg-white text-[#0F1419] font-mono"
+                className="w-full h-11 border border-[#CFD6DF] rounded-md px-3 text-sm bg-white text-[#0F1419] font-mono"
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-semibold text-[14px] text-[#0F1419]">Federal TD1 claim</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-semibold text-[13px] text-[#0F1419]">Federal TD1 claim</label>
               <input
                 type="number"
                 min="0"
@@ -191,11 +191,11 @@ export default function PaychequeCalculator() {
                 placeholder="Auto"
                 value={federalClaim}
                 onChange={(e) => setFederalClaim(e.target.value)}
-                className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-sm bg-white text-[#0F1419] font-mono"
+                className="w-full h-11 border border-[#CFD6DF] rounded-md px-3 text-sm bg-white text-[#0F1419] font-mono"
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-semibold text-[14px] text-[#0F1419]">Provincial TD1 claim</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-semibold text-[13px] text-[#0F1419]">Provincial TD1 claim</label>
               <input
                 type="number"
                 min="0"
@@ -203,7 +203,7 @@ export default function PaychequeCalculator() {
                 placeholder="Auto"
                 value={provincialClaim}
                 onChange={(e) => setProvincialClaim(e.target.value)}
-                className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-sm bg-white text-[#0F1419] font-mono"
+                className="w-full h-11 border border-[#CFD6DF] rounded-md px-3 text-sm bg-white text-[#0F1419] font-mono"
               />
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function PaychequeCalculator() {
 
         {/* Error */}
         {error && (
-          <div className="col-span-2 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="col-span-2 rounded-lg bg-red-50 border border-red-200 px-4 py-2.5 text-[13px] text-red-700">
             {error}
           </div>
         )}
@@ -220,7 +220,7 @@ export default function PaychequeCalculator() {
         <button
           onClick={handleCalculate}
           disabled={calculating}
-          className="col-span-2 h-[54px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[18px] font-bold cursor-pointer mt-2 disabled:opacity-60 transition-colors"
+          className="col-span-2 h-[50px] sm:h-[54px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[16px] sm:text-[18px] font-bold cursor-pointer mt-1 disabled:opacity-60 transition-colors"
         >
           {calculating ? "Calculating…" : "Calculate take-home pay"}
         </button>
@@ -229,16 +229,17 @@ export default function PaychequeCalculator() {
       {/* Results */}
       {result && (
         <>
-          <div className="h-px bg-[#E5E9EF] my-6" />
+          <div className="h-px bg-[#E5E9EF] my-5" />
 
-          <div className="grid grid-cols-[1fr_1.1fr_1fr] gap-6 max-lg:grid-cols-1">
-            {/* Net Pay */}
-            <div>
-              <h3 className="text-xl font-bold m-0 mb-3">Estimated net pay</h3>
-              <div className="text-[52px] font-extrabold tracking-[-0.03em] mb-4 text-[#0F1419]">
+          {/* Results: responsive — 3 cols on desktop, stacked on narrow */}
+          <div className="grid sm:grid-cols-[1fr_1.1fr_1fr] gap-5 max-sm:gap-4">
+            {/* Net Pay — full width on mobile, first col on desktop */}
+            <div className="max-sm:col-span-full max-sm:text-center">
+              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">Estimated net pay</h3>
+              <div className="text-[36px] sm:text-[44px] font-extrabold tracking-[-0.02em] mb-3 text-[#0F1419]">
                 {fmtCAD(result.netPay)}
               </div>
-              <p className="text-[#3E4752] text-sm leading-relaxed m-0">
+              <p className="text-[#3E4752] text-[13px] leading-relaxed m-0">
                 For a {FREQUENCIES.find((f) => f.value === frequency)?.short.toLowerCase() ?? ""}{" "}
                 {fmtCAD(result.gross)} gross pay
                 {provinceLabel ? ` in ${provinceLabel}` : ""}
@@ -246,19 +247,19 @@ export default function PaychequeCalculator() {
             </div>
 
             {/* Employee Deductions */}
-            <div className="border-l border-[#DDE3EA] pl-[22px] max-lg:border-l-0 max-lg:pl-0 max-lg:border-t max-lg:pt-5 max-lg:mt-3">
-              <h3 className="text-xl font-bold m-0 mb-3">Employee deductions</h3>
+            <div className="sm:border-l sm:border-[#DDE3EA] sm:pl-5 max-sm:border-t max-sm:border-[#EEF1F4] max-sm:pt-4">
+              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">Employee deductions</h3>
               <DeductionRow label="Employee CPP" amount={result.cpp} />
               <DeductionRow label="Employee EI" amount={result.ei} />
               {result.cpp2 > 0 && <DeductionRow label="CPP2 enhancement" amount={result.cpp2} />}
               <DeductionRow label="Federal tax" amount={result.federalTax} />
-              <DeductionRow label={`${provinceLabel} tax`} amount={result.provincialTax} />
+              <DeductionRow label={`${provinceLabel || "Provincial"} tax`} amount={result.provincialTax} />
               <DeductionRow label="Total employee deductions" amount={result.totalDeductions} total />
             </div>
 
             {/* Employer Cost */}
-            <div className="border-l border-[#DDE3EA] pl-[22px] max-lg:border-l-0 max-lg:pl-0 max-lg:border-t max-lg:pt-5 max-lg:mt-3">
-              <h3 className="text-xl font-bold m-0 mb-3">Employer cost</h3>
+            <div className="sm:border-l sm:border-[#DDE3EA] sm:pl-5 max-sm:border-t max-sm:border-[#EEF1F4] max-sm:pt-4">
+              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">Employer cost</h3>
               <DeductionRow label="Employer CPP" amount={result.employer.cpp} />
               {result.employer.cpp2 > 0 && <DeductionRow label="Employer CPP2" amount={result.employer.cpp2} />}
               <DeductionRow label="Employer EI" amount={result.employer.ei} />
@@ -267,12 +268,12 @@ export default function PaychequeCalculator() {
           </div>
 
           {/* Remittance box */}
-          <div className="mt-5 border border-[#D7DDE4] rounded-lg p-[18px_20px] flex justify-between items-center gap-6 max-sm:flex-col max-sm:items-start">
+          <div className="mt-4 border border-[#D7DDE4] rounded-lg p-4 sm:p-[18px_20px] flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-6">
             <div>
-              <strong className="text-lg text-[#0F1419]">Total remittance for the period</strong>
-              <span className="block text-[#5D6673] text-sm mt-1">Employee deductions + employer cost</span>
+              <strong className="text-base sm:text-lg text-[#0F1419]">Total remittance for the period</strong>
+              <span className="block text-[#5D6673] text-[13px] mt-0.5">Employee deductions + employer cost</span>
             </div>
-            <div className="text-[42px] font-extrabold tracking-[-0.02em] whitespace-nowrap text-[#0F1419]">
+            <div className="text-[32px] sm:text-[38px] font-extrabold tracking-[-0.02em] text-[#0F1419] font-mono tabular-nums">
               {fmtCAD(result.totalDeductions + result.employer.total)}
             </div>
           </div>
@@ -280,24 +281,24 @@ export default function PaychequeCalculator() {
           {/* CTA */}
           <Link
             href="/sign-in"
-            className="w-full h-[52px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[18px] font-bold mt-4 flex items-center justify-center no-underline transition-colors"
+            className="w-full h-[50px] sm:h-[52px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[16px] sm:text-[18px] font-bold mt-3 flex items-center justify-center no-underline transition-colors"
           >
             Run this payroll in NEXVAR
           </Link>
 
           {/* Warnings */}
           {result.warnings.length > 0 && (
-            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 mt-4">
-              <p className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-2">Warnings</p>
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 mt-3">
+              <p className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-1.5">Warnings</p>
               <ul className="list-disc list-inside space-y-1">
                 {result.warnings.map((w, i) => (
-                  <li key={i} className="text-sm text-amber-700">{w}</li>
+                  <li key={i} className="text-[13px] text-amber-700">{w}</li>
                 ))}
               </ul>
             </div>
           )}
 
-          <p className="text-[#6B7480] text-sm mt-4 leading-relaxed">
+          <p className="text-[#6B7480] text-[13px] mt-3 leading-relaxed">
             Estimate only. Final payroll may vary based on TD1 forms, benefits, pensions, and other settings.
           </p>
         </>
@@ -317,9 +318,9 @@ function DeductionRow({
 }) {
   return (
     <div
-      className={`flex justify-between gap-4 py-2 text-[15px] ${
+      className={`flex justify-between gap-2 py-1.5 sm:py-2 text-[13px] sm:text-[15px] ${
         total
-          ? "font-extrabold border-b-0 mt-1.5"
+          ? "font-extrabold border-b-0 mt-1"
           : "border-b border-[#EEF1F4]"
       }`}
     >
