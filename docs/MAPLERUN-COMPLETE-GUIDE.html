@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MapleRun — Complete System Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f5f5f4;color:#1c1917;line-height:1.6}
+.mono{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* ── Top Navigation ── */
+.topbar{background:#1c1917;color:#fff;padding:16px 48px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.topbar-logo{font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px}
+.topbar-sep{width:1px;height:20px;background:#292524}
+.topbar-title{font-size:14px;font-weight:600;color:#a8a29e}
+.topbar-meta{margin-left:auto;font-size:12px;color:#78716c}
+
+/* ── Sidebar ── */
+.layout{display:flex;max-width:1400px;margin:0 auto}
+.sidebar{width:260px;background:#1c1917;min-height:calc(100vh - 56px);padding:24px 16px;position:sticky;top:56px;flex-shrink:0}
+.sidebar a{display:block;color:#a8a29e;text-decoration:none;font-size:13px;font-weight:500;padding:8px 12px;border-radius:8px;margin-bottom:2px;transition:all .12s}
+.sidebar a:hover{background:#292524;color:#e7e5e4}
+.sidebar a.active{background:#3f1413;color:#fff}
+
+/* ── Content ── */
+.content{flex:1;padding:40px 48px 120px;min-width:0}
+.section{margin-bottom:60px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#B3261E;margin-bottom:8px}
+.sec-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+.sec-sub{font-size:15px;color:#78716c;margin-bottom:28px;max-width:700px;line-height:1.55}
+
+/* ── Cards ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+.card-title{font-size:16px;font-weight:700;margin-bottom:6px}
+.card-desc{font-size:13px;color:#78716c;line-height:1.55}
+
+/* ── Info boxes ── */
+.info{display:flex;gap:12px;border-radius:12px;padding:16px 20px;margin-bottom:16px;font-size:13px;line-height:1.55}
+.info.blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.info.green{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+.info.amber{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.info.red{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.info-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+
+/* ── Tables ── */
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+thead tr{background:#fafaf9}
+th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #e7e5e4}
+td{padding:11px 16px;font-size:13px;border-bottom:1px solid #f0efed;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf9}
+
+/* ── Chip / Pill ── */
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.04em;border-radius:20px;padding:3px 10px;white-space:nowrap}
+.chip.green{background:#dcfce7;color:#15803d}
+.chip.amber{background:#fef3c7;color:#92400e}
+.chip.red{background:#fef2f2;color:#991b1b}
+.chip.blue{background:#dbeafe;color:#1e40af}
+.chip.purple{background:#f3e8ff;color:#7c3aed}
+
+/* ── Stats row ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.stat{background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:16px 20px;text-align:center}
+.stat-value{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.stat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#a8a29e;margin-top:4px}
+
+/* ── Code block ── */
+pre{background:#1c1917;color:#e7e5e4;border-radius:12px;padding:18px 22px;overflow-x:auto;font-size:12px;line-height:1.7;margin:12px 0}
+pre .k{color:#fca5a5}
+pre .s{color:#86efac}
+pre .c{color:#78716c}
+pre .f{color:#fcd34d}
+
+/* ── Flow ── */
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:20px 0}
+.flow-step{background:#fff;border:1px solid #e7e5e4;border-radius:10px;padding:12px 16px;font-size:13px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.flow-arrow{color:#a8a29e;font-size:18px}
+
+/* Print */
+@media print{.sidebar{display:none}.content{padding:20px}body{background:#fff}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo"><span>🍁</span> MapleRun</div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-title">Complete System Guide</div>
+  <div class="topbar-meta">Version 1.0 · June 2026 · nexvarlab.com</div>
+</div>
+
+<div class="layout">
+<aside class="sidebar">
+  <a href="#overview" class="active">📋 Overview</a>
+  <a href="#architecture">🏗 Architecture</a>
+  <a href="#tax-engine">🧮 Tax Engine</a>
+  <a href="#plans">💳 Plans & Billing</a>
+  <a href="#payroll-workflow">💵 Payroll Workflow</a>
+  <a href="#employees">👥 Employees</a>
+  <a href="#reports">📊 Reports & Compliance</a>
+  <a href="#security">🔒 Security & Data</a>
+  <a href="#deployment">🚀 Deployment</a>
+  <a href="#user-manual">📖 User Manual</a>
+  <a href="#faq">❓ FAQ</a>
+</aside>
+
+<div class="content">
+
+<!-- ═══════════════════════ OVERVIEW ═══════════════════════ -->
+<div class="section" id="overview">
+  <div class="sec-label">Section 1</div>
+  <div class="sec-title">MapleRun Overview</div>
+  <div class="sec-sub">Canadian cloud payroll — accurate CRA-compliant calculations for all 13 provinces and territories.</div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-value" style="color:#B3261E">137</div><div class="stat-label">Automated Tests</div></div>
+    <div class="stat"><div class="stat-value" style="color:#16a34a">34</div><div class="stat-label">App Routes</div></div>
+    <div class="stat"><div class="stat-value" style="color:#2563eb">13</div><div class="stat-label">Provinces Supported</div></div>
+    <div class="stat"><div class="stat-value" style="color:#7c3aed">3</div><div class="stat-label">Plan Tiers</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon" style="background:#fef2f2">🧮</div>
+      <div class="card-title">CRA-Compliant Tax Engine</div>
+      <div class="card-desc">T4127 formulas (2026 editions). CPP, CPP2, EI, Federal, Provincial. All 13 provinces including Quebec (QPP/QPIP).</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#eff6ff">💵</div>
+      <div class="card-title">Full Payroll Workflow</div>
+      <div class="card-desc">3-step wizard: enter pay → preview deductions → finalize. Hours, vacation pay, progressive disclosure per plan.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#f0fdf4">📊</div>
+      <div class="card-title">CRA Reports</div>
+      <div class="card-desc">T4 slips, PD7A remittance, ROE (Service Canada), GL Journal (debit/credit), Payroll Summary, CPA-005 EFT files.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#fefce8">🔒</div>
+      <div class="card-title">Enterprise Security</div>
+      <div class="card-desc">AES-256-GCM encryption for SIN and bank details. JWT sessions. Multi-tenant data isolation. SSL everywhere.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ARCHITECTURE ═══════════════════════ -->
+<div class="section" id="architecture">
+  <div class="sec-label">Section 2</div>
+  <div class="sec-title">System Architecture</div>
+  <div class="sec-sub">Full-stack TypeScript monorepo with React frontend, server-side API, PostgreSQL database.</div>
+
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><b>Frontend</b></td><td>Next.js 16.2 (Turbopack) + React 19 + Tailwind CSS 4 + shadcn/ui</td><td>Server components, App Router, responsive UI</td></tr>
+      <tr><td><b>Backend</b></td><td>Next.js Route Handlers + Server Actions</td><td>API endpoints, auth, business logic</td></tr>
+      <tr><td><b>Database</b></td><td>PostgreSQL (Neon) + Prisma ORM v7</td><td>12 models, type-safe queries, migrations</td></tr>
+      <tr><td><b>Tax Engine</b></td><td>Pure TypeScript (zero dependencies)</td><td>Stateless payroll calculations, 137 tests</td></tr>
+      <tr><td><b>Auth</b></td><td>Auth.js v5 (JWT sessions)</td><td>Magic link via Resend, multi-tenant isolation</td></tr>
+      <tr><td><b>Payments</b></td><td>Stripe SDK v22</td><td>Subscription billing, checkout, webhooks</td></tr>
+      <tr><td><b>Email</b></td><td>Resend SDK v6</td><td>Magic link delivery, pay stub emails</td></tr>
+      <tr><td><b>PDF</b></td><td>@react-pdf/renderer v4</td><td>Server-side pay stub generation</td></tr>
+      <tr><td><b>Hosting</b></td><td>Vercel (Washington DC)</td><td>Auto-deploy from GitHub, global CDN</td></tr>
+      <tr><td><b>DNS</b></td><td>Cloudflare</td><td>DNS management for nexvarlab.com</td></tr>
+      <tr><td><b>Domain</b></td><td>Namecheap</td><td>nexvarlab.com registration</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info green" style="margin-top:16px">
+    <div class="info-icon">💡</div>
+    <div><b>Monorepo structure:</b> <span class="mono">packages/tax-engine</span> (pure calculations) + <span class="mono">apps/web</span> (Next.js app). The tax engine has zero runtime dependencies — it's a pure function: input → output. This makes it testable, portable, and impossible to break with framework updates.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TAX ENGINE ═══════════════════════ -->
+<div class="section" id="tax-engine">
+  <div class="sec-label">Section 3</div>
+  <div class="sec-title">Tax Engine & Accuracy</div>
+  <div class="sec-sub">How every deduction is calculated and verified against CRA standards.</div>
+
+  <h3 style="margin:20px 0 12px">2026 Tax Rates (T4127 123rd Edition)</h3>
+  <table>
+    <thead><tr><th>Component</th><th>Rate</th><th>Maximum/Threshold</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>CPP (employee)</td><td class="mono">5.95%</td><td>Max $4,230.45 (YMPE $74,600)</td><td>Basic exemption $3,500/yr</td></tr>
+      <tr><td>CPP2 (employee)</td><td class="mono">4.00%</td><td>Max $416 (YAMPE $85,000)</td><td>Earnings between $74,600–$85,000</td></tr>
+      <tr><td>EI (employee)</td><td class="mono">1.63%</td><td>Max $1,123.07 (MIE $68,900)</td><td>QC: 1.30% (reduced)</td></tr>
+      <tr><td>EI (employer)</td><td class="mono">2.282%</td><td>1.4 × employee premium</td><td>QC: 1.82%</td></tr>
+      <tr><td>Federal BPA</td><td class="mono">$16,452</td><td>Phased out above $181,440</td><td>Income-tested</td></tr>
+      <tr><td>QPP (Quebec)</td><td class="mono">6.30%</td><td>Same YMPE/YAMPE as CPP</td><td>Base rate 5.30%</td></tr>
+      <tr><td>QPIP (Quebec)</td><td class="mono">0.43%</td><td>Max $442.90 (MIE $103,000)</td><td>Employer: 0.602%</td></tr>
+      <tr><td>Federal abatement (QC)</td><td class="mono">16.5%</td><td>Reduction in federal tax</td><td>For Quebec residents</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin:24px 0 12px">How Tax Accuracy Is Verified</h3>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon" style="background:#f0fdf4">✅</div>
+      <div class="card-title">T4127 Formula Tests</div>
+      <div class="card-desc">37 unit tests verify every CRA formula: CPP, CPP2, EI, federal tax brackets, provincial surtax, health premiums, tax reductions, K constants within $0.50.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#f0fdf4">🔬</div>
+      <div class="card-title">PDOC Golden Tests</div>
+      <div class="card-desc">85 regression tests across 6 employee profiles × 12 provinces. Every pay run output is verified against stored goldens. Tolerance: $0.50.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#f0fdf4">📅</div>
+      <div class="card-title">Mid-Year Updates</div>
+      <div class="card-desc">July 2026 edition applied: BC rate 6.14% (prorated), NL BPA $15,000, PE new bracket 21%. Engine auto-selects edition by pay date.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#f0fdf4">🇨🇦</div>
+      <div class="card-title">Quebec Complete</div>
+      <div class="card-desc">QPP (6.30%), QPIP (0.43%), Quebec provincial tax (TP-1015.3), 16.5% federal abatement. All provinces supported.</div>
+    </div>
+  </div>
+
+  <h3 style="margin:24px 0 12px">How Tax Tables Update Each Year</h3>
+  <div class="flow">
+    <div class="flow-step">CRA publishes new T4127</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Create data/2027/ files</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Register edition in index.ts</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Run 137 tests</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Deploy</div>
+  </div>
+  <p style="font-size:13px;color:#78716c;margin-top:8px">Past pay runs keep their original year's rates — immutable by design. The engine selects the correct edition by pay date automatically.</p>
+</div>
+
+<!-- ═══════════════════════ PLANS ═══════════════════════ -->
+<div class="section" id="plans">
+  <div class="sec-label">Section 4</div>
+  <div class="sec-title">Plans & Billing</div>
+  <div class="sec-sub">Three tiered plans with progressive feature disclosure. One codebase — the sidebar, dashboard, and wizard adapt to the plan.</div>
+
+  <table>
+    <thead><tr><th>Feature</th><th style="color:#0891b2">🌱 Solo</th><th style="color:#16a34a">📈 Growth</th><th style="color:#B3261E">🧮 Accountant</th></tr></thead>
+    <tbody>
+      <tr><td>Monthly price</td><td class="mono">$15</td><td class="mono">$25</td><td class="mono">$59</td></tr>
+      <tr><td>Per employee</td><td>$3/mo</td><td>$3/mo</td><td>$2/mo</td></tr>
+      <tr><td>Pay runs</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+      <tr><td>Pay stubs + T4</td><td><span class="chip green">✓</span></td><td><span class="chip green">✓</span></td><td><span class="chip green">✓</span></td></tr>
+      <tr><td>PD7A remittance</td><td><span class="chip amber">Amount shown</span></td><td><span class="chip green">✓</span></td><td><span class="chip green">✓</span></td></tr>
+      <tr><td>Timesheets</td><td>—</td><td><span class="chip green">✓</span></td><td><span class="chip green">✓</span></td></tr>
+      <tr><td>ROE</td><td>—</td><td><span class="chip green">✓</span></td><td><span class="chip green">✓</span></td></tr>
+      <tr><td>GL Journal</td><td>—</td><td>—</td><td><span class="chip green">✓</span></td></tr>
+      <tr><td>EFT/Direct Deposit</td><td>—</td><td><span class="chip green">✓</span></td><td><span class="chip green">✓</span></td></tr>
+      <tr><td>Year-End Centre</td><td>—</td><td>—</td><td><span class="chip green">✓</span></td></tr>
+      <tr><td>Audit Log</td><td>—</td><td>—</td><td><span class="chip green">✓</span></td></tr>
+      <tr><td>Sidebar items</td><td>6</td><td>13</td><td>16</td></tr>
+      <tr><td>Dashboard widgets</td><td>4</td><td>6</td><td>8+compliance</td></tr>
+      <tr><td>Free trial</td><td>2 pay runs</td><td>2 pay runs</td><td>2 pay runs</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info blue" style="margin-top:16px">
+    <div class="info-icon">🔑</div>
+    <div><b>Promo code MAPLE2026:</b> During onboarding, enter "MAPLE2026" as company name or slug to get Accountant plan + unlimited pay runs for testing.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAYROLL WORKFLOW ═══════════════════════ -->
+<div class="section" id="payroll-workflow">
+  <div class="sec-label">Section 5</div>
+  <div class="sec-title">Payroll Workflow</div>
+
+  <div class="flow" style="margin-bottom:24px">
+    <div class="flow-step">① Select pay group</div><div class="flow-arrow">→</div>
+    <div class="flow-step">② Enter period + pay date</div><div class="flow-arrow">→</div>
+    <div class="flow-step">③ Enter gross + hours per employee</div><div class="flow-arrow">→</div>
+    <div class="flow-step">④ Calculate (engine)</div><div class="flow-arrow">→</div>
+    <div class="flow-step">⑤ Preview deductions</div><div class="flow-arrow">→</div>
+    <div class="flow-step">⑥ Finalize (permanent)</div>
+  </div>
+
+  <h3 style="margin:20px 0 12px">Deduction Calculation</h3>
+  <table>
+    <thead><tr><th>Step</th><th>Formula</th><th>Example (ON biweekly $3,000)</th></tr></thead>
+    <tbody>
+      <tr><td>Gross income</td><td class="mono">P × gross − HD − F × P</td><td>$3,000.00</td></tr>
+      <tr><td>CPP</td><td class="mono">0.0595 × (gross − $3,500/P)</td><td>~$170.82</td></tr>
+      <tr><td>EI</td><td class="mono">0.0163 × gross</td><td>~$48.90</td></tr>
+      <tr><td>Annual taxable (A)</td><td class="mono">P × (gross − F5)</td><td>~$77,255</td></tr>
+      <tr><td>Federal tax</td><td class="mono">(R × A − K − K1 − K2 − K4) ÷ P</td><td>Bracket-based</td></tr>
+      <tr><td>Provincial tax</td><td class="mono">(V × A − KP − K1P − K2P − K4P) ÷ P</td><td>+ ON surtax/health premium</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin:24px 0 12px">Vacation Pay</h3>
+  <p style="font-size:14px;margin-bottom:12px">Per-employee toggle in the wizard with customizable percentage. Default 4% (most provinces for &lt;5 years service). Calculated as <span class="mono">Gross × Rate%</span>. Shown on pay stub. Canadian employment standards minimums: 4% → 6% at 5 years (varies by province). Saskatchewan: 3/52 (≈5.77%), Quebec: 4% then 6%.</p>
+
+  <h3 style="margin:24px 0 12px">Hours Tracking</h3>
+  <p style="font-size:14px">Per-employee hours input (default 75 for biweekly). Stored per pay period. Used for ROE Block 15A (insurable hours). Displayed on pay stubs with calculated hourly rate.</p>
+</div>
+
+<!-- ═══════════════════════ EMPLOYEES ═══════════════════════ -->
+<div class="section" id="employees">
+  <div class="sec-label">Section 6</div>
+  <div class="sec-title">Employee Management</div>
+
+  <table>
+    <thead><tr><th>Field</th><th>Stored</th><th>Encrypted</th></tr></thead>
+    <tbody>
+      <tr><td>Name, DOB, email, phone, address</td><td>Plain text</td><td>—</td></tr>
+      <tr><td>SIN</td><td class="mono">sinEncrypted</td><td><span class="chip red">AES-256-GCM</span></td></tr>
+      <tr><td>Bank details (transit, institution, account)</td><td class="mono">bankEncrypted</td><td><span class="chip red">AES-256-GCM</span></td></tr>
+      <tr><td>Pay type (salary/hourly) + rate</td><td>Plain text</td><td>—</td></tr>
+      <tr><td>TD1 claims (federal, provincial, extra tax, exempt flags)</td><td>Separate table</td><td>—</td></tr>
+      <tr><td>YTD ledger (pensionable, insurable, CPP, EI)</td><td>Separate table, per year</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info red" style="margin-top:16px">
+    <div class="info-icon">🔒</div>
+    <div><b>SIN and bank details are encrypted at rest.</b> Decrypted only when needed for T4 filing or EFT generation. Never logged, never exposed in API responses without explicit permission.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ REPORTS ═══════════════════════ -->
+<div class="section" id="reports">
+  <div class="sec-label">Section 7</div>
+  <div class="sec-title">Reports & CRA Compliance</div>
+
+  <table>
+    <thead><tr><th>Report</th><th>Purpose</th><th>Data Source</th><th>CRA Form</th></tr></thead>
+    <tbody>
+      <tr><td><b>Pay Stub</b></td><td>Per-period employee earnings statement</td><td>PayRunItem</td><td>—</td></tr>
+      <tr><td><b>T4 Slip</b></td><td>Annual remuneration paid (Box 14/16/18/22/24/26/28)</td><td>All finalized runs per employee/year</td><td>T4</td></tr>
+      <tr><td><b>PD7A Remittance</b></td><td>Source deductions owing to CRA (monthly)</td><td>Aggregated PayRun totals</td><td>PD7A</td></tr>
+      <tr><td><b>ROE</b></td><td>Record of Employment for Service Canada</td><td>Pay history + insurable hours</td><td>ROE Web</td></tr>
+      <tr><td><b>GL Journal</b></td><td>Debit/credit entries for accounting</td><td>PayRun totals per run</td><td>—</td></tr>
+      <tr><td><b>Payroll Summary</b></td><td>Aggregated wages, deductions, employer costs</td><td>All finalized runs</td><td>—</td></tr>
+      <tr><td><b>Remittance Report</b></td><td>4-tab: Breakdown, By Employee, History, Schedule</td><td>Real-time from finalized runs</td><td>PD7A</td></tr>
+      <tr><td><b>Direct Deposit (EFT)</b></td><td>CPA-005 file for bank upload</td><td>PayRunItem net pay + employee bank info</td><td>CPA-005</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info amber" style="margin-top:16px">
+    <div class="info-icon">⚠️</div>
+    <div><b>Important:</b> MapleRun calculates and reports — it does NOT file with CRA. You must submit T4 XML, remit PD7A payments, and file ROEs through your CRA business account or Service Canada. The Remit with CRA feature provides all reference numbers.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SECURITY ═══════════════════════ -->
+<div class="section" id="security">
+  <div class="sec-label">Section 8</div>
+  <div class="sec-title">Security & Data Storage</div>
+
+  <table>
+    <thead><tr><th>Aspect</th><th>Implementation</th></tr></thead>
+    <tbody>
+      <tr><td>Authentication</td><td>JWT sessions (Auth.js v5). Magic link via Resend. No passwords stored.</td></tr>
+      <tr><td>SIN encryption</td><td>AES-256-GCM. Key from ENCRYPTION_KEY env var. Never logged.</td></tr>
+      <tr><td>Bank details</td><td>AES-256-GCM. Decrypted only for EFT generation.</td></tr>
+      <tr><td>Multi-tenancy</td><td>Every DB query scoped by companyId. Users can only see their company's data.</td></tr>
+      <tr><td>Database</td><td>Neon PostgreSQL (serverless). SSL connections. Automated backups.</td></tr>
+      <tr><td>Hosting</td><td>Vercel (SOC 2, GDPR compliant). Global CDN. Automatic HTTPS.</td></tr>
+      <tr><td>Payment data</td><td>Never touches our servers. Stripe handles all card data (PCI DSS Level 1).</td></tr>
+      <tr><td>Email</td><td>Resend (encrypted in transit). DKIM signed. SPF verified.</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin:24px 0 12px">Database Schema (12 models)</h3>
+  <pre>
+<span class="c">// Core</span>
+<span class="k">User</span> ──┬── <span class="k">Account</span> (OAuth)
+       ├── <span class="k">Session</span>
+       └── <span class="k">Membership</span> ─── <span class="k">Company</span> ──┬── <span class="k">Employee</span> ──┬── <span class="k">TD1Profile</span>
+                                    │               ├── <span class="k">YtdLedger</span>
+                                    ├── <span class="k">PayGroup</span>    └── <span class="k">PayRunItem</span> ─── <span class="k">PayRun</span>
+                                    └── <span class="k">PayRun</span>
+
+<span class="c">// Auth</span>
+<span class="k">VerificationToken</span></pre>
+</div>
+
+<!-- ═══════════════════════ DEPLOYMENT ═══════════════════════ -->
+<div class="section" id="deployment">
+  <div class="sec-label">Section 9</div>
+  <div class="sec-title">Deployment & Infrastructure</div>
+
+  <table>
+    <thead><tr><th>Service</th><th>Provider</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td>Hosting</td><td>Vercel (Hobby)</td><td>Free</td></tr>
+      <tr><td>Database</td><td>Neon PostgreSQL</td><td>Free tier</td></tr>
+      <tr><td>Email</td><td>Resend</td><td>Free (100/day)</td></tr>
+      <tr><td>Payments</td><td>Stripe</td><td>2.9% + $0.30/transaction</td></tr>
+      <tr><td>Domain</td><td>Namecheap (nexvarlab.com)</td><td>~$14/year</td></tr>
+      <tr><td>DNS</td><td>Cloudflare</td><td>Free</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info blue" style="margin-top:16px">
+    <div class="info-icon">🚀</div>
+    <div><b>Deploy flow:</b> Push to GitHub → Vercel auto-detects → builds → deploys. Environment variables set in Vercel dashboard. Domain <span class="mono">app.nexvarlab.com</span> via Cloudflare DNS.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ USER MANUAL ═══════════════════════ -->
+<div class="section" id="user-manual">
+  <div class="sec-label">Section 10</div>
+  <div class="sec-title">User Manual</div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon" style="background:#fef2f2">1</div>
+      <div class="card-title">Sign Up</div>
+      <div class="card-desc">Go to <span class="mono">app.nexvarlab.com</span> → click "Try it free" → enter your email → check inbox for magic link → click to sign in.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#eff6ff">2</div>
+      <div class="card-title">Create Company</div>
+      <div class="card-desc">First-time sign-in shows onboarding: company name, workspace slug, default province, pay frequency. Creates company + default pay group.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#f0fdf4">3</div>
+      <div class="card-title">Add Employees</div>
+      <div class="card-desc">Employees → Add Employee. Fill personal info, employment (salary/hourly + rate), bank details, TD1 defaults. Auto-creates YTD ledger.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#fefce8">4</div>
+      <div class="card-title">Run Payroll</div>
+      <div class="card-desc">Payroll → Run Payroll. Select pay group, dates, enter gross (auto-filled from employee rate). Add hours, vacation pay. Preview → Finalize.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#f3e8ff">5</div>
+      <div class="card-title">View Pay Stubs</div>
+      <div class="card-desc">Click any employee in a finalized pay run. View earnings, deductions, net pay, YTD, employer costs. Download PDF or print.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#fce7f3">6</div>
+      <div class="card-title">Generate Reports</div>
+      <div class="card-desc">Reports → T4 slips, PD7A remittance, ROE, GL Journal, Payroll Summary. All from finalized pay runs. Export PDF/CSV.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ FAQ ═══════════════════════ -->
+<div class="section" id="faq">
+  <div class="sec-label">Section 11</div>
+  <div class="sec-title">Frequently Asked Questions</div>
+
+  <div class="info blue"><div class="info-icon">Q</div><div><b>How accurate are the tax calculations?</b> All formulas follow CRA T4127. 137 automated tests verify every calculation. Golden tests match PDOC within $0.50.</div></div>
+  <div class="info blue"><div class="info-icon">Q</div><div><b>Does MapleRun file taxes with CRA?</b> No. It calculates amounts and generates reports. You file through your CRA business account.</div></div>
+  <div class="info blue"><div class="info-icon">Q</div><div><b>How do tax tables update each year?</b> New CRA edition → create data files → register → run tests → deploy. Past pay runs keep original rates.</div></div>
+  <div class="info blue"><div class="info-icon">Q</div><div><b>Is my data secure?</b> SIN and bank details are AES-256-GCM encrypted. All connections use SSL. Stripe handles payments (PCI DSS Level 1).</div></div>
+  <div class="info blue"><div class="info-icon">Q</div><div><b>Can I switch plans anytime?</b> Yes. Company → Profile → click any plan button. Changes instantly. Upgrade/downgrade anytime.</div></div>
+  <div class="info blue"><div class="info-icon">Q</div><div><b>What about Quebec?</b> Fully supported: QPP (6.30%), QPIP (0.43%), reduced EI (1.30%), Quebec provincial tax, 16.5% federal abatement.</div></div>
+  <div class="info blue"><div class="info-icon">Q</div><div><b>Can I have multiple companies?</b> Yes. Click "＋ New company" in sidebar. Switch between them using the company switcher.</div></div>
+  <div class="info blue"><div class="info-icon">Q</div><div><b>How do I delete test data?</b> Payroll history → red Delete button on any run. Employee list → trash icon on any row. Confirm to delete permanently.</div></div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /layout -->
+</body>
+</html>
