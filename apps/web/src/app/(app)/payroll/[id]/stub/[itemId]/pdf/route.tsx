@@ -33,7 +33,7 @@ export async function GET(
   });
 
   const pdfData = {
-    companyName: company?.name ?? "MapleRun",
+    companyName: company?.name ?? "Nexvar Pay",
     employeeName: `${item.employee.firstName} ${item.employee.lastName}`,
     payDate: payRun.payDate,
     payGroup: `${payRun.payGroup.name} · ${payRun.payGroup.frequency.toLowerCase()}`,

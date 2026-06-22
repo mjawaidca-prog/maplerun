@@ -50,8 +50,8 @@ export async function generateEftFile(payRunId: string): Promise<{ filename: str
 
   const originatorId = padRight(companyId.replace(/[^a-zA-Z0-9]/g, "").slice(0, 15), 15);
   const dateStr = payRun.payDate.replace(/-/g, "");
-  const companyName = padRight((company?.name ?? "MapleRun").replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 30), 30);
-  const originatorName = padRight("MAPLERUN PAYROLL", 30);
+  const companyName = padRight((company?.name ?? "Nexvar Pay").replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 30), 30);
+  const originatorName = padRight("NEXVAR PAYROLL", 30);
   const institution = "001";  // Bank of Canada institution code placeholder
   const account = padRight(companyId.slice(-12), 12);
 

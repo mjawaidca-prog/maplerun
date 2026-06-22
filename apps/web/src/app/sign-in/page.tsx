@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,9 +45,8 @@ function SignInForm() {
     <div className="min-h-screen flex items-center justify-center px-8 py-12 bg-gradient-to-b from-white to-[#FEF6F5]">
       <div className="w-full max-w-[400px] space-y-7">
         <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2.5">
-            <span className="text-[26px]">🍁</span>
-            <span className="text-[22px] font-extrabold tracking-[-0.02em]">MapleRun</span>
+          <div className="flex items-center justify-center">
+            <Logo size={34} />
           </div>
           <p className="text-sm text-[#78716C]">Sign in to your payroll account</p>
         </div>

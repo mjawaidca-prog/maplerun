@@ -17,7 +17,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   providers: [
     Resend({
-      from: process.env.AUTH_RESEND_FROM ?? "noreply@maplerun.ca",
+      from: process.env.AUTH_RESEND_FROM ?? "noreply@nexvarlab.com",
       // API key read automatically from AUTH_RESEND_KEY env var
     }),
     Google({

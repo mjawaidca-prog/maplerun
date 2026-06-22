@@ -1,5 +1,6 @@
 import PaychequeCalculator from "@/components/paycheque-calculator";
 import { PricingCards } from "@/components/pricing-cards";
+import { Logo } from "@/components/logo";
 import Link from "next/link";
 
 export default function Home() {
@@ -7,8 +8,8 @@ export default function Home() {
     <div className="flex flex-col">
       {/* Nav */}
       <nav className="max-w-[1120px] mx-auto w-full px-8 flex items-center justify-between py-5">
-        <Link href="/" className="flex items-center gap-2.5 text-[19px] font-extrabold tracking-tight">
-          <span className="text-[23px]">🍁</span> MapleRun
+        <Link href="/" className="flex items-center gap-2.5 font-extrabold tracking-tight no-underline">
+          <Logo size={30} />
         </Link>
         <div className="flex items-center gap-7">
           <a href="#features" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Features</a>
@@ -24,8 +25,8 @@ export default function Home() {
       {/* Hero */}
       <section className="bg-gradient-to-b from-white to-[#FEF6F5] py-[70px] pb-20 text-center">
         <div className="max-w-[1120px] mx-auto px-8">
-          <span className="inline-flex items-center gap-[7px] text-xs font-semibold text-[#B3261E] bg-[#FEF2F2] border border-[#FECACA] rounded-full px-3.5 py-1.5 mb-[22px]">
-            🍁 Built for Canadian small business
+          <span className="inline-flex items-center gap-[7px] text-xs font-semibold text-[#0F172A] bg-[#EFF6FF] border border-[#BFDBFE] rounded-full px-3.5 py-1.5 mb-[22px]">
+            🇨🇦 Built for Canadian small business · A NexvarLab product
           </span>
           <h1 className="text-[52px] font-extrabold leading-tight tracking-[-0.03em] max-w-[760px] mx-auto">
             Payroll that feels like a <em className="not-italic text-[#B3261E]">bank statement</em>, not a spreadsheet.
@@ -120,7 +121,7 @@ export default function Home() {
             <div>
               <h3 className="text-[28px] font-extrabold tracking-[-0.02em]">See a paycheque in real time</h3>
               <p className="text-sm text-[#A8A29E] mt-2.5 leading-relaxed">
-                Enter a gross amount and province — MapleRun shows the exact CPP, EI, and tax split before you ever create an account.
+                Enter a gross amount and province — Nexvar Pay shows the exact CPP, EI, and tax split before you ever create an account.
               </p>
               <Link href="/sign-in" className="inline-flex mt-[22px] px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline">
                 Try the full product →
@@ -137,9 +138,7 @@ export default function Home() {
       <footer className="border-t border-[#E7E5E4] py-9 mt-6">
         <div className="max-w-[1120px] mx-auto px-8">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2.5 text-[17px] font-extrabold tracking-tight">
-              <span className="text-[21px]">🍁</span> MapleRun
-            </div>
+            <Logo size={26} />
             <div className="flex gap-[22px]">
               <a href="#features" className="text-[13px] text-[#78716C] no-underline">Features</a>
               <a href="#pricing" className="text-[13px] text-[#78716C] no-underline">Pricing</a>
@@ -148,7 +147,7 @@ export default function Home() {
             </div>
           </div>
           <p className="text-xs text-[#A8A29E] mt-[18px] leading-relaxed max-w-[620px]">
-            © {new Date().getFullYear()} MapleRun. Calculations follow CRA payroll guidelines and are provided for convenience. MapleRun is not affiliated with the Canada Revenue Agency, and its outputs are not official CRA documents. Verify all remittances and filings against your CRA account.
+            © {new Date().getFullYear()} NexvarLab. Nexvar Pay is a payroll calculation tool. Outputs are not official CRA documents. Verify all remittances and filings against your CRA account. NexvarLab is not affiliated with the Canada Revenue Agency.
           </p>
         </div>
       </footer>

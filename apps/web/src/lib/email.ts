@@ -35,21 +35,22 @@ export async function sendPayStubEmail(params: {
   try {
     const client = getResend();
     await client.emails.send({
-      from: process.env.AUTH_RESEND_FROM ?? "noreply@maplerun.ca",
+      from: process.env.AUTH_RESEND_FROM ?? "noreply@nexvarlab.com",
       to,
-      subject: `Your pay stub for ${payDate} — MapleRun`,
+      subject: `Your pay stub for ${payDate} — Nexvar Pay`,
       html: `
         <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto;">
-          <h1 style="color: #B3261E;">🍁 MapleRun</h1>
+          <h1 style="color: #0F172A;">Nexvar Pay</h1>
+          <p style="color: #78716C; font-size: 12px;">A NexvarLab product</p>
           <p>Hi ${employeeName},</p>
           <p>Your pay stub for the pay period ending <strong>${payDate}</strong> is available.</p>
           <p>
-            <a href="${stubUrl}" style="display: inline-block; background: #B3261E; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px;">
+            <a href="${stubUrl}" style="display: inline-block; background: #0F172A; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px;">
               View pay stub
             </a>
           </p>
           <p style="color: #666; font-size: 12px; margin-top: 24px;">
-            This is an automated message from MapleRun. If you have questions, contact your employer.
+            This is an automated message from Nexvar Pay. If you have questions, contact your employer.
           </p>
         </div>
       `,
@@ -74,17 +75,18 @@ export async function sendWelcomeEmail(params: {
   try {
     const client = getResend();
     await client.emails.send({
-      from: process.env.AUTH_RESEND_FROM ?? "noreply@maplerun.ca",
+      from: process.env.AUTH_RESEND_FROM ?? "noreply@nexvarlab.com",
       to,
-      subject: `Welcome to ${companyName} payroll — MapleRun`,
+      subject: `Welcome to ${companyName} payroll — Nexvar Pay`,
       html: `
         <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto;">
-          <h1 style="color: #B3261E;">🍁 MapleRun</h1>
+          <h1 style="color: #0F172A;">Nexvar Pay</h1>
+          <p style="color: #78716C; font-size: 12px;">A NexvarLab product</p>
           <p>Hi ${employeeName},</p>
-          <p>You've been added to <strong>${companyName}</strong>'s payroll on MapleRun.</p>
+          <p>You've been added to <strong>${companyName}</strong>'s payroll on Nexvar Pay.</p>
           <p>You'll receive your pay stubs by email each pay period.</p>
           <p style="color: #666; font-size: 12px; margin-top: 24px;">
-            Powered by MapleRun — Canadian payroll that runs itself.
+            Powered by Nexvar Pay — Canadian payroll that runs itself.
           </p>
         </div>
       `,

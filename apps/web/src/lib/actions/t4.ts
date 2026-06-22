@@ -143,7 +143,7 @@ export async function getT4Report(year: number): Promise<T4Report> {
     box26: round2(slips.reduce((s, sl) => s + sl.box26, 0)),
   };
 
-  return { year, companyName: company?.name ?? "MapleRun", slips, totals };
+  return { year, companyName: company?.name ?? "Nexvar Pay", slips, totals };
 }
 
 function round2(n: number): number {

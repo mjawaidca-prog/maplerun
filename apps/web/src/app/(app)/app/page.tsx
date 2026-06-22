@@ -49,7 +49,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <div>
           <h1 className="text-[28px] font-extrabold tracking-[-0.02em]">Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {firstName ? `Good morning, ${firstName} — ` : ""}{company?.name ?? "MapleRun"}
+            {firstName ? `Good morning, ${firstName} — ` : ""}{company?.name ?? "Nexvar Pay"}
           </p>
         </div>
         <Link href="/payroll/new" className="inline-flex items-center gap-2 rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-white text-sm font-semibold px-5 py-2.5 no-underline transition-colors">

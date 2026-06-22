@@ -65,7 +65,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
 
       {/* Print-only header */}
       <div className="hidden print:block text-center border-b-2 border-black pb-4 mb-4">
-        <h1 className="text-xl font-bold">MapleRun — Remittance Report</h1>
+        <h1 className="text-xl font-bold">Nexvar Pay — Remittance Report</h1>
         <p className="text-sm">{currentPeriod} · Regular Remitter · Due {dueDate.toISOString().slice(0,10)}</p>
         <p className="text-sm font-bold mt-1">Total Owing to CRA: {fmtCAD(totalCRA)}</p>
       </div>

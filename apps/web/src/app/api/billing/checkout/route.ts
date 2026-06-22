@@ -47,7 +47,7 @@ export async function POST(request: Request) {
         {
           price_data: {
             currency: "cad",
-            product_data: { name: `MapleRun ${plan.name}` },
+            product_data: { name: `Nexvar Pay ${plan.name}` },
             unit_amount: plan.basePriceCents,
             recurring: { interval: "month" as const },
           },

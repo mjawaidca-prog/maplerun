@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Logo } from "@/components/logo";
 
 const PROVINCES = ["AB","BC","MB","NB","NL","NS","NT","NU","ON","PE","QC","SK","YT"];
 const FREQUENCIES = [
@@ -44,9 +45,8 @@ export default function OnboardingPage() {
     <div className="min-h-screen flex items-center justify-center px-8 py-12 bg-gradient-to-b from-white to-[#FEF6F5]">
       <div className="w-full max-w-[460px] space-y-6">
         <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2.5">
-            <span className="text-2xl">🍁</span>
-            <span className="text-xl font-extrabold tracking-[-0.02em]">MapleRun</span>
+          <div className="flex items-center justify-center">
+            <Logo size={32} />
           </div>
           <p className="text-sm text-[#78716C]">Let&apos;s set up your company</p>
           <div className="flex items-center justify-center gap-1.5">
@@ -69,7 +69,7 @@ export default function OnboardingPage() {
             <div>
               <label className="text-[13px] font-semibold text-[#44403C] block mb-1.5">Workspace URL <span className="text-[#B3261E]">*</span></label>
               <div className="flex items-center border border-[#D6D3D1] rounded-lg overflow-hidden">
-                <span className="px-3 py-[11px] bg-[#FAFAF9] text-[#A8A29E] text-sm border-r border-[#E7E5E4]">maplerun.ca/</span>
+                <span className="px-3 py-[11px] bg-[#FAFAF9] text-[#A8A29E] text-sm border-r border-[#E7E5E4]">nexvarlab.com/</span>
                 <input className="flex-1 border-none px-3 py-[11px] text-sm font-mono outline-none disabled:opacity-50" value={slug} onChange={(e) => setSlug(e.target.value)} required maxLength={50} pattern="[a-zA-Z0-9-]+" disabled={submitting} placeholder="northwind" />
               </div>
               <p className="text-xs text-[#A8A29E] mt-1.5">Letters, numbers and hyphens only.</p>

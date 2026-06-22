@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MapleRun — Canadian Payroll, Done in Minutes",
+  title: "Nexvar Pay — Canadian Payroll, Done in Minutes",
   description:
-    "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, and produce pay stubs in minutes. Supports all provinces and territories. 2026 T4127 tax tables.",
+    "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, and produce pay stubs in minutes. Supports all provinces and territories. 2026 T4127 tax tables. A product of NexvarLab.",
   keywords: [
     "Canadian payroll",
     "payroll software",
@@ -27,12 +27,13 @@ export const metadata: Metadata = {
     "T4",
     "remittance",
     "PD7A",
-    "MapleRun",
+    "Nexvar Pay",
+    "NexvarLab",
   ],
   openGraph: {
-    title: "MapleRun — Canadian Payroll, Done in Minutes",
+    title: "Nexvar Pay — Canadian Payroll, Done in Minutes",
     description:
-      "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, produce pay stubs in minutes.",
+      "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, produce pay stubs in minutes. A NexvarLab product.",
     type: "website",
     locale: "en_CA",
   },

@@ -6,6 +6,7 @@ import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SIDEBAR_NAV, can, PLAN_META, REQUIRES as REQ_MAP, type NavItem, type Plan } from "@/lib/plan";
 import { CompanySwitcher } from "@/components/company-switcher";
+import { Logo } from "@/components/logo";
 import Link from "next/link";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -31,9 +32,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen flex bg-[#F5F5F4] dark:bg-[#0C0A09]">
       <aside className="w-[220px] bg-[#1C1917] min-h-screen flex-shrink-0 flex flex-col py-6 px-4 text-white">
         {/* Logo */}
-        <Link href="/app" className="flex items-center gap-2 px-2 mb-6">
-          <span className="text-[22px]">🍁</span>
-          <span className="text-[17px] font-extrabold tracking-tight">MapleRun</span>
+        <Link href="/app" className="flex items-center px-2 mb-6">
+          <Logo size={26} />
         </Link>
 
         {/* Navigation — plan-aware */}

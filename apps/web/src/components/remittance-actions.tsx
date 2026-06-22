@@ -37,7 +37,7 @@ export function RemittanceActions({ totalCRA, period, businessNumber }: Props) {
   function handlePDF() { window.print(); }
 
   async function handleMarkSubmitted() {
-    if (!confirm(`Mark remittance as submitted for ${period}?\n\nAmount: $${totalCRA.toFixed(2)}\n\nThis records the filing in MapleRun. You must remit the actual payment through your CRA business account.`)) return;
+    if (!confirm(`Mark remittance as submitted for ${period}?\n\nAmount: $${totalCRA.toFixed(2)}\n\nThis records the filing in Nexvar Pay. You must remit the actual payment through your CRA business account.`)) return;
     setSubmitting(true);
     try {
       await fetch("/api/remittance/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ period }) });
@@ -83,7 +83,7 @@ export function RemittanceActions({ totalCRA, period, businessNumber }: Props) {
           onClick={handleMarkSubmitted}
           disabled={submitting || totalCRA <= 0}
           className="rounded-[9px] bg-[#B3261E] hover:bg-[#9B1C18] text-white text-[13px] font-semibold px-4 py-2.5 inline-flex items-center gap-[7px] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="Records the filing in MapleRun. Remit actual payment through your CRA account."
+          title="Records the filing in Nexvar Pay. Remit actual payment through your CRA account."
         >
           {submitting ? "Submitting…" : "Mark as submitted"}
         </button>
@@ -96,7 +96,7 @@ export function RemittanceActions({ totalCRA, period, businessNumber }: Props) {
             <div>
               <h3 className="text-base font-bold">Remit to CRA</h3>
               <p className="text-[13px] text-muted-foreground mt-0.5">
-                MapleRun prepares the report — you submit through your CRA account. Copy the details below.
+                Nexvar Pay prepares the report — you submit through your CRA account. Copy the details below.
               </p>
             </div>
             <a

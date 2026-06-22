@@ -117,7 +117,7 @@ export async function getPayrollSummary(payGroupId?: string): Promise<PayrollSum
     employees: employees.length,
   };
 
-  return { companyName: company?.name ?? "MapleRun", totals, employees };
+  return { companyName: company?.name ?? "Nexvar Pay", totals, employees };
 }
 
 function r2(n: number): number { return Math.round(n * 100) / 100; }

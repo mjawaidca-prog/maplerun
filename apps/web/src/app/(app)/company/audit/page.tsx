@@ -30,7 +30,7 @@ export default async function AuditLogPage() {
         <p className="text-sm text-muted-foreground mt-1">All changes to company records, pay runs, and settings.</p>
       </div>
       <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-12 text-center shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <p className="text-[13px] text-muted-foreground">Audit trail will be populated as you use MapleRun. All pay run finalizations, employee changes, and plan modifications are logged here.</p>
+        <p className="text-[13px] text-muted-foreground">Audit trail will be populated as you use Nexvar Pay. All pay run finalizations, employee changes, and plan modifications are logged here.</p>
       </div>
     </div>
   );
