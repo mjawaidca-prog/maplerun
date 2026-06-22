@@ -304,6 +304,21 @@ export default function PaychequeCalculator() {
               </div>
             </div>
 
+            {/* Total remittance to CRA */}
+            <div className="bg-[#1C1917] rounded-xl p-5 text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-xs font-bold text-[#A8A29E] uppercase tracking-[0.06em]">Total remittance to CRA</p>
+                  <p className="text-[11px] text-[#78716C] mt-0.5">Employee + Employer combined</p>
+                </div>
+                <p className="text-2xl font-bold font-mono tabular-nums">{fmtCAD(result.totalDeductions + result.employer.total)}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#292524] text-xs text-[#A8A29E]">
+                <span>Employee deductions: {fmtCAD(result.totalDeductions)}</span>
+                <span className="text-right">Employer costs: {fmtCAD(result.employer.total)}</span>
+              </div>
+            </div>
+
             {/* Warnings */}
             {result.warnings.length > 0 && (
               <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-4 py-3">
