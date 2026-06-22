@@ -1,4 +1,5 @@
 import PaychequeCalculator from "@/components/paycheque-calculator";
+import { PricingCards } from "@/components/pricing-cards";
 import Link from "next/link";
 
 export default function Home() {
@@ -62,10 +63,10 @@ export default function Home() {
               { icon: "📈", title: "Always up to date", desc: "Rate tables update each tax year. Past runs keep their original year's rates." },
               { icon: "👥", title: "For owners & accountants", desc: "Remittances, ROEs, and journals when you need them — share access with your bookkeeper." },
             ].map((f) => (
-              <div key={f.title} className="border border-[#E7E5E4] rounded-[14px] p-6 bg-white">
-                <div className="w-11 h-11 rounded-[11px] bg-[#FEF2F2] flex items-center justify-center text-[21px] mb-4">{f.icon}</div>
-                <h3 className="text-base font-bold">{f.title}</h3>
-                <p className="text-[13.5px] text-[#78716C] mt-1.5 leading-relaxed">{f.desc}</p>
+              <div key={f.title} className="border border-[#E7E5E4] rounded-[14px] p-6 bg-white hover:border-[#B3261E]/30 hover:shadow-[0_4px_12px_rgba(179,38,30,0.06)] transition-all">
+                <div className="w-11 h-11 rounded-[11px] bg-[#B3261E]/10 flex items-center justify-center text-[21px] mb-4">{f.icon}</div>
+                <h3 className="text-base font-bold text-[#1C1917]">{f.title}</h3>
+                <p className="text-[13.5px] text-[#57534E] mt-1.5 leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -80,50 +81,7 @@ export default function Home() {
             <h2 className="text-[34px] font-extrabold tracking-[-0.02em] mt-2.5">One plan per team size</h2>
             <p className="text-[15px] text-[#78716C] mt-2.5">Prices in CAD. Switch or cancel anytime.</p>
           </div>
-          <div className="grid grid-cols-3 gap-[18px] items-start">
-            {[
-              { name: "Solo", price: "$15", emp: "1 employee", features: ["Unlimited pay runs", "Pay stubs & T4 slips", "CRA-aligned calculations"], hot: false },
-              { name: "Growth", price: "$25", emp: "Up to 10 employees", features: ["Everything in Solo", "Multiple pay groups", "PD7A remittance"], hot: true },
-              { name: "Accountant", price: "$59", emp: "Unlimited employees", features: ["Everything in Growth", "ROE generation", "Payroll journals · multi-company"], hot: false },
-            ].map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative flex flex-col border rounded-2xl p-7 bg-white ${
-                  plan.hot
-                    ? "border-2 border-[#B3261E] shadow-[0_8px_30px_rgba(179,38,30,0.12)]"
-                    : "border-[#E7E5E4]"
-                }`}
-              >
-                {plan.hot && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold tracking-[0.05em] bg-[#B3261E] text-white rounded-full px-3 py-1.5">
-                    MOST POPULAR
-                  </span>
-                )}
-                <p className="text-[15px] font-bold">{plan.name}</p>
-                <p className="text-[40px] font-extrabold tracking-[-0.02em] mt-3">
-                  {plan.price}<span className="text-sm font-medium text-[#A8A29E]"> /mo</span>
-                </p>
-                <p className="text-[13px] text-[#78716C] mt-1">{plan.emp}</p>
-                <ul className="list-none my-5 flex-1 space-y-0">
-                  {plan.features.map((f) => (
-                    <li key={f} className="text-[13.5px] text-[#44403C] leading-[1.85] flex gap-2.5">
-                      <span className="text-[#16A34A] font-bold">✓</span> {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/sign-in"
-                  className={`text-center py-2.5 px-[18px] rounded-[10px] text-sm font-semibold no-underline ${
-                    plan.hot
-                      ? "bg-[#B3261E] text-white"
-                      : "border border-[#D6D3D1] bg-white text-[#1C1917]"
-                  }`}
-                >
-                  Start free
-                </Link>
-              </div>
-            ))}
-          </div>
+          <PricingCards />
         </div>
       </section>
 
