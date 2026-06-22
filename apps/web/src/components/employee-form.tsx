@@ -23,6 +23,11 @@ export function EmployeeForm({ payGroups }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedPayGroup, setSelectedPayGroup] = useState("");
+  const [payType, setPayType] = useState("salary");
+  const [payRate, setPayRate] = useState("");
+  const [bankTransit, setBankTransit] = useState("");
+  const [bankInstitution, setBankInstitution] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -63,6 +68,11 @@ export function EmployeeForm({ payGroups }: Props) {
       <form onSubmit={handleSubmit} className="space-y-8">
         <input type="hidden" name="province" value={selectedProvince} />
         <input type="hidden" name="payGroupId" value={selectedPayGroup} />
+        <input type="hidden" name="payType" value={payType} />
+        <input type="hidden" name="payRate" value={payRate} />
+        <input type="hidden" name="bankTransit" value={bankTransit} />
+        <input type="hidden" name="bankInstitution" value={bankInstitution} />
+        <input type="hidden" name="bankAccount" value={bankAccount} />
         <Card className="border-border/60">
           <CardHeader>
             <CardTitle className="text-lg">Personal information</CardTitle>
@@ -133,6 +143,56 @@ export function EmployeeForm({ payGroups }: Props) {
               <div className="space-y-2">
                 <Label htmlFor="postalCode">Postal code</Label>
                 <Input id="postalCode" name="postalCode" maxLength={7} disabled={submitting} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Employment info */}
+        <Card className="border-border/60">
+          <CardHeader><CardTitle className="text-lg">Employment</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Pay type</Label>
+                <select value={payType} onChange={(e) => setPayType(e.target.value)} className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white">
+                  <option value="salary">Salary</option>
+                  <option value="hourly">Hourly</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Pay rate (per period)</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                  <Input className="pl-7 tabular-nums" type="number" min="0" step="0.01" placeholder="0.00" value={payRate} onChange={(e) => setPayRate(e.target.value)} />
+                </div>
+              </div>
+              <div className="flex items-end pb-2">
+                {payRate && <span className="text-xs text-[#78716C]">Annual: ${(parseFloat(payRate||"0") * (payType==="hourly"?2000:26)).toFixed(2)}</span>}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Bank details */}
+        <Card className="border-border/60">
+          <CardHeader>
+            <CardTitle className="text-lg">Bank details (Direct Deposit)</CardTitle>
+            <CardDescription>For CPA-005 EFT files. Encrypted at rest.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Transit # (5 digits)</Label>
+                <Input maxLength={5} placeholder="12345" value={bankTransit} onChange={(e) => setBankTransit(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Institution # (3 digits)</Label>
+                <Input maxLength={3} placeholder="001" value={bankInstitution} onChange={(e) => setBankInstitution(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Account #</Label>
+                <Input maxLength={12} placeholder="123456789012" value={bankAccount} onChange={(e) => setBankAccount(e.target.value)} />
               </div>
             </div>
           </CardContent>

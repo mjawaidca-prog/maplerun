@@ -17,7 +17,7 @@ export default async function NewPayRunPage() {
 
   const [payGroups, employees, company] = await Promise.all([
     prisma.payGroup.findMany({ where: { companyId }, orderBy: { name: "asc" } }),
-    prisma.employee.findMany({ where: { companyId, active: true }, orderBy: { lastName: "asc" }, select: { id: true, firstName: true, lastName: true } }),
+    prisma.employee.findMany({ where: { companyId, active: true }, orderBy: { lastName: "asc" }, select: { id: true, firstName: true, lastName: true, payType: true, payRate: true } }),
     prisma.company.findUnique({ where: { id: companyId }, select: { plan: true } }),
   ]);
 
@@ -33,7 +33,7 @@ export default async function NewPayRunPage() {
       <PayRunWizard
         plan={(company?.plan as Plan) ?? "growth"}
         payGroups={payGroups.map((pg) => ({ id: pg.id, name: pg.name, frequency: pg.frequency, defaultProvince: pg.defaultProvince }))}
-        employees={employees.map((e) => ({ id: e.id, name: `${e.firstName} ${e.lastName}` }))}
+        employees={employees.map((e) => ({ id: e.id, name: `${e.firstName} ${e.lastName}`, payRate: e.payRate }))}
         previewAction={previewPayRun}
         finalizeAction={finalizePayRun}
       />

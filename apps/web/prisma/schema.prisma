@@ -134,6 +134,10 @@ model Employee {
   postalCode    String?
   /// AES-256-GCM encrypted direct-deposit details (transit/institution/account)
   bankEncrypted String?
+  /// Employment type: salary or hourly
+  payType      String?
+  /// Per-period gross rate (auto-fills wizard)
+  payRate      Float?
   active        Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

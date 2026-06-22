@@ -35,6 +35,7 @@ type PayGroupOption = {
 type EmployeeOption = {
   id: string;
   name: string;
+  payRate?: number | null;
 };
 
 type Props = {
@@ -79,7 +80,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   const [payDate, setPayDate] = useState(saved?.payDate ?? new Date().toISOString().slice(0, 10));
   const [actualPayDate, setActualPayDate] = useState(saved?.actualPayDate ?? "");
   const [grossAmounts, setGrossAmounts] = useState<Record<string, string>>(
-    saved?.grossAmounts ?? Object.fromEntries(employees.map((e) => [e.id, ""]))
+    saved?.grossAmounts ?? Object.fromEntries(employees.map((e) => [e.id, e.payRate ? String(e.payRate) : ""]))
   );
   // Try importing hours from timesheet upload (sessionStorage)
   const importedHours = (() => {

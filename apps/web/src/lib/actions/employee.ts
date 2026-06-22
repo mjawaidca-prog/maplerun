@@ -27,6 +27,11 @@ export async function createEmployee(formData: FormData) {
   const province = formData.get("province") as string;
   const postalCode = formData.get("postalCode") as string;
   const payGroupId = formData.get("payGroupId") as string;
+  const payType = formData.get("payType") as string;
+  const payRate = formData.get("payRate") as string;
+  const bankTransit = formData.get("bankTransit") as string;
+  const bankInstitution = formData.get("bankInstitution") as string;
+  const bankAccount = formData.get("bankAccount") as string;
 
   if (!firstName || !lastName || !sin) {
     throw new Error("First name, last name, and SIN are required.");
@@ -59,6 +64,11 @@ export async function createEmployee(formData: FormData) {
       province: province || null,
       postalCode: postalCode || null,
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+      payType: payType || null,
+      payRate: payRate ? parseFloat(payRate) : null,
+      bankEncrypted: (bankTransit || bankInstitution || bankAccount)
+        ? encrypt(JSON.stringify({ transit: bankTransit, institution: bankInstitution, account: bankAccount }))
+        : null,
     },
   });
 
