@@ -16,17 +16,18 @@ export function PricingCards() {
     <div className="grid grid-cols-3 gap-[18px] items-start">
       {PLANS.map((plan) => {
         const isActive = active === plan.name;
+        const isPopular = plan.name === "Growth";
         return (
           <div
             key={plan.name}
             onClick={() => setActive(plan.name)}
-            className={`relative flex flex-col border rounded-2xl p-7 bg-white cursor-pointer transition-all hover:border-[#B3261E]/50 ${
+            className={`relative flex flex-col border rounded-2xl p-7 bg-white cursor-pointer transition-all ${
               isActive
                 ? "border-2 border-[#B3261E] shadow-[0_8px_30px_rgba(179,38,30,0.12)]"
-                : "border-[#E7E5E4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)]"
+                : `border-[#E7E5E4] ${isPopular ? "shadow-[0_4px_12px_rgba(0,0,0,0.04)]" : ""}`
             }`}
           >
-            {isActive && (
+            {isPopular && (
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold tracking-[0.05em] bg-[#B3261E] text-white rounded-full px-3 py-1.5">
                 MOST POPULAR
               </span>
@@ -47,7 +48,7 @@ export function PricingCards() {
               href="/sign-in"
               onClick={(e) => e.stopPropagation()}
               className={`text-center py-2.5 px-[18px] rounded-[10px] text-sm font-semibold no-underline ${
-                isActive
+                isActive || isPopular
                   ? "bg-[#B3261E] text-white hover:bg-[#8F1D17]"
                   : "border border-[#D6D3D1] bg-white text-[#1C1917] hover:border-[#B3261E]"
               }`}
