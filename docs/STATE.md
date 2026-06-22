@@ -21,6 +21,11 @@
   - ✅ Year-End Centre: T4/RL-1 filing wizard built
   - ✅ Deploy: GitHub → Vercel → live at https://app.nexvarlab.com
   - ✅ Complete system guide: docs/MAPLERUN-COMPLETE-GUIDE.html (11 sections)
+- **Rebrand (June 22): DONE** — Name conflict with maplerun.ca resolved.
+  - ✅ Renamed to **Nexvar Pay** (a NexvarLab product)
+  - ✅ New SVG logo: geometric "N" mark + NEXVAR wordmark
+  - ✅ All 22 user-facing pages updated (landing, auth, sidebar, pay stubs, T4, reports, emails, Stripe)
+  - ✅ Internal identifiers preserved (@maplerun/tax-engine package, cookie names)
 
 ## Live
 - **Production URL:** https://app.nexvarlab.com (Cloudflare + Vercel, Next.js 16, Auth.js v5)
