@@ -14,13 +14,24 @@
   - ✅ Step 4: Wizard progressive disclosure (Solo simple / Growth expander / Accountant grid)
   - ✅ P1: ROE plan gate + Stripe checkout wiring
   - ✅ P2: ROE pages redesigned (list + detail with Service Canada layout)
+- **Infrastructure + Launch: DONE** — 2026-06-22.
+  - ✅ Cloudflare DNS: nexvarlab.com migrated from Namecheap, DNS managed via Cloudflare
+  - ✅ Stripe: Products/prices created, keys in .env
+  - ✅ Timesheet screens: Entry + CSV import built
+  - ✅ Year-End Centre: T4/RL-1 filing wizard built
+  - ✅ Deploy: GitHub → Vercel → live at https://app.nexvarlab.com
+  - ✅ Complete system guide: docs/MAPLERUN-COMPLETE-GUIDE.html (11 sections)
+
+## Live
+- **Production URL:** https://app.nexvarlab.com (Cloudflare + Vercel, Next.js 16, Auth.js v5)
+- **Stack:** Vercel (pdx1) + Neon PostgreSQL + Cloudflare DNS + Stripe + Resend
+- **Domain:** nexvarlab.com registered via Namecheap, DNS on Cloudflare
 
 ## Next actions
-1. **Cloudflare DNS**: Migrate from Namecheap DNS → switch to Resend live key
-2. **Stripe Dashboard**: Create products/prices in Stripe, copy keys to .env
-3. **Timesheet screens**: Build entry + CSV import per designer HTML
-4. **Year-End Centre**: Build wizard for T4/RL-1 filing season
-5. **Deploy**: Push to GitHub → Vercel → live at nexvarlab.com
+1. **Monitor**: Watch production for issues, user feedback, Stripe webhook events
+2. **2027 tax tables**: When CRA publishes T4127 124th ed. (Jan 2027), create data/2027/ files
+3. **User acquisition**: Marketing, onboarding flow tuning, conversion optimization
+4. **Feature requests**: Gather and prioritize from real users
 
 ## Environment facts (don't re-discover)
 - Windows 11, PowerShell (no `&&`). Node v24.16.0, npm 11.13.0, git 2.54. Repo root = `MapleRun/`, branch `main`.
