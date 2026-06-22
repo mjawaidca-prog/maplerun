@@ -92,8 +92,12 @@ export async function generateEftFile(payRunId: string): Promise<{ filename: str
     );
   }
 
+  // Accept items even without bank details — they'll use defaults
+  if (credits.length === 0 && payRun.totalNetPay <= 0) {
+    throw new Error("This pay run has no net pay to deposit. Run payroll first.");
+  }
   if (credits.length === 0) {
-    throw new Error("No employees with net pay > $0 in this run.");
+    throw new Error("No employees found in this pay run. Add employees with bank details and re-run payroll.");
   }
 
   lines.push(...credits);
