@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { calculatePay, type ProvinceCode, type PayFrequency, type PayResult, PERIODS_PER_YEAR, ZERO_YTD } from "@maplerun/tax-engine";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 const PROVINCES: { code: ProvinceCode; label: string }[] = [
   { code: "AB", label: "Alberta" },
@@ -26,15 +20,15 @@ const PROVINCES: { code: ProvinceCode; label: string }[] = [
   { code: "YT", label: "Yukon" },
 ];
 
-const FREQUENCIES: { value: PayFrequency; label: string }[] = [
-  { value: "weekly", label: "Weekly (52)" },
-  { value: "biweekly", label: "Biweekly (26)" },
-  { value: "semimonthly", label: "Semi-monthly (24)" },
-  { value: "monthly", label: "Monthly (12)" },
+const FREQUENCIES: { value: PayFrequency; label: string; short: string }[] = [
+  { value: "weekly", label: "Weekly (52)", short: "Weekly" },
+  { value: "biweekly", label: "Biweekly (26)", short: "Biweekly" },
+  { value: "semimonthly", label: "Semi-monthly (24)", short: "Semi-monthly" },
+  { value: "monthly", label: "Monthly (12)", short: "Monthly" },
 ];
 
 function fmtCAD(cents: number): string {
-  return `CA$${cents.toFixed(2)}`;
+  return `$${cents.toFixed(2)}`;
 }
 
 export default function PaychequeCalculator() {
@@ -44,6 +38,7 @@ export default function PaychequeCalculator() {
   const [periodDeductions, setPeriodDeductions] = useState<string>("");
   const [federalClaim, setFederalClaim] = useState<string>("");
   const [provincialClaim, setProvincialClaim] = useState<string>("");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [result, setResult] = useState<PayResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [calculating, setCalculating] = useState(false);
@@ -52,7 +47,6 @@ export default function PaychequeCalculator() {
     setError(null);
     setResult(null);
 
-    // Validate fields
     const missing: string[] = [];
     if (!province) missing.push("province");
     if (!frequency) missing.push("pay frequency");
@@ -82,12 +76,11 @@ export default function PaychequeCalculator() {
         ytd: ZERO_YTD,
       });
 
-      // Check if annual caps would be hit (no YTD provided)
       const P = PERIODS_PER_YEAR[frequency as PayFrequency];
       const annualCPP = payResult.cpp * P;
       const annualEI = payResult.ei * P;
-      const cppMax = 4034.10; // 2026 CPP1 max
-      const eiMax = 1123.07; // 2026 EI max
+      const cppMax = 4034.10;
+      const eiMax = 1123.07;
       if (annualCPP > cppMax || annualEI > eiMax) {
         payResult.warnings.push(
           `CPP/EI annual caps not applied (no YTD). At this rate, annual CPP ≈ $${annualCPP.toFixed(0)} (max $${cppMax.toFixed(0)}) and EI ≈ $${annualEI.toFixed(0)} (max $${eiMax.toFixed(0)}). Mid-year caps would reduce actual deductions.`
@@ -103,244 +96,211 @@ export default function PaychequeCalculator() {
     }
   }
 
+  const provinceLabel = PROVINCES.find((p) => p.code === province)?.label ?? "";
+
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8">
-      {/* Input card */}
-      <Card className="border-border/60 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl font-semibold tracking-tight">
-            Paycheque Calculator
-          </CardTitle>
-          <CardDescription>
-            Estimate CRA-compliant payroll deductions. Uses 2026 T4127 tax tables.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Province + Frequency row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="province">Province</Label>
-              <Select value={province} onValueChange={(v) => setProvince(v as ProvinceCode)}>
-                <SelectTrigger id="province">
-                  <SelectValue placeholder="Select province…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROVINCES.map((p) => (
-                    <SelectItem key={p.code} value={p.code}>
-                      {p.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="bg-white rounded-[14px] p-[34px] shadow-[0_28px_70px_rgba(0,0,0,0.35)] max-w-[600px] w-full">
+      <h2 className="text-[32px] font-extrabold tracking-[-0.02em] m-0">Canadian payroll calculator</h2>
+      <p className="text-[#5D6673] text-base mt-2 mb-7">
+        Uses 2026 CRA T4127 payroll deduction tables for federal and provincial estimates.
+      </p>
 
-            <div className="space-y-2">
-              <Label htmlFor="frequency">Pay frequency</Label>
-              <Select value={frequency} onValueChange={(v) => setFrequency(v as PayFrequency)}>
-                <SelectTrigger id="frequency">
-                  <SelectValue placeholder="Select frequency…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FREQUENCIES.map((f) => (
-                    <SelectItem key={f.value} value={f.value}>
-                      {f.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Form */}
+      <div className="grid grid-cols-2 gap-5">
+        {/* Province */}
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-[15px] text-[#0F1419]">Province of employment</label>
+          <select
+            value={province}
+            onChange={(e) => setProvince(e.target.value as ProvinceCode)}
+            className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-base bg-white text-[#0F1419]"
+          >
+            <option value="">Select province…</option>
+            {PROVINCES.map((p) => (
+              <option key={p.code} value={p.code}>{p.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Frequency */}
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-[15px] text-[#0F1419]">Pay frequency</label>
+          <select
+            value={frequency}
+            onChange={(e) => setFrequency(e.target.value as PayFrequency)}
+            className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-base bg-white text-[#0F1419]"
+          >
+            <option value="">Select frequency…</option>
+            {FREQUENCIES.map((f) => (
+              <option key={f.value} value={f.value}>{f.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Gross pay */}
+        <div className="col-span-2 flex flex-col gap-2">
+          <label className="font-semibold text-[15px] text-[#0F1419]">Gross pay before deductions</label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5D6673] text-base font-medium">$</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="2,500.00"
+              value={grossIncome}
+              onChange={(e) => setGrossIncome(e.target.value)}
+              className="w-full h-12 border border-[#CFD6DF] rounded-md pl-8 pr-4 text-base bg-white text-[#0F1419] font-mono tabular-nums"
+            />
           </div>
+        </div>
 
-          {/* Gross income */}
-          <div className="space-y-2">
-            <Label htmlFor="grossIncome">Gross period income</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">
-                $
-              </span>
-              <Input
-                id="grossIncome"
+        {/* Advanced options toggle */}
+        <button
+          type="button"
+          onClick={() => setAdvancedOpen(!advancedOpen)}
+          className="col-span-2 border border-[#D7DDE4] rounded-lg p-4 flex justify-between items-center bg-[#FAFBFC] cursor-pointer hover:bg-[#F4F6F8] transition-colors"
+        >
+          <div className="text-left">
+            <strong className="block text-base text-[#0F1419]">Advanced options</strong>
+            <span className="text-sm text-[#66707D]">TD1 amounts, pension/RRSP deductions, union dues</span>
+          </div>
+          <span className={`text-[#66707D] text-lg transition-transform ${advancedOpen ? "rotate-180" : ""}`}>⌄</span>
+        </button>
+
+        {/* Advanced fields */}
+        {advancedOpen && (
+          <div className="col-span-2 grid grid-cols-3 gap-4 pt-2">
+            <div className="flex flex-col gap-2">
+              <label className="font-semibold text-[14px] text-[#0F1419]">Period deductions</label>
+              <input
                 type="number"
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                className="pl-7 tabular-nums text-lg"
-                value={grossIncome}
-                onChange={(e) => setGrossIncome(e.target.value)}
+                value={periodDeductions}
+                onChange={(e) => setPeriodDeductions(e.target.value)}
+                className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-sm bg-white text-[#0F1419] font-mono"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="font-semibold text-[14px] text-[#0F1419]">Federal TD1 claim</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Auto"
+                value={federalClaim}
+                onChange={(e) => setFederalClaim(e.target.value)}
+                className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-sm bg-white text-[#0F1419] font-mono"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="font-semibold text-[14px] text-[#0F1419]">Provincial TD1 claim</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Auto"
+                value={provincialClaim}
+                onChange={(e) => setProvincialClaim(e.target.value)}
+                className="w-full h-12 border border-[#CFD6DF] rounded-md px-4 text-sm bg-white text-[#0F1419] font-mono"
               />
             </div>
           </div>
+        )}
 
-          {/* Optional fields */}
-          <details className="group">
-            <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
-              Advanced options
-            </summary>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t">
-              <div className="space-y-2">
-                <Label htmlFor="periodDeductions">Period deductions (F)</Label>
-                <Input
-                  id="periodDeductions"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  className="tabular-nums"
-                  value={periodDeductions}
-                  onChange={(e) => setPeriodDeductions(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">RPP, RRSP, union dues per period</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="federalClaim">Federal TD1 claim (K1)</Label>
-                <Input
-                  id="federalClaim"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Auto"
-                  className="tabular-nums"
-                  value={federalClaim}
-                  onChange={(e) => setFederalClaim(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="provincialClaim">Provincial TD1 claim (K1P)</Label>
-                <Input
-                  id="provincialClaim"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Auto"
-                  className="tabular-nums"
-                  value={provincialClaim}
-                  onChange={(e) => setProvincialClaim(e.target.value)}
-                />
-              </div>
-            </div>
-          </details>
+        {/* Error */}
+        {error && (
+          <div className="col-span-2 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
-          {error && (
-            <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
-              {error}
-            </div>
-          )}
-
-          <Button
-            onClick={handleCalculate}
-            disabled={calculating}
-            className="w-full"
-            size="lg"
-          >
-            {calculating ? "Calculating…" : "Calculate Deductions"}
-          </Button>
-        </CardContent>
-      </Card>
+        {/* Calculate button */}
+        <button
+          onClick={handleCalculate}
+          disabled={calculating}
+          className="col-span-2 h-[54px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[18px] font-bold cursor-pointer mt-2 disabled:opacity-60 transition-colors"
+        >
+          {calculating ? "Calculating…" : "Calculate take-home pay"}
+        </button>
+      </div>
 
       {/* Results */}
       {result && (
-        <Card className="border-border/60 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold tracking-tight flex items-center gap-3">
-              Results
-              <Badge variant="secondary" className="text-xs font-normal">
-                {PERIODS_PER_YEAR[frequency as PayFrequency]} periods/yr
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Big net pay */}
-            <div className="text-center py-6 bg-accent/30 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Net pay this period</p>
-              <p className="text-5xl font-bold tabular-nums tracking-tight text-maple">
+        <>
+          <div className="h-px bg-[#E5E9EF] my-6" />
+
+          <div className="grid grid-cols-[1fr_1.1fr_1fr] gap-6 max-lg:grid-cols-1">
+            {/* Net Pay */}
+            <div>
+              <h3 className="text-xl font-bold m-0 mb-3">Estimated net pay</h3>
+              <div className="text-[52px] font-extrabold tracking-[-0.03em] mb-4 text-[#0F1419]">
                 {fmtCAD(result.netPay)}
+              </div>
+              <p className="text-[#3E4752] text-sm leading-relaxed m-0">
+                For a {FREQUENCIES.find((f) => f.value === frequency)?.short.toLowerCase() ?? ""}{" "}
+                {fmtCAD(result.gross)} gross pay
+                {provinceLabel ? ` in ${provinceLabel}` : ""}
               </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Gross {fmtCAD(result.gross)} &middot;{" "}
-                {result.annualTaxableIncome > 0
-                  ? `Annual taxable ~ ${fmtCAD(result.annualTaxableIncome)}`
-                  : ""}
-              </p>
-              {result.annualTaxableIncome > 0 && (
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  Annual taxable = gross × periods minus CPP/EI deduction (CRA T4127 formula)
-                </p>
-              )}
             </div>
 
-            {/* Employee deductions */}
+            {/* Employee Deductions */}
+            <div className="border-l border-[#DDE3EA] pl-[22px] max-lg:border-l-0 max-lg:pl-0 max-lg:border-t max-lg:pt-5 max-lg:mt-3">
+              <h3 className="text-xl font-bold m-0 mb-3">Employee deductions</h3>
+              <DeductionRow label="Employee CPP" amount={result.cpp} />
+              <DeductionRow label="Employee EI" amount={result.ei} />
+              {result.cpp2 > 0 && <DeductionRow label="CPP2 enhancement" amount={result.cpp2} />}
+              <DeductionRow label="Federal tax" amount={result.federalTax} />
+              <DeductionRow label={`${provinceLabel} tax`} amount={result.provincialTax} />
+              <DeductionRow label="Total employee deductions" amount={result.totalDeductions} total />
+            </div>
+
+            {/* Employer Cost */}
+            <div className="border-l border-[#DDE3EA] pl-[22px] max-lg:border-l-0 max-lg:pl-0 max-lg:border-t max-lg:pt-5 max-lg:mt-3">
+              <h3 className="text-xl font-bold m-0 mb-3">Employer cost</h3>
+              <DeductionRow label="Employer CPP" amount={result.employer.cpp} />
+              {result.employer.cpp2 > 0 && <DeductionRow label="Employer CPP2" amount={result.employer.cpp2} />}
+              <DeductionRow label="Employer EI" amount={result.employer.ei} />
+              <DeductionRow label="Total employer cost" amount={result.employer.total} total />
+            </div>
+          </div>
+
+          {/* Remittance box */}
+          <div className="mt-5 border border-[#D7DDE4] rounded-lg p-[18px_20px] flex justify-between items-center gap-6 max-sm:flex-col max-sm:items-start">
             <div>
-              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                Employee Deductions
-              </h4>
-              <div className="space-y-2">
-                <DeductionRow label="CPP / QPP" amount={result.cpp} />
-                <DeductionRow label="CPP2 (enhancement)" amount={result.cpp2} />
-                <DeductionRow label="EI premiums" amount={result.ei} />
-                {province === "QC" && <DeductionRow label="QPIP (Quebec)" amount={result.totalDeductions - result.cpp - result.cpp2 - result.ei - result.federalTax - result.provincialTax} />}
-                <Separator />
-                <DeductionRow label="Federal income tax" amount={result.federalTax} />
-                <DeductionRow label="Provincial income tax" amount={result.provincialTax} />
-                <Separator />
-                <DeductionRow
-                  label="Total deductions"
-                  amount={result.totalDeductions}
-                  bold
-                />
-              </div>
+              <strong className="text-lg text-[#0F1419]">Total remittance for the period</strong>
+              <span className="block text-[#5D6673] text-sm mt-1">Employee deductions + employer cost</span>
             </div>
-
-            {/* Employer costs */}
-            <div>
-              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                Employer Costs (remittance)
-              </h4>
-              <div className="space-y-2">
-                <DeductionRow label="CPP match" amount={result.employer.cpp} />
-                <DeductionRow label="CPP2 match" amount={result.employer.cpp2} />
-                <DeductionRow label="EI (1.4×)" amount={result.employer.ei} />
-                <Separator />
-                <DeductionRow label="Total employer cost" amount={result.employer.total} bold />
-              </div>
+            <div className="text-[42px] font-extrabold tracking-[-0.02em] whitespace-nowrap text-[#0F1419]">
+              {fmtCAD(result.totalDeductions + result.employer.total)}
             </div>
+          </div>
 
-            {/* Total remittance to CRA */}
-            <div className="bg-[#1C1917] rounded-xl p-5 text-white">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-xs font-bold text-[#A8A29E] uppercase tracking-[0.06em]">Total remittance to CRA</p>
-                  <p className="text-[11px] text-[#78716C] mt-0.5">Employee + Employer combined</p>
-                </div>
-                <p className="text-2xl font-bold font-mono tabular-nums">{fmtCAD(result.totalDeductions + result.employer.total)}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#292524] text-xs text-[#A8A29E]">
-                <span>Employee deductions: {fmtCAD(result.totalDeductions)}</span>
-                <span className="text-right">Employer costs: {fmtCAD(result.employer.total)}</span>
-              </div>
+          {/* CTA */}
+          <Link
+            href="/sign-in"
+            className="w-full h-[52px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[18px] font-bold mt-4 flex items-center justify-center no-underline transition-colors"
+          >
+            Run this payroll in NEXVAR
+          </Link>
+
+          {/* Warnings */}
+          {result.warnings.length > 0 && (
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 mt-4">
+              <p className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-2">Warnings</p>
+              <ul className="list-disc list-inside space-y-1">
+                {result.warnings.map((w, i) => (
+                  <li key={i} className="text-sm text-amber-700">{w}</li>
+                ))}
+              </ul>
             </div>
+          )}
 
-            {/* Warnings */}
-            {result.warnings.length > 0 && (
-              <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-4 py-3">
-                <p className="text-xs font-semibold text-amber-800 dark:text-amber-200 uppercase tracking-wider mb-2">
-                  Warnings
-                </p>
-                <ul className="list-disc list-inside space-y-1">
-                  {result.warnings.map((w, i) => (
-                    <li key={i} className="text-sm text-amber-700 dark:text-amber-300">
-                      {w}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <p className="text-xs text-muted-foreground text-center">
-              Estimates only. Always verify with CRA PDOC for your specific situation.
-              Tax tables: T4127 121st edition (January 2026).
-            </p>
-          </CardContent>
-        </Card>
+          <p className="text-[#6B7480] text-sm mt-4 leading-relaxed">
+            Estimate only. Final payroll may vary based on TD1 forms, benefits, pensions, and other settings.
+          </p>
+        </>
       )}
     </div>
   );
@@ -349,26 +309,22 @@ export default function PaychequeCalculator() {
 function DeductionRow({
   label,
   amount,
-  bold,
+  total,
 }: {
   label: string;
   amount: number;
-  bold?: boolean;
+  total?: boolean;
 }) {
   return (
-    <div className="flex justify-between items-center">
-      <span className={bold ? "text-sm font-semibold" : "text-sm text-muted-foreground"}>
-        {label}
-      </span>
-      <span
-        className={
-          bold
-            ? "text-sm font-bold tabular-nums"
-            : "text-sm tabular-nums"
-        }
-      >
-        {fmtCAD(amount)}
-      </span>
+    <div
+      className={`flex justify-between gap-4 py-2 text-[15px] ${
+        total
+          ? "font-extrabold border-b-0 mt-1.5"
+          : "border-b border-[#EEF1F4]"
+      }`}
+    >
+      <span className="text-[#0F1419]">{label}</span>
+      <strong className="font-mono tabular-nums text-[#0F1419]">{fmtCAD(amount)}</strong>
     </div>
   );
 }

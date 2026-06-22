@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXVAR Payroll Calculator</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: #f4f6f8;
+      color: #0f1419;
+    }
+
+    .payroll-section {
+      min-height: 100vh;
+      padding: 48px;
+      background: #070d14;
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .hero {
+      color: #fff;
+      max-width: 560px;
+    }
+
+    .hero h1 {
+      font-size: 52px;
+      line-height: 1.18;
+      margin: 0 0 28px;
+      letter-spacing: -1.5px;
+    }
+
+    .hero p {
+      font-size: 22px;
+      line-height: 1.55;
+      color: #d7dde5;
+      margin-bottom: 42px;
+    }
+
+    .trust-list {
+      display: grid;
+      gap: 22px;
+      margin-bottom: 48px;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 20px;
+      color: #f3f5f7;
+    }
+
+    .check {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .secondary-btn {
+      display: inline-block;
+      padding: 18px 34px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .calculator-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 34px;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    .calculator-card h2 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      letter-spacing: -0.7px;
+    }
+
+    .subtext {
+      color: #5d6673;
+      font-size: 16px;
+      margin-bottom: 28px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: span 2;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #cfd6df;
+      border-radius: 6px;
+      padding: 0 16px;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    .advanced {
+      grid-column: span 2;
+      border: 1px solid #d7dde4;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafbfc;
+      margin-top: 4px;
+    }
+
+    .advanced strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .advanced span {
+      font-size: 14px;
+      color: #66707d;
+    }
+
+    .primary-btn {
+      grid-column: span 2;
+      height: 54px;
+      border: 0;
+      border-radius: 7px;
+      background: #e30613;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e5e9ef;
+      margin: 24px 0;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 1fr;
+      gap: 24px;
+    }
+
+    .net-pay h3,
+    .breakdown h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .net-pay .amount {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 16px;
+    }
+
+    .net-pay p {
+      color: #3e4752;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .breakdown {
+      border-left: 1px solid #dde3ea;
+      padding-left: 22px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eef1f4;
+      font-size: 15px;
+    }
+
+    .row.total {
+      font-weight: 800;
+      border-bottom: 0;
+      margin-top: 6px;
+    }
+
+    .remittance-box {
+      margin-top: 20px;
+      border: 1px solid #d7dde4;
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .remittance-box strong {
+      font-size: 18px;
+    }
+
+    .remittance-box span {
+      display: block;
+      color: #5d6673;
+      margin-top: 4px;
+    }
+
+    .remittance-amount {
+      font-size: 42px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .cta {
+      width: 100%;
+      height: 52px;
+      border: 0;
+      border-radius: 7px;
+      background: #e30613;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+
+    .disclaimer {
+      color: #6b7480;
+      font-size: 14px;
+      margin-top: 14px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1050px) {
+      .payroll-section {
+        grid-template-columns: 1fr;
+        padding: 28px;
+      }
+
+      .hero h1 {
+        font-size: 40px;
+      }
+
+      .results {
+        grid-template-columns: 1fr;
+      }
+
+      .breakdown {
+        border-left: 0;
+        padding-left: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full,
+      .advanced,
+      .primary-btn {
+        grid-column: span 1;
+      }
+
+      .remittance-box {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="payroll-section">
+    <div class="hero">
+      <h1>Estimate Canadian take-home pay in seconds</h1>
+      <p>
+        NEXVAR shows employee deductions, employer cost, and total remittance
+        before you run payroll.
+      </p>
+
+      <div class="trust-list">
+        <div class="trust-item">
+          <div class="check">✓</div>
+          Uses 2026 CRA payroll deduction tables
+        </div>
+        <div class="trust-item">
+          <div class="check">✓</div>
+          Includes CPP, EI, federal and provincial tax
+        </div>
+        <div class="trust-item">
+          <div class="check">✓</div>
+          No account required
+        </div>
+      </div>
+
+      <a href="#" class="secondary-btn">See NEXVAR payroll</a>
+    </div>
+
+    <div class="calculator-card">
+      <h2>Canadian payroll calculator</h2>
+      <div class="subtext">
+        Uses 2026 CRA T4127 payroll deduction tables for federal and provincial estimates.
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Province of employment</label>
+          <select>
+            <option>MB</option>
+            <option>ON</option>
+            <option>BC</option>
+            <option>AB</option>
+            <option>SK</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Pay frequency</label>
+          <select>
+            <option>Biweekly</option>
+            <option>Weekly</option>
+            <option>Semi-monthly</option>
+            <option>Monthly</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label>Gross pay before deductions</label>
+          <input type="text" value="$ 2,500.00" />
+        </div>
+
+        <div class="advanced">
+          <div>
+            <strong>Advanced options</strong>
+            <span>TD1 amounts, pension/RRSP deductions, union dues</span>
+          </div>
+          <div>⌄</div>
+        </div>
+
+        <button class="primary-btn">Calculate take-home pay</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="results">
+        <div class="net-pay">
+          <h3>Estimated net pay</h3>
+          <div class="amount">$1,923.42</div>
+          <p>For a biweekly $2,500.00 gross pay in Manitoba</p>
+        </div>
+
+        <div class="breakdown">
+          <h3>Employee deductions</h3>
+          <div class="row">
+            <span>Employee CPP</span>
+            <strong>$130.12</strong>
+          </div>
+          <div class="row">
+            <span>Employee EI</span>
+            <strong>$41.50</strong>
+          </div>
+          <div class="row">
+            <span>Federal tax</span>
+            <strong>$248.96</strong>
+          </div>
+          <div class="row">
+            <span>Manitoba tax</span>
+            <strong>$156.00</strong>
+          </div>
+          <div class="row total">
+            <span>Total employee deductions</span>
+            <strong>$576.58</strong>
+          </div>
+        </div>
+
+        <div class="breakdown">
+          <h3>Employer cost</h3>
+          <div class="row">
+            <span>Employer CPP</span>
+            <strong>$130.12</strong>
+          </div>
+          <div class="row">
+            <span>Employer EI</span>
+            <strong>$58.10</strong>
+          </div>
+          <div class="row total">
+            <span>Total employer cost</span>
+            <strong>$188.22</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="remittance-box">
+        <div>
+          <strong>Total remittance for the period</strong>
+          <span>Employee deductions + employer cost</span>
+        </div>
+        <div class="remittance-amount">$764.80</div>
+      </div>
+
+      <button class="cta">Run this payroll in NEXVAR</button>
+
+      <div class="disclaimer">
+        Estimate only. Final payroll may vary based on TD1 forms, benefits,
+        pensions, and other settings.
+      </div>
+    </div>
+  </section>
+</body>
+</html>

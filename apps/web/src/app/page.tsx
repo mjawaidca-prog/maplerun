@@ -115,21 +115,43 @@ export default function Home() {
       </section>
 
       {/* Calculator */}
-      <section id="calculator" className="py-[72px]">
-        <div className="max-w-[1120px] mx-auto px-8">
-          <div className="bg-[#1C1917] rounded-[20px] p-11 grid grid-cols-[1fr_1.2fr] gap-10 items-start text-white">
-            <div>
-              <h3 className="text-[28px] font-extrabold tracking-[-0.02em]">See a paycheque in real time</h3>
-              <p className="text-sm text-[#A8A29E] mt-2.5 leading-relaxed">
-                Enter a gross amount and province — Nexvar Pay shows the exact CPP, EI, and tax split before you ever create an account.
-              </p>
-              <Link href="/sign-in" className="inline-flex mt-[22px] px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline">
-                Try the full product →
-              </Link>
+      <section id="calculator" className="bg-[#070D14] py-20 px-8">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-[1fr_1.35fr] gap-16 items-center max-[1050px]:grid-cols-1">
+          {/* Hero */}
+          <div className="text-white max-w-[560px]">
+            <h2 className="text-[52px] font-extrabold leading-[1.18] tracking-[-0.03em] m-0 mb-7 max-[1050px]:text-[40px]">
+              Estimate Canadian take-home pay in seconds
+            </h2>
+            <p className="text-[22px] leading-relaxed text-[#D7DDE5] mb-[42px]">
+              NEXVAR shows employee deductions, employer cost, and total remittance before you run payroll.
+            </p>
+
+            <div className="grid gap-[22px] mb-12">
+              <div className="flex items-center gap-4 text-xl text-[#F3F5F7]">
+                <div className="w-11 h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-base">✓</div>
+                Uses 2026 CRA payroll deduction tables
+              </div>
+              <div className="flex items-center gap-4 text-xl text-[#F3F5F7]">
+                <div className="w-11 h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-base">✓</div>
+                Includes CPP, EI, federal and provincial tax
+              </div>
+              <div className="flex items-center gap-4 text-xl text-[#F3F5F7]">
+                <div className="w-11 h-11 rounded-full bg-white/10 grid place-items-center font-extrabold text-base">✓</div>
+                No account required
+              </div>
             </div>
-            <div className="bg-white rounded-[14px] text-[#1C1917]">
-              <PaychequeCalculator />
-            </div>
+
+            <Link
+              href="/sign-in"
+              className="inline-block px-[34px] py-[18px] border border-white/35 rounded-lg text-white text-lg no-underline hover:bg-white/10 transition-colors"
+            >
+              See NEXVAR payroll
+            </Link>
+          </div>
+
+          {/* Calculator card */}
+          <div className="text-[#1C1917]">
+            <PaychequeCalculator />
           </div>
         </div>
       </section>
