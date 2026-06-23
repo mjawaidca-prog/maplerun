@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const MONTHLY_PRICES = { Solo: 15, Growth: 25, Accountant: 59 };
-const EMPLOYEE_PRICES = { Solo: "$3", Growth: "$3", Accountant: "$2" };
+const MONTHLY_PRICES = { Solo: 7, Growth: 19, Accountant: 49 };
+const EMPLOYEE_PRICES = { Solo: "$2", Growth: "$2", Accountant: "$1.50" };
 
 const PLANS = [
   {
@@ -108,22 +108,30 @@ export function PricingCards() {
 
               <p className="text-[15px] font-bold">{plan.name}</p>
 
-              {/* Price — changes with toggle */}
-              <p className="text-[40px] font-extrabold tracking-[-0.02em] mt-3">
-                {annual ? `$${annualPrice}` : `$${monthlyPrice}`}
-                <span className="text-sm font-medium text-[#A8A29E]">
-                  {annual ? " /yr" : " /mo"}
-                </span>
-              </p>
-
+              {/* Price — shows monthly rate, annual shows equivalent monthly */}
               {annual ? (
-                <p className="text-[13px] text-[#15803D] mt-0.5 font-medium">
-                  ${monthlyPrice}/mo when billed annually
-                </p>
+                <>
+                  <p className="text-[40px] font-extrabold tracking-[-0.02em] mt-3">
+                    ${(annualPrice / 12).toFixed(2)}
+                    <span className="text-sm font-medium text-[#A8A29E]"> /mo</span>
+                  </p>
+                  <p className="text-[13px] text-[#78716C] mt-1">
+                    Billed annually at ${annualPrice}/yr
+                  </p>
+                  <p className="text-[13px] text-[#15803D] mt-0.5 font-medium">
+                    Save ${monthlyPrice * 12 - annualPrice} vs monthly
+                  </p>
+                </>
               ) : (
-                <p className="text-[13px] text-[#78716C] mt-1">
-                  + ${empPrice} / employee / month
-                </p>
+                <>
+                  <p className="text-[40px] font-extrabold tracking-[-0.02em] mt-3">
+                    ${monthlyPrice}
+                    <span className="text-sm font-medium text-[#A8A29E]"> /mo</span>
+                  </p>
+                  <p className="text-[13px] text-[#78716C] mt-1">
+                    + ${empPrice} / employee / month
+                  </p>
+                </>
               )}
 
               <ul className="list-none my-5 flex-1 space-y-0">

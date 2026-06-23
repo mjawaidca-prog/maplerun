@@ -39,8 +39,8 @@ export const PLANS: Record<string, PlanDefinition> = {
   solo: {
     id: "solo",
     name: "Solo",
-    basePriceCents: 1_500, // $15.00 CAD
-    employeePriceCents: 300, // $3.00 CAD
+    basePriceCents: 700, // $7.00 CAD
+    employeePriceCents: 200, // $2.00 CAD
     stripePriceId:
       process.env.STRIPE_PRICE_SOLO ?? "price_SOLO_PLACEHOLDER",
     features: [
@@ -54,8 +54,8 @@ export const PLANS: Record<string, PlanDefinition> = {
   growth: {
     id: "growth",
     name: "Growth",
-    basePriceCents: 2_500, // $25.00 CAD
-    employeePriceCents: 300, // $3.00 CAD
+    basePriceCents: 1_900, // $19.00 CAD
+    employeePriceCents: 200, // $2.00 CAD
     stripePriceId:
       process.env.STRIPE_PRICE_GROWTH ?? "price_GROWTH_PLACEHOLDER",
     features: [
@@ -70,8 +70,8 @@ export const PLANS: Record<string, PlanDefinition> = {
   accountant: {
     id: "accountant",
     name: "Accountant",
-    basePriceCents: 5_900, // $59.00 CAD
-    employeePriceCents: 200, // $2.00 CAD
+    basePriceCents: 4_900, // $49.00 CAD
+    employeePriceCents: 150, // $1.50 CAD
     stripePriceId:
       process.env.STRIPE_PRICE_ACCOUNTANT ?? "price_ACCOUNTANT_PLACEHOLDER",
     features: [

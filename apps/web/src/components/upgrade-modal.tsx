@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 
 const PLANS = [
-  { name: "Solo", price: "$15", emp: "1 employee", features: ["Unlimited pay runs","Pay stubs & T4 slips","CRA-aligned calculations"], off: ["ROE generation","Payroll journals"], current: true },
-  { name: "Growth", price: "$25", emp: "Up to 10 employees", features: ["Everything in Solo","Multiple pay groups","PD7A remittance"], off: ["Payroll journals"], reco: true },
-  { name: "Accountant", price: "$59", emp: "Unlimited employees", features: ["Everything in Growth","ROE generation","Payroll journals","Multi-company"], off: [] },
+  { name: "Solo", price: "$7", emp: "+ $2/emp", features: ["Unlimited pay runs","Pay stubs & T4 slips","CRA-aligned calculations"], off: ["ROE generation","Payroll journals"], current: true },
+  { name: "Growth", price: "$19", emp: "+ $2/emp", features: ["Everything in Solo","Multiple pay groups","PD7A remittance"], off: ["Payroll journals"], reco: true },
+  { name: "Accountant", price: "$49", emp: "+ $1.50/emp", features: ["Everything in Growth","ROE generation","Payroll journals","Multi-company"], off: [] },
 ];
 
 export function UpgradeModal({ onClose }: { onClose: () => void }) {

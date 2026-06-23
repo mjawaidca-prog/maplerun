@@ -56,9 +56,9 @@ export function can(plan: Plan | undefined | null, feature: string): boolean {
 // ── Plan metadata (display) ──────────────────────────────────────────────
 
 export const PLAN_META: Record<Plan, { label: string; dot: string; price: string }> = {
-  solo: { label: "Solo plan", dot: "#0891B2", price: "$15" },
-  growth: { label: "Growth plan", dot: "#16A34A", price: "$25" },
-  accountant: { label: "Accountant plan", dot: "#B3261E", price: "$59" },
+  solo: { label: "Solo plan", dot: "#0891B2", price: "$7" },
+  growth: { label: "Growth plan", dot: "#16A34A", price: "$19" },
+  accountant: { label: "Accountant plan", dot: "#B3261E", price: "$49" },
 };
 
 // ── Sidebar navigation config ────────────────────────────────────────────
