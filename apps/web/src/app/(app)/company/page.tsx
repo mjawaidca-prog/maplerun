@@ -4,7 +4,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { PLAN_META, type Plan } from "@/lib/plan";
-import { UpgradePlanButton } from "@/components/upgrade-plan-button";
+import { BillingUpgradeCards } from "@/components/upgrade-plan-button";
 import { PlanSwitcher } from "@/components/plan-switcher";
 import { PayGroupsManager } from "@/components/pay-groups-manager";
 import Link from "next/link";
@@ -143,33 +143,12 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
             </div>
             <div className="border-t border-[#F0EFED] pt-4 space-y-2">
               <p className="text-[13px] text-muted-foreground leading-relaxed">
-                Billing is handled through Stripe. Upgrade or change your plan by selecting one below and completing checkout.
+                Billing is handled through Stripe. Choose monthly or annual billing, then select a plan to complete checkout.
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3.5">
-            {(["solo", "growth", "accountant"] as Plan[]).map((p) => {
-              const m = PLAN_META[p];
-              const isCurrent = p === plan;
-              return (
-                <div
-                  key={p}
-                  className={`bg-white border rounded-[14px] p-5 text-center space-y-3 ${
-                    isCurrent ? "border-[#B3261E] ring-2 ring-[#B3261E]/20" : "border-[#E7E5E4]"
-                  } shadow-[0_1px_3px_rgba(0,0,0,0.04)]`}
-                >
-                  <p className="text-sm font-bold capitalize">{p}</p>
-                  <p className="text-2xl font-extrabold tracking-[-0.02em]">{m.price}<span className="text-xs font-medium text-[#A8A29E]">/mo</span></p>
-                  {isCurrent ? (
-                    <span className="inline-flex rounded-[9px] bg-[#F0EFED] text-[#A8A29E] text-xs font-semibold px-4 py-2">Current plan</span>
-                  ) : (
-                    <UpgradePlanButton planId={p} label={`Upgrade to ${p}`} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <BillingUpgradeCards currentPlan={plan} />
         </div>
       )}
     </div>

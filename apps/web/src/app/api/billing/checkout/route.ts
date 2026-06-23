@@ -1,26 +1,25 @@
 /**
  * POST /api/billing/checkout — create a Stripe Checkout session.
- * Body: { planId: string, employeeCount: number, companyId: string }
+ * Body: { planId: string, employeeCount: number, annual?: boolean }
  *
- * Stripe Checkout redirects to success/cancel URLs after payment.
- * On success, the webhook handler provisions access.
+ * Monthly billing or annual (2 months free = 10x monthly price billed yearly).
  */
 
 import { NextResponse } from "next/server";
-import { stripe, getPlan, planMonthlyTotal } from "@/lib/stripe";
+import { stripe, getPlan } from "@/lib/stripe";
 import { requireCompany } from "@/lib/session";
 
 export async function POST(request: Request) {
   const { companyId } = await requireCompany();
 
-  let body: { planId: string; employeeCount: number };
+  let body: { planId: string; employeeCount: number; annual?: boolean };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { planId, employeeCount } = body;
+  const { planId, employeeCount, annual } = body;
   const plan = getPlan(planId);
   if (!plan) {
     return NextResponse.json(
@@ -38,18 +37,22 @@ export async function POST(request: Request) {
 
   const origin = request.headers.get("origin") ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
+  // Annual = 10x monthly price (2 months free), billed yearly
+  const unitAmount = annual ? plan.basePriceCents * 10 : plan.basePriceCents;
+  const interval = annual ? ("year" as const) : ("month" as const);
+  const label = annual ? `${plan.name} (Annual)` : plan.name;
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       billing_address_collection: "required",
-      customer_email: undefined, // will be set by Checkout
       line_items: [
         {
           price_data: {
             currency: "cad",
-            product_data: { name: `Nexvar Pay ${plan.name}` },
-            unit_amount: plan.basePriceCents,
-            recurring: { interval: "month" as const },
+            product_data: { name: `Nexvar Pay ${label}` },
+            unit_amount: unitAmount,
+            recurring: { interval },
           },
           quantity: 1,
         },
@@ -57,12 +60,14 @@ export async function POST(request: Request) {
       metadata: {
         companyId,
         planId,
+        annual: annual ? "true" : "false",
         employeeCount: employeeCount.toString(),
       },
       subscription_data: {
         metadata: {
           companyId,
           planId,
+          annual: annual ? "true" : "false",
         },
       },
       success_url: `${origin}/app?checkout=success&plan=${planId}`,
