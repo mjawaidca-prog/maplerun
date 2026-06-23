@@ -18,12 +18,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Resend({
       from: process.env.AUTH_RESEND_FROM ?? "noreply@nexvarlab.com",
-      // API key read automatically from AUTH_RESEND_KEY env var
     }),
+    // Google OAuth — works when AUTH_GOOGLE_ID + AUTH_GOOGLE_SECRET are set
     Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-      // Allow only if both keys are set
+      clientId: process.env.AUTH_GOOGLE_ID ?? "",
+      clientSecret: process.env.AUTH_GOOGLE_SECRET ?? "",
       allowDangerousEmailAccountLinking: true,
     }),
   ],
