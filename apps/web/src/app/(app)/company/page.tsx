@@ -1,11 +1,12 @@
 /**
- * Company settings — Profile / Payroll / Billing tabs.
+ * Company settings — Profile / Pay Groups / Payroll / Billing tabs.
  */
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { PLAN_META, type Plan } from "@/lib/plan";
 import { UpgradePlanButton } from "@/components/upgrade-plan-button";
 import { PlanSwitcher } from "@/components/plan-switcher";
+import { PayGroupsManager } from "@/components/pay-groups-manager";
 import Link from "next/link";
 
 type SearchParams = Promise<{ tab?: string }>;
@@ -22,9 +23,16 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
 
   const tabs = [
     { key: "profile", label: "Profile" },
+    { key: "paygroups", label: "Pay Groups" },
     { key: "payroll", label: "Payroll" },
     { key: "billing", label: "Billing" },
   ];
+
+  // Fetch pay groups for the paygroups tab
+  const payGroups = await prisma.payGroup.findMany({
+    where: { companyId },
+    orderBy: { createdAt: "asc" },
+  });
 
   return (
     <div className="space-y-6">
@@ -61,6 +69,7 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
             <div className="p-[22px] space-y-4">
               {[
                 ["Legal name", company.name],
+                ["Business Number (BN)", company.businessNumber || "—"],
                 ["Workspace slug", company.slug],
                 ["Status", company.active ? "Active" : "Inactive"],
                 ["Created", company.createdAt.toISOString().slice(0, 10)],
@@ -79,6 +88,11 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Pay Groups tab ── */}
+      {activeTab === "paygroups" && (
+        <PayGroupsManager companyId={companyId} payGroups={payGroups} />
       )}
 
       {/* ── Payroll tab ── */}

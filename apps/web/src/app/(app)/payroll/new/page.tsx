@@ -11,6 +11,7 @@ import { prisma } from "@/lib/prisma";
 import { type Plan } from "@/lib/plan";
 import { previewPayRun, finalizePayRun, type PayRunPreview } from "@/lib/actions/payroll";
 import { PayRunWizard } from "./wizard";
+import Link from "next/link";
 
 export default async function NewPayRunPage() {
   const { companyId } = await requireCompany();
@@ -20,6 +21,24 @@ export default async function NewPayRunPage() {
     prisma.employee.findMany({ where: { companyId, active: true }, orderBy: { lastName: "asc" }, select: { id: true, firstName: true, lastName: true, payType: true, payRate: true } }),
     prisma.company.findUnique({ where: { id: companyId }, select: { plan: true } }),
   ]);
+
+  if (payGroups.length === 0) {
+    return (
+      <div className="space-y-6 max-w-lg mx-auto pt-12 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-[#FEF2F2] flex items-center justify-center text-[30px] mx-auto">⚙️</div>
+        <h1 className="text-2xl font-bold tracking-tight">No pay groups yet</h1>
+        <p className="text-muted-foreground leading-relaxed">
+          A pay group defines how often employees are paid and their default tax province. Create one before running payroll.
+        </p>
+        <Link
+          href="/company?tab=paygroups"
+          className="inline-flex items-center gap-2 rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-white text-sm font-semibold px-5 py-2.5 no-underline transition-colors"
+        >
+          ＋ Create your first pay group
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-3xl">

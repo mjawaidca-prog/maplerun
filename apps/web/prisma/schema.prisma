@@ -90,6 +90,7 @@ model Company {
   slug      String   @unique
   active    Boolean  @default(true)
   plan      String   @default("growth")
+  businessNumber    String?
   freePayRunsUsed Int @default(0)
   maxFreePayRuns  Int @default(2)
   trialEndsAt     DateTime?

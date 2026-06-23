@@ -52,10 +52,34 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             {firstName ? `Good morning, ${firstName} — ` : ""}{company?.name ?? "Nexvar Pay"}
           </p>
         </div>
-        <Link href="/payroll/new" className="inline-flex items-center gap-2 rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-white text-sm font-semibold px-5 py-2.5 no-underline transition-colors">
-          ＋ Run payroll
+        <Link
+          href={payGroupCount === 0 ? "/company?tab=paygroups" : "/payroll/new"}
+          className="inline-flex items-center gap-2 rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-white text-sm font-semibold px-5 py-2.5 no-underline transition-colors"
+        >
+          {payGroupCount === 0 ? "＋ Set up pay group" : "＋ Run payroll"}
         </Link>
       </div>
+
+      {/* No pay groups yet — setup prompt for all plans */}
+      {payGroupCount === 0 && (
+        <div className="bg-[#FFF7ED] border border-[#FED7AA] rounded-[14px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#FFF7ED] flex items-center justify-center text-2xl flex-shrink-0">⚙️</div>
+            <div className="flex-1">
+              <p className="text-base font-bold text-[#9A3412]">Set up your first pay group</p>
+              <p className="text-sm text-[#C2410C] mt-1 leading-relaxed">
+                A pay group defines how often employees are paid (weekly, biweekly, monthly) and their default province for tax calculations. You need at least one pay group before running payroll.
+              </p>
+              <Link
+                href="/company?tab=paygroups"
+                className="inline-flex items-center gap-2 mt-4 rounded-[9px] bg-[#9A3412] hover:bg-[#7C2D12] text-white text-[13px] font-semibold px-4 py-2 no-underline transition-colors"
+              >
+                Create pay group →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ═══ SOLO — minimal essentials ═══ */}
       {plan === "solo" && (
