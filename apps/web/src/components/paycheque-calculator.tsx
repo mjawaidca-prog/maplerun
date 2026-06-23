@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { calculatePay, type ProvinceCode, type PayFrequency, type PayResult, PERIODS_PER_YEAR, ZERO_YTD } from "@maplerun/tax-engine";
 import Link from "next/link";
+import { useLang } from "@/lib/i18n";
+import { T } from "@/lib/translations";
 
 const PROVINCES: { code: ProvinceCode; label: string }[] = [
   { code: "AB", label: "Alberta" },
@@ -97,19 +99,25 @@ export default function PaychequeCalculator() {
   }
 
   const provinceLabel = PROVINCES.find((p) => p.code === province)?.label ?? "";
+  const { lang } = useLang();
+  const fr = lang === "fr";
 
   return (
     <div className="bg-white rounded-[14px] p-[34px] shadow-[0_28px_70px_rgba(0,0,0,0.35)]">
-      <h2 className="text-[28px] sm:text-[32px] font-extrabold tracking-[-0.02em] m-0">Canadian payroll calculator</h2>
+      <h2 className="text-[28px] sm:text-[32px] font-extrabold tracking-[-0.02em] m-0">
+        {fr ? T.calcCardTitle.fr : T.calcCardTitle.en}
+      </h2>
       <p className="text-[#5D6673] text-sm sm:text-base mt-1.5 mb-6">
-        Uses 2026 CRA T4127 payroll deduction tables.
+        {fr ? T.calcCardSub.fr : T.calcCardSub.en}
       </p>
 
       {/* Form */}
       <div className="grid grid-cols-2 gap-4">
         {/* Province */}
         <div className="flex flex-col gap-1.5">
-          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">Province of employment</label>
+          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">
+            {fr ? T.calcProvince.fr : T.calcProvince.en}
+          </label>
           <select
             value={province}
             onChange={(e) => setProvince(e.target.value as ProvinceCode)}
@@ -124,7 +132,9 @@ export default function PaychequeCalculator() {
 
         {/* Frequency */}
         <div className="flex flex-col gap-1.5">
-          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">Pay frequency</label>
+          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">
+            {fr ? T.calcFrequency.fr : T.calcFrequency.en}
+          </label>
           <select
             value={frequency}
             onChange={(e) => setFrequency(e.target.value as PayFrequency)}
@@ -139,7 +149,9 @@ export default function PaychequeCalculator() {
 
         {/* Gross pay */}
         <div className="col-span-2 flex flex-col gap-1.5">
-          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">Gross pay before deductions</label>
+          <label className="font-semibold text-sm sm:text-[15px] text-[#0F1419]">
+            {fr ? T.calcGross.fr : T.calcGross.en}
+          </label>
           <div className="relative">
             <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#5D6673] font-medium text-sm sm:text-base">$</span>
             <input
@@ -161,8 +173,12 @@ export default function PaychequeCalculator() {
           className="col-span-2 border border-[#D7DDE4] rounded-lg p-3 sm:p-4 flex justify-between items-center bg-[#FAFBFC] cursor-pointer hover:bg-[#F4F6F8] transition-colors"
         >
           <div className="text-left">
-            <strong className="block text-sm sm:text-base text-[#0F1419]">Advanced options</strong>
-            <span className="text-xs sm:text-sm text-[#66707D]">TD1 amounts, pension/RRSP deductions, union dues</span>
+            <strong className="block text-sm sm:text-base text-[#0F1419]">
+              {fr ? T.calcAdvanced.fr : T.calcAdvanced.en}
+            </strong>
+            <span className="text-xs sm:text-sm text-[#66707D]">
+              {fr ? T.calcAdvancedDesc.fr : T.calcAdvancedDesc.en}
+            </span>
           </div>
           <span className={`text-[#66707D] text-lg transition-transform ${advancedOpen ? "rotate-180" : ""}`}>⌄</span>
         </button>
@@ -171,7 +187,9 @@ export default function PaychequeCalculator() {
         {advancedOpen && (
           <div className="col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-[13px] text-[#0F1419]">Period deductions</label>
+              <label className="font-semibold text-[13px] text-[#0F1419]">
+                {fr ? T.calcPeriodDed.fr : T.calcPeriodDed.en}
+              </label>
               <input
                 type="number"
                 min="0"
@@ -183,7 +201,9 @@ export default function PaychequeCalculator() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-[13px] text-[#0F1419]">Federal TD1 claim</label>
+              <label className="font-semibold text-[13px] text-[#0F1419]">
+                {fr ? T.calcFederalTD1.fr : T.calcFederalTD1.en}
+              </label>
               <input
                 type="number"
                 min="0"
@@ -195,7 +215,9 @@ export default function PaychequeCalculator() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="font-semibold text-[13px] text-[#0F1419]">Provincial TD1 claim</label>
+              <label className="font-semibold text-[13px] text-[#0F1419]">
+                {fr ? T.calcProvTD1.fr : T.calcProvTD1.en}
+              </label>
               <input
                 type="number"
                 min="0"
@@ -222,7 +244,7 @@ export default function PaychequeCalculator() {
           disabled={calculating}
           className="col-span-2 h-[50px] sm:h-[54px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[16px] sm:text-[18px] font-bold cursor-pointer mt-1 disabled:opacity-60 transition-colors"
         >
-          {calculating ? "Calculating…" : "Calculate take-home pay"}
+          {calculating ? (fr ? T.calcCalculating.fr : T.calcCalculating.en) : (fr ? T.calcButton.fr : T.calcButton.en)}
         </button>
       </div>
 
@@ -235,7 +257,9 @@ export default function PaychequeCalculator() {
           <div className="grid sm:grid-cols-[1fr_1.1fr_1fr] gap-5 max-sm:gap-4">
             {/* Net Pay — full width on mobile, first col on desktop */}
             <div className="max-sm:col-span-full max-sm:text-center">
-              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">Estimated net pay</h3>
+              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">
+                {fr ? T.calcNetPay.fr : T.calcNetPay.en}
+              </h3>
               <div className="text-[36px] sm:text-[44px] font-extrabold tracking-[-0.02em] mb-3 text-[#0F1419]">
                 {fmtCAD(result.netPay)}
               </div>
@@ -248,7 +272,9 @@ export default function PaychequeCalculator() {
 
             {/* Employee Deductions */}
             <div className="sm:border-l sm:border-[#DDE3EA] sm:pl-5 max-sm:border-t max-sm:border-[#EEF1F4] max-sm:pt-4">
-              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">Employee deductions</h3>
+              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">
+                {fr ? T.calcEmpDed.fr : T.calcEmpDed.en}
+              </h3>
               <DeductionRow label="Employee CPP" amount={result.cpp} />
               <DeductionRow label="Employee EI" amount={result.ei} />
               {result.cpp2 > 0 && <DeductionRow label="CPP2 enhancement" amount={result.cpp2} />}
@@ -259,7 +285,9 @@ export default function PaychequeCalculator() {
 
             {/* Employer Cost */}
             <div className="sm:border-l sm:border-[#DDE3EA] sm:pl-5 max-sm:border-t max-sm:border-[#EEF1F4] max-sm:pt-4">
-              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">Employer cost</h3>
+              <h3 className="text-base sm:text-lg font-bold m-0 mb-2">
+                {fr ? T.calcEmpCost.fr : T.calcEmpCost.en}
+              </h3>
               <DeductionRow label="Employer CPP" amount={result.employer.cpp} />
               {result.employer.cpp2 > 0 && <DeductionRow label="Employer CPP2" amount={result.employer.cpp2} />}
               <DeductionRow label="Employer EI" amount={result.employer.ei} />
@@ -270,8 +298,12 @@ export default function PaychequeCalculator() {
           {/* Remittance box */}
           <div className="mt-4 border border-[#D7DDE4] rounded-lg p-4 sm:p-[18px_20px] flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-6">
             <div>
-              <strong className="text-base sm:text-lg text-[#0F1419]">Total remittance for the period</strong>
-              <span className="block text-[#5D6673] text-[13px] mt-0.5">Employee deductions + employer cost</span>
+              <strong className="text-base sm:text-lg text-[#0F1419]">
+                {fr ? T.calcRemitTitle.fr : T.calcRemitTitle.en}
+              </strong>
+              <span className="block text-[#5D6673] text-[13px] mt-0.5">
+                {fr ? T.calcRemitSub.fr : T.calcRemitSub.en}
+              </span>
             </div>
             <div className="text-[32px] sm:text-[38px] font-extrabold tracking-[-0.02em] text-[#0F1419] font-mono tabular-nums">
               {fmtCAD(result.totalDeductions + result.employer.total)}
@@ -283,7 +315,7 @@ export default function PaychequeCalculator() {
             href="/signup"
             className="w-full h-[50px] sm:h-[52px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[16px] sm:text-[18px] font-bold mt-3 flex items-center justify-center no-underline transition-colors"
           >
-            Run this payroll in NEXVAR
+            {fr ? T.calcRunCTA.fr : T.calcRunCTA.en}
           </Link>
 
           {/* Warnings */}
@@ -299,7 +331,7 @@ export default function PaychequeCalculator() {
           )}
 
           <p className="text-[#6B7480] text-[13px] mt-3 leading-relaxed">
-            Estimate only. Final payroll may vary based on TD1 forms, benefits, pensions, and other settings.
+            {fr ? T.calcDisclaimer.fr : T.calcDisclaimer.en}
           </p>
         </>
       )}

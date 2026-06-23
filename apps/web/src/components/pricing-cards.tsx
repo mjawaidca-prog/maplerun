@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useLang } from "@/lib/i18n";
+import { T } from "@/lib/translations";
 
 const MONTHLY_PRICES = { Solo: 7, Growth: 19, Accountant: 49 };
 const EMPLOYEE_PRICES = { Solo: "$2", Growth: "$2", Accountant: "$1.50" };
@@ -50,13 +52,15 @@ const PLANS = [
 export function PricingCards() {
   const [active, setActive] = useState("Growth");
   const [annual, setAnnual] = useState(false);
+  const { lang } = useLang();
+  const fr = lang === "fr";
 
   return (
     <div>
       {/* Monthly / Annual toggle */}
       <div className="flex items-center justify-center gap-4 mb-8">
         <span className={`text-sm font-semibold ${!annual ? "text-[#1C1917]" : "text-[#A8A29E]"}`}>
-          Monthly
+          {fr ? T.monthly.fr : T.monthly.en}
         </span>
         <button
           onClick={() => setAnnual(!annual)}
@@ -72,11 +76,11 @@ export function PricingCards() {
           />
         </button>
         <span className={`text-sm font-semibold ${annual ? "text-[#1C1917]" : "text-[#A8A29E]"}`}>
-          Annual
+          {fr ? T.annual.fr : T.annual.en}
         </span>
         {annual && (
           <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-[#F0FDF4] border border-[#BBF7D0] text-[#15803D] rounded-full px-2.5 py-1">
-            Save 2 months
+            {fr ? T.saveMonths.fr : T.saveMonths.en}
           </span>
         )}
       </div>
@@ -102,7 +106,7 @@ export function PricingCards() {
             >
               {isPopular && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold tracking-[0.05em] bg-[#B3261E] text-white rounded-full px-3 py-1.5">
-                  MOST POPULAR
+                  {fr ? T.mostPopular.fr : T.mostPopular.en}
                 </span>
               )}
 
@@ -116,10 +120,10 @@ export function PricingCards() {
                     <span className="text-sm font-medium text-[#A8A29E]"> /mo</span>
                   </p>
                   <p className="text-[13px] text-[#78716C] mt-1">
-                    Billed annually at ${annualPrice}/yr
+                    {fr ? T.billedAnnually.fr(annualPrice) : T.billedAnnually.en(annualPrice)}
                   </p>
                   <p className="text-[13px] text-[#15803D] mt-0.5 font-medium">
-                    Save ${monthlyPrice * 12 - annualPrice} vs monthly
+                    {fr ? T.saveVsMonthly.fr(monthlyPrice * 12 - annualPrice) : T.saveVsMonthly.en(monthlyPrice * 12 - annualPrice)}
                   </p>
                 </>
               ) : (
@@ -129,7 +133,7 @@ export function PricingCards() {
                     <span className="text-sm font-medium text-[#A8A29E]"> /mo</span>
                   </p>
                   <p className="text-[13px] text-[#78716C] mt-1">
-                    + ${empPrice} / employee / month
+                    {fr ? T.perEmployee.fr(empPrice) : T.perEmployee.en(empPrice)}
                   </p>
                 </>
               )}
@@ -151,7 +155,7 @@ export function PricingCards() {
                     : "border border-[#D6D3D1] bg-white text-[#1C1917] hover:border-[#B3261E]"
                 }`}
               >
-                Start 14-day free trial
+                {fr ? T.startTrial.fr : T.startTrial.en}
               </Link>
             </div>
           );
