@@ -72,28 +72,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-[72px]">
+      {/* Stats bar */}
+      <section className="py-16 bg-[#FAFAF9] border-y border-[#E7E5E4]">
         <div className="max-w-[1120px] mx-auto px-8">
-          <div className="text-center max-w-[560px] mx-auto mb-11">
-            <p className="text-xs font-bold text-[#B3261E] uppercase tracking-[0.08em]">Trusted by Canadian teams</p>
-            <h2 className="text-[34px] font-extrabold tracking-[-0.02em] mt-2.5">Less dread, more done</h2>
-          </div>
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-4 gap-8 text-center">
             {[
-              { q: '"I switched from a spreadsheet and a prayer. Now payroll takes ten minutes and I actually trust the numbers."', name: "Marcus Reid", role: "Owner, Northwind Carpentry", initial: "M" },
-              { q: '"The pay stubs look like they came from a bank. My employees stopped asking me to explain their deductions."', name: "Priya Sharma", role: "Founder, Lumen Studio", initial: "P" },
-              { q: '"As the bookkeeper for six clients, the journal export and ROE tools save me a full day each month."', name: "Jean‑Luc Caron", role: "CPA, Caron Accounting", initial: "J" },
-            ].map((t) => (
-              <div key={t.name} className="border border-[#E7E5E4] rounded-[14px] p-6 bg-[#FAFAF9]">
-                <p className="text-sm text-[#1C1917] leading-relaxed">{t.q}</p>
-                <div className="flex items-center gap-[11px] mt-[18px]">
-                  <div className="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-[#B3261E] to-[#E56A5C] flex items-center justify-center text-white font-bold text-sm">{t.initial}</div>
-                  <div>
-                    <p className="text-[13px] font-bold">{t.name}</p>
-                    <p className="text-xs text-[#A8A29E]">{t.role}</p>
-                  </div>
-                </div>
+              { value: "137", label: "Automated tests" },
+              { value: "13", label: "Provinces & territories" },
+              { value: "2026", label: "CRA tax tables" },
+              { value: "100%", label: "Free from spreadsheets" },
+            ].map((s) => (
+              <div key={s.label} className="space-y-2">
+                <p className="text-[36px] font-extrabold tracking-[-0.02em] text-[#1C1917]">{s.value}</p>
+                <p className="text-sm text-[#78716C] font-medium">{s.label}</p>
               </div>
             ))}
           </div>
