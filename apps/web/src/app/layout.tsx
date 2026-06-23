@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://app.nexvarlab.com"),
   title: "Nexvar Pay — Canadian Payroll, Done in Minutes",
   description:
     "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, and produce pay stubs in minutes. Supports all provinces and territories. 2026 T4127 tax tables. A product of NexvarLab.",

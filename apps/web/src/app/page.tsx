@@ -6,11 +6,13 @@ import { LandingHero } from "@/components/landing-hero";
 import { LandingFeaturesSection } from "@/components/landing-features";
 import { LandingStats, LandingSecurity, LandingCalculatorHero, LandingFooter } from "@/components/landing-sections";
 import { PricingHeader } from "@/components/pricing-header";
+import { StructuredData } from "@/components/structured-data";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="flex flex-col">
+      <StructuredData />
       {/* Nav */}
       <nav className="max-w-[1120px] mx-auto w-full px-8 flex items-center justify-between py-5">
         <Link href="/" className="flex items-center gap-2.5 font-extrabold tracking-tight no-underline">
