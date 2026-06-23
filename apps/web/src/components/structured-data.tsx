@@ -23,11 +23,6 @@ export function StructuredData() {
       name: "NexvarLab",
       url: "https://pay.nexvarlab.com",
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      reviewCount: "24",
-    },
   };
 
   return (
