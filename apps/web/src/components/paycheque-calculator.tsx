@@ -280,7 +280,7 @@ export default function PaychequeCalculator() {
 
           {/* CTA */}
           <Link
-            href="/sign-in"
+            href="/signup"
             className="w-full h-[50px] sm:h-[52px] border-0 rounded-[7px] bg-[#E30613] hover:bg-[#C90510] text-white text-[16px] sm:text-[18px] font-bold mt-3 flex items-center justify-center no-underline transition-colors"
           >
             Run this payroll in NEXVAR

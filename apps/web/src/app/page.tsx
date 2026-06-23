@@ -15,8 +15,11 @@ export default function Home() {
           <a href="#features" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Features</a>
           <a href="#pricing" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Pricing</a>
           <a href="#calculator" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Calculator</a>
+          <button className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium bg-transparent border border-[#D6D3D1] rounded-md px-2 py-0.5 cursor-pointer" title="Français bientôt disponible">
+            EN
+          </button>
           <Link href="/sign-in" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Sign in</Link>
-          <Link href="/sign-in" className="inline-flex items-center gap-2 px-[18px] py-2.5 rounded-[10px] bg-[#B3261E] text-white text-sm font-semibold no-underline hover:bg-[#8F1D17] transition-colors">
+          <Link href="/signup" className="inline-flex items-center gap-2 px-[18px] py-2.5 rounded-[10px] bg-[#B3261E] text-white text-sm font-semibold no-underline hover:bg-[#8F1D17] transition-colors">
             14-day free trial →
           </Link>
         </div>
@@ -26,7 +29,7 @@ export default function Home() {
       <section className="bg-gradient-to-b from-white to-[#FEF6F5] py-[70px] pb-20 text-center">
         <div className="max-w-[1120px] mx-auto px-8">
           <span className="inline-flex items-center gap-[7px] text-xs font-semibold text-[#0F172A] bg-[#EFF6FF] border border-[#BFDBFE] rounded-full px-3.5 py-1.5 mb-[22px]">
-            🇨🇦 Built for Canadian small business · A NexvarLab product
+            🇨🇦 Built for Canadian small business & accountants · A NexvarLab product
           </span>
           <h1 className="text-[52px] font-extrabold leading-tight tracking-[-0.03em] max-w-[760px] mx-auto">
             Payroll that feels like a <em className="not-italic text-[#B3261E]">bank statement</em>, not a spreadsheet.
@@ -35,7 +38,7 @@ export default function Home() {
             Run CPP, EI, and tax-accurate payroll in minutes. Pay stubs and T4s your employees and accountant will actually trust.
           </p>
           <div className="flex gap-3 justify-center mt-[30px]">
-            <Link href="/sign-in" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline hover:bg-[#8F1D17]">
+            <Link href="/signup" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline hover:bg-[#8F1D17]">
               Start 14-day free trial
             </Link>
             <a href="#calculator" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] border border-[#D6D3D1] bg-white text-[#1C1917] font-semibold no-underline hover:bg-gray-50">
@@ -62,7 +65,7 @@ export default function Home() {
               { icon: "🛡️", title: "Guided & safe", desc: "Preview every deduction and confirm before you finalize. Drafts are saved automatically." },
               { icon: "⚡", title: "Minutes, not hours", desc: "A three-step wizard takes a full pay run from gross amounts to net deposit." },
               { icon: "📈", title: "Always up to date", desc: "Rate tables update each tax year. Past runs keep their original year's rates." },
-              { icon: "👥", title: "For owners & accountants", desc: "Remittances, ROEs, and journals when you need them — share access with your bookkeeper." },
+              { icon: "👥", title: "Built for owners & accountants", desc: "Multi-company dashboard for bookkeepers. Full CRA reports for accountants. Your whole team stays in sync." },
             ].map((f) => (
               <div key={f.title} className="border border-[#E7E5E4] rounded-[14px] p-6 bg-white hover:border-[#B3261E]/30 hover:shadow-[0_4px_12px_rgba(179,38,30,0.06)] transition-all">
                 <div className="w-11 h-11 rounded-[11px] bg-[#B3261E]/10 flex items-center justify-center text-[21px] mb-4">{f.icon}</div>
@@ -116,6 +119,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Security trust bar */}
+      <section className="py-10 bg-white border-y border-[#E7E5E4]">
+        <div className="max-w-[1120px] mx-auto px-8">
+          <div className="grid grid-cols-4 gap-8 text-center">
+            {[
+              { icon: "🔒", title: "AES-256-GCM", desc: "SIN & bank details encrypted at rest" },
+              { icon: "🗄", title: "Neon PostgreSQL", desc: "Canada-adjacent infrastructure · SSL" },
+              { icon: "💳", title: "Stripe PCI DSS Level 1", desc: "Payments never touch our servers" },
+              { icon: "📧", title: "Resend DKIM/SPF", desc: "Encrypted email delivery, verified" },
+            ].map((t) => (
+              <div key={t.title} className="space-y-2">
+                <div className="text-2xl">{t.icon}</div>
+                <p className="text-[13px] font-bold text-[#1C1917]">{t.title}</p>
+                <p className="text-xs text-[#A8A29E]">{t.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Calculator */}
       <section id="calculator" className="bg-[#070D14] py-16 sm:py-20 px-4 sm:px-8">
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.35fr] gap-8 lg:gap-16 items-start lg:items-center">
@@ -144,7 +167,7 @@ export default function Home() {
             </div>
 
             <Link
-              href="/sign-in"
+              href="/signup"
               className="inline-block px-6 sm:px-[34px] py-3.5 sm:py-[18px] border border-white/35 rounded-lg text-white text-base sm:text-lg no-underline hover:bg-white/10 transition-colors"
             >
               See NEXVAR payroll
@@ -166,8 +189,9 @@ export default function Home() {
             <div className="flex gap-[22px]">
               <a href="#features" className="text-[13px] text-[#78716C] no-underline">Features</a>
               <a href="#pricing" className="text-[13px] text-[#78716C] no-underline">Pricing</a>
-              <a href="#" className="text-[13px] text-[#78716C] no-underline">Security</a>
               <Link href="/sign-in" className="text-[13px] text-[#78716C] no-underline">Sign in</Link>
+              <a href="#" className="text-[13px] text-[#78716C] no-underline">Privacy</a>
+              <a href="#" className="text-[13px] text-[#78716C] no-underline">Terms</a>
             </div>
           </div>
           <p className="text-xs text-[#A8A29E] mt-[18px] leading-relaxed max-w-[620px]">
