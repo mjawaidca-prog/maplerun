@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/", "/app/", "/payroll/", "/employees/", "/company/", "/reports/", "/onboarding"],
     },
-    sitemap: "https://app.nexvarlab.com/sitemap.xml",
+    sitemap: "https://pay.nexvarlab.com/sitemap.xml",
   };
 }

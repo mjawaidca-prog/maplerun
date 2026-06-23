@@ -11,7 +11,7 @@ export function StructuredData() {
     operatingSystem: "Web",
     description:
       "Canadian payroll software for small businesses and accountants. CRA-compliant CPP, EI, and tax calculations for all 13 provinces and territories. Pay stubs, T4 slips, ROEs, and PD7A remittance.",
-    url: "https://app.nexvarlab.com",
+    url: "https://pay.nexvarlab.com",
     offers: {
       "@type": "Offer",
       price: "7.00",
@@ -21,7 +21,7 @@ export function StructuredData() {
     provider: {
       "@type": "Organization",
       name: "NexvarLab",
-      url: "https://app.nexvarlab.com",
+      url: "https://pay.nexvarlab.com",
     },
     aggregateRating: {
       "@type": "AggregateRating",

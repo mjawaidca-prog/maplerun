@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://app.nexvarlab.com";
+  const baseUrl = "https://pay.nexvarlab.com";
 
   return [
     {

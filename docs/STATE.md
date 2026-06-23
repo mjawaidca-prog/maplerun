@@ -19,7 +19,7 @@
   - ✅ Stripe: Products/prices created, keys in .env
   - ✅ Timesheet screens: Entry + CSV import built
   - ✅ Year-End Centre: T4/RL-1 filing wizard built
-  - ✅ Deploy: GitHub → Vercel → live at https://app.nexvarlab.com
+  - ✅ Deploy: GitHub → Vercel → live at https://pay.nexvarlab.com
   - ✅ Complete system guide: docs/MAPLERUN-COMPLETE-GUIDE.html (11 sections)
 - **Rebrand (June 22): DONE** — Name conflict with maplerun.ca resolved.
   - ✅ Renamed to **Nexvar Pay** (a NexvarLab product)
@@ -28,7 +28,7 @@
   - ✅ Internal identifiers preserved (@maplerun/tax-engine package, cookie names)
 
 ## Live
-- **Production URL:** https://app.nexvarlab.com (Cloudflare + Vercel, Next.js 16, Auth.js v5)
+- **Production URL:** https://pay.nexvarlab.com (Cloudflare + Vercel, Next.js 16, Auth.js v5)
 - **Stack:** Vercel (pdx1) + Neon PostgreSQL + Cloudflare DNS + Stripe + Resend
 - **Domain:** nexvarlab.com registered via Namecheap, DNS on Cloudflare
 
