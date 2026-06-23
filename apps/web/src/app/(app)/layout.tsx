@@ -6,6 +6,7 @@ import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SIDEBAR_NAV, can, PLAN_META, REQUIRES as REQ_MAP, type NavItem, type Plan } from "@/lib/plan";
 import { CompanySwitcher } from "@/components/company-switcher";
+import { TrialBanner } from "@/components/trial-banner";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
 
@@ -17,7 +18,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   // Get company plan + all user companies for switcher
   const [company, allCompanies] = await Promise.all([
-    prisma.company.findUnique({ where: { id: user.companyId }, select: { plan: true } }),
+    prisma.company.findUnique({ where: { id: user.companyId }, select: { plan: true, trialEndsAt: true } }),
     prisma.company.findMany({
       where: { memberships: { some: { userId: session?.user?.id } } },
       select: { id: true, name: true },
@@ -125,7 +126,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </aside>
 
       <main className="flex-1 overflow-auto">
-        <div className="px-12 py-9">{children}</div>
+        <div className="px-12 py-9 space-y-5">
+          <TrialBanner trialEndsAt={company?.trialEndsAt ?? null} plan={plan} />
+          {children}
+        </div>
       </main>
     </div>
   );

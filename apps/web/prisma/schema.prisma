@@ -92,6 +92,7 @@ model Company {
   plan      String   @default("growth")
   freePayRunsUsed Int @default(0)
   maxFreePayRuns  Int @default(2)
+  trialEndsAt     DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

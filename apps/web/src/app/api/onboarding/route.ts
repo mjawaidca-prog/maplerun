@@ -35,6 +35,9 @@ export async function POST(request: Request) {
   // Promo code: MAPLE2026 gives Accountant plan + unlimited free runs
   const isPromo = slug.toUpperCase().includes("MAPLE2026") || name.toUpperCase().includes("MAPLE2026");
 
+  // Trial: 14 days from now (promo code = no expiry)
+  const trialEndsAt = isPromo ? null : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+
   const company = await prisma.company.create({
     data: {
       name,
@@ -42,6 +45,7 @@ export async function POST(request: Request) {
       active: true,
       plan: isPromo ? "accountant" : "growth",
       maxFreePayRuns: isPromo ? 999 : 2,
+      trialEndsAt,
       memberships: {
         create: {
           userId: session.user.id,
