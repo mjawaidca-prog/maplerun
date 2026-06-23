@@ -1,6 +1,8 @@
 import PaychequeCalculator from "@/components/paycheque-calculator";
 import { PricingCards } from "@/components/pricing-cards";
 import { Logo } from "@/components/logo";
+import { LangToggle } from "@/components/lang-toggle";
+import { LandingHero } from "@/components/landing-hero";
 import Link from "next/link";
 
 export default function Home() {
@@ -15,9 +17,7 @@ export default function Home() {
           <a href="#features" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Features</a>
           <a href="#pricing" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Pricing</a>
           <a href="#calculator" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Calculator</a>
-          <button className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium bg-transparent border border-[#D6D3D1] rounded-md px-2 py-0.5 cursor-pointer" title="Français bientôt disponible">
-            EN
-          </button>
+          <LangToggle />
           <Link href="/sign-in" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Sign in</Link>
           <Link href="/signup" className="inline-flex items-center gap-2 px-[18px] py-2.5 rounded-[10px] bg-[#B3261E] text-white text-sm font-semibold no-underline hover:bg-[#8F1D17] transition-colors">
             14-day free trial →
@@ -28,26 +28,7 @@ export default function Home() {
       {/* Hero */}
       <section className="bg-gradient-to-b from-white to-[#FEF6F5] py-[70px] pb-20 text-center">
         <div className="max-w-[1120px] mx-auto px-8">
-          <span className="inline-flex items-center gap-[7px] text-xs font-semibold text-[#0F172A] bg-[#EFF6FF] border border-[#BFDBFE] rounded-full px-3.5 py-1.5 mb-[22px]">
-            🇨🇦 Built for Canadian small business & accountants · A NexvarLab product
-          </span>
-          <h1 className="text-[52px] font-extrabold leading-tight tracking-[-0.03em] max-w-[760px] mx-auto">
-            Payroll that feels like a <em className="not-italic text-[#B3261E]">bank statement</em>, not a spreadsheet.
-          </h1>
-          <p className="text-lg text-[#57534E] mt-5 max-w-[560px] mx-auto leading-relaxed">
-            Run CPP, EI, and tax-accurate payroll in minutes. Pay stubs and T4s your employees and accountant will actually trust.
-          </p>
-          <div className="flex gap-3 justify-center mt-[30px]">
-            <Link href="/signup" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline hover:bg-[#8F1D17]">
-              Start 14-day free trial
-            </Link>
-            <a href="#calculator" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] border border-[#D6D3D1] bg-white text-[#1C1917] font-semibold no-underline hover:bg-gray-50">
-              Quick calculator
-            </a>
-          </div>
-          <p className="text-sm text-[#57534E] mt-[18px] font-medium">
-            🔓 No credit card required · Cancel anytime · Full access for 14 days
-          </p>
+          <LandingHero />
         </div>
       </section>
 
