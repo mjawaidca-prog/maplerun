@@ -6,12 +6,12 @@ interface TrialBannerProps {
 }
 
 /**
- * Shows a "X days left in your free trial" banner for users on the default plan.
- * Hidden for paid plans (growth/accountant) and promo users (no trialEndsAt).
+ * Shows a "X days left in your free trial" banner for any company with an active trial.
+ * Hidden only for promo users (no trialEndsAt) and expired trials.
  */
 export function TrialBanner({ trialEndsAt, plan }: TrialBannerProps) {
-  // Only show for unpaid plans with an active trial
-  if (plan === "growth" || plan === "accountant" || !trialEndsAt) return null;
+  // No trial set (promo code) — don't show
+  if (!trialEndsAt) return null;
 
   const now = new Date();
   const end = new Date(trialEndsAt);

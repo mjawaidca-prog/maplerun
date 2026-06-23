@@ -213,19 +213,18 @@ export async function finalizePayRun(formData: FormData) {
     throw new Error("Invalid pay group.");
   }
 
-  // Free trial gate — check trialEndsAt (14-day period) + pay-run cap as safety net
+  // Free trial gate — check trialEndsAt (14-day period) + pay-run cap
   const company = await prisma.company.findUnique({ where: { id: companyId }, select: { plan: true, freePayRunsUsed: true, maxFreePayRuns: true, trialEndsAt: true } });
-  const plan = company?.plan ?? "growth";
   const used = company?.freePayRunsUsed ?? 0;
   const max = company?.maxFreePayRuns ?? 2;
   const trialEnded = company?.trialEndsAt ? new Date(company.trialEndsAt) < new Date() : false;
 
-  // Paid plans always allowed; trial checks only apply to unpaid/default plans
-  if (plan === "growth" || plan === "accountant") {
-    // Paid plan — allow (no trial gate)
-  } else if (trialEnded) {
+  // Promo users (trialEndsAt = null) have unlimited access
+  if (trialEnded) {
     throw new Error(`Your 14-day free trial has ended. Upgrade to a paid plan to continue running payroll.`);
-  } else if (used >= max) {
+  }
+
+  if (company?.trialEndsAt !== null && used >= max) {
     throw new Error(`Free trial limit reached (${used}/${max} pay runs). Upgrade your plan to continue.`);
   }
 
