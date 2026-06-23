@@ -4,9 +4,50 @@ import { useState } from "react";
 import Link from "next/link";
 
 const PLANS = [
-  { name: "Solo", price: "$15", emp: "1 employee", features: ["Unlimited pay runs", "Pay stubs & T4 slips", "CRA-aligned calculations"] },
-  { name: "Growth", price: "$25", emp: "Up to 10 employees", features: ["Everything in Solo", "Multiple pay groups", "PD7A remittance"] },
-  { name: "Accountant", price: "$59", emp: "Unlimited employees", features: ["Everything in Growth", "ROE generation", "Payroll journals · multi-company"] },
+  {
+    name: "Solo",
+    price: "$15",
+    emp: "+ $3 / employee / month",
+    features: [
+      "Unlimited pay runs",
+      "Pay stubs with PDF download",
+      "T4 slips per employee",
+      "CRA-aligned T4127 calculations",
+      "All 13 provinces & territories",
+      "Email employee pay stubs",
+      "Email support",
+    ],
+  },
+  {
+    name: "Growth",
+    price: "$25",
+    emp: "+ $3 / employee / month",
+    features: [
+      "Everything in Solo",
+      "PD7A remittance reports",
+      "Timesheets with CSV import",
+      "ROE (Record of Employment)",
+      "EFT / Direct Deposit files",
+      "Multiple pay groups",
+      "Multi-admin access",
+      "Priority support",
+    ],
+  },
+  {
+    name: "Accountant",
+    price: "$59",
+    emp: "+ $2 / employee / month",
+    features: [
+      "Everything in Growth",
+      "Multi-company workspace",
+      "GL Journal for accounting",
+      "Year-End Centre (T4 wizard)",
+      "Audit log & compliance",
+      "Payroll Summary reports",
+      "Bulk pay runs",
+      "Priority support · SLA",
+    ],
+  },
 ];
 
 export function PricingCards() {
@@ -53,7 +94,7 @@ export function PricingCards() {
                   : "border border-[#D6D3D1] bg-white text-[#1C1917] hover:border-[#B3261E]"
               }`}
             >
-              Start free
+              Start 14-day free trial
             </Link>
           </div>
         );

@@ -17,7 +17,7 @@ export default function Home() {
           <a href="#calculator" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Calculator</a>
           <Link href="/sign-in" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Sign in</Link>
           <Link href="/sign-in" className="inline-flex items-center gap-2 px-[18px] py-2.5 rounded-[10px] bg-[#B3261E] text-white text-sm font-semibold no-underline hover:bg-[#8F1D17] transition-colors">
-            Try it free →
+            14-day free trial →
           </Link>
         </div>
       </nav>
@@ -36,14 +36,14 @@ export default function Home() {
           </p>
           <div className="flex gap-3 justify-center mt-[30px]">
             <Link href="/sign-in" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] bg-[#B3261E] text-white font-semibold no-underline hover:bg-[#8F1D17]">
-              Try it free
+              Start 14-day free trial
             </Link>
             <a href="#calculator" className="inline-flex px-6 py-3.5 text-[15px] rounded-[11px] border border-[#D6D3D1] bg-white text-[#1C1917] font-semibold no-underline hover:bg-gray-50">
               Quick calculator
             </a>
           </div>
-          <p className="text-[13px] text-[#A8A29E] mt-[18px]">
-            No credit card · CRA-aligned rate tables · Cancel anytime
+          <p className="text-sm text-[#57534E] mt-[18px] font-medium">
+            🔓 No credit card required · Cancel anytime · Full access for 14 days
           </p>
         </div>
       </section>
@@ -80,7 +80,9 @@ export default function Home() {
           <div className="text-center max-w-[560px] mx-auto mb-11">
             <p className="text-xs font-bold text-[#B3261E] uppercase tracking-[0.08em]">Simple pricing</p>
             <h2 className="text-[34px] font-extrabold tracking-[-0.02em] mt-2.5">One plan per team size</h2>
-            <p className="text-[15px] text-[#78716C] mt-2.5">Prices in CAD. Switch or cancel anytime.</p>
+            <p className="text-[15px] text-[#78716C] mt-2.5">
+              Prices in CAD. 14-day free trial on all plans · No credit card required · Cancel anytime.
+            </p>
           </div>
           <PricingCards />
         </div>
