@@ -222,7 +222,7 @@ export function EmployeeForm({ payGroups }: Props) {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="payGroupId">Pay group</Label>
-              <Select value={selectedPayGroup} onValueChange={(v) => setSelectedPayGroup(v ?? "")}>
+              <Select value={selectedPayGroup} onValueChange={(v) => { setSelectedPayGroup(v ?? ""); if (v) { const pg = payGroups.find(p => p.id === v); if (pg && !selectedProvince) setSelectedProvince(pg.defaultProvince); } }}>
                 <SelectTrigger id="payGroupId">
                   <SelectValue placeholder="Select a pay group…" />
                 </SelectTrigger>
