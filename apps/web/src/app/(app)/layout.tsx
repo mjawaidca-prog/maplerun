@@ -81,17 +81,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <span className="text-base">＋</span> New company
         </Link>
 
-        {/* Company switcher (Accountant plan only) */}
-        {can(plan, "roe") ? (
-          <CompanySwitcher companies={allCompanies} activeId={user.companyId} />
-        ) : (
-          allCompanies.length > 1 && (
-            <div className="px-2">
-              <p className="text-[10px] font-bold tracking-[0.08em] uppercase text-[#57534E] mb-1.5">Companies</p>
-              <CompanySwitcher companies={allCompanies} activeId={user.companyId} />
-            </div>
-          )
-        )}
+        {/* Company switcher — always visible if multiple companies */}
+        <CompanySwitcher companies={allCompanies} activeId={user.companyId} />
 
         {/* Footer */}
         <div className="border-t border-[#292524] pt-4 mt-auto space-y-3">
