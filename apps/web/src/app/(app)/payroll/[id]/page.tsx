@@ -53,7 +53,7 @@ export default async function PayRunDetailPage({ params }: Props) {
           <Link key={item.id} href={`/payroll/${run.id}/stub/${item.id}`} className="grid grid-cols-[2fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3.5 border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#B3261E] to-[#E56A5C] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.employee.firstName[0]}</div>
-              <div><p className="text-sm font-semibold">{item.employee.firstName} {item.employee.lastName}</p><p className="text-xs text-[#A8A29E]">Ontario · {run.payGroup.frequency.toLowerCase()}</p></div>
+              <div><p className="text-sm font-semibold">{item.employee.firstName} {item.employee.lastName}</p><p className="text-xs text-[#A8A29E]">{run.payGroup.defaultProvince} · {run.payGroup.frequency.toLowerCase()}</p></div>
             </div>
             <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(item.gross)}</div>
             <div className="text-[13px] text-right font-mono tabular-nums text-[#57534E]">{fmtCAD(item.totalDeductions)}</div>
