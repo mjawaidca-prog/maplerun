@@ -95,6 +95,26 @@ export default async function RoeDetailPage({ params }: Props) {
           </div>
         </div>
 
+        {/* Block 16 — Reason for issuing ROE */}
+        <div className="px-6 py-5 border-t border-[#F0EFED]">
+          <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em] mb-3.5">Block 16 — Reason for issuing ROE</p>
+          <div className="grid grid-cols-5 gap-2">
+            {[
+              ["A","Shortage of work"],["B","Strike / lockout"],["C","Return to school"],
+              ["D","Illness / injury"],["E","Quit"],["F","Maternity"],
+              ["G","Retirement"],["H","Work sharing"],["J","Apprentice training"],
+              ["K","Other"],["M","Dismissal"],["N","Leave of absence"],
+              ["P","Parental"],["Z","Compassionate care"],
+            ].map(([code,label]) => (
+              <div key={code} className="border border-[#E7E5E4] rounded-[8px] p-2.5 text-center">
+                <p className="text-base font-bold font-mono">{code}</p>
+                <p className="text-[10px] text-[#A8A29E] leading-tight mt-0.5">{label}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-[#A8A29E] mt-3">Select the appropriate reason code when filing with Service Canada. The reason determines EI benefit eligibility.</p>
+        </div>
+
         {/* Pay period table */}
         <div className="px-6 py-5 border-t border-[#F0EFED]">
           <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em] mb-3.5">Pay Periods (Block 15C)</p>

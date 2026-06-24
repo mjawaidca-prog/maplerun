@@ -34,7 +34,7 @@ export default function HelpPage() {
 
       {/* Plans & billing */}
       <Section title="Plans & billing">
-        <Q q="What plans are available?" a="Solo ($15/mo + $3/employee): Basic payroll for 1–5 employees. Growth ($25/mo + $3/employee): Timesheets, remittances, ROE, more reports. Accountant ($59/mo + $2/employee): Full suite with GL, year-end centre, audit log, multi-company." />
+        <Q q="What plans are available?" a="Solo ($7/mo + $2/employee): Basic payroll. Growth ($19/mo + $2/employee): Timesheets, remittances, ROE, more reports. Accountant ($49/mo + $1.50/employee): Full suite with GL, year-end centre, audit log, multi-company." />
         <Q q="Is there a free trial?" a="Yes. Each plan includes 2 free pay runs. No credit card required to start." />
         <Q q="How do I upgrade?" a="Go to Company → Billing tab → select a plan → complete checkout through Stripe. Your plan updates immediately." />
       </Section>

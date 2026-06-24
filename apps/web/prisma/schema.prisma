@@ -272,6 +272,8 @@ model PayRunItem {
   vacationPay     Float    @default(0)
   /// Vacation pay rate used (e.g. 0.04 = 4%)
   vacationPayRate Float    @default(0)
+  /// Bonus or non-periodic payment included in this pay run
+  bonus           Float    @default(0)
 
   payRun   PayRun   @relation(fields: [payRunId], references: [id], onDelete: Cascade)
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)

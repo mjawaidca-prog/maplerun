@@ -78,11 +78,13 @@ export async function previewPayRun(formData: FormData): Promise<PayRunPreview> 
   // Parse gross amounts per employee (JSON: { [employeeId]: amount })
   const grossAmounts: Record<string, number> = JSON.parse(grossAmountsStr);
 
-  // Parse hours and vacation data from wizard
+  // Parse hours, bonus, and vacation data from wizard
   const hoursStr = formData.get("hours") as string;
   const vacationStr = formData.get("vacation") as string;
+  const bonusStr = formData.get("bonus") as string;
   const hoursData: Record<string, number> = hoursStr ? JSON.parse(hoursStr) : {};
   const vacationData: Record<string, { enabled: boolean; rate: number; amount: number }> = vacationStr ? JSON.parse(vacationStr) : {};
+  const bonusData: Record<string, number> = bonusStr ? JSON.parse(bonusStr) : {};
 
   // Load active employees with YTD and TD1
   const employees = await prisma.employee.findMany({
@@ -137,11 +139,17 @@ export async function previewPayRun(formData: FormData): Promise<PayRunPreview> 
         }
       : { ...ZERO_YTD };
 
+    // Apply bonus and vacation pay — add to gross income before calculation
+    const empVacation = vacationData[emp.id];
+    const bonusAmount = bonusData[emp.id] ?? 0;
+    const vacationAmount = empVacation?.amount ?? 0;
+    const effectiveGross = gross + bonusAmount + vacationAmount;
+
     const result = calculatePay({
       payDate,
       province,
       frequency,
-      grossPeriodIncome: gross,
+      grossPeriodIncome: effectiveGross,
       federalClaim: td1?.federalClaim ?? undefined,
       provincialClaim: td1?.provincialClaim ?? undefined,
       cppExempt: td1?.cppExempt ?? false,
@@ -149,21 +157,16 @@ export async function previewPayRun(formData: FormData): Promise<PayRunPreview> 
       ytd,
     });
 
-    // Attach hours + vacation for finalize step
-    const empVacation = vacationData[emp.id];
-    (result as any)._hours = hoursData[emp.id] ?? 0;
-    (result as any)._vacationPay = empVacation?.amount ?? 0;
-    (result as any)._vacationRate = empVacation?.rate ?? 0;
-
     items.push({
       employeeId: emp.id,
       employeeName: `${emp.firstName} ${emp.lastName}`,
-      gross,
+      gross: effectiveGross,
       result,
       ytdBefore: ytd,
       hours: hoursData[emp.id] ?? 0,
-      vacationPay: empVacation?.amount ?? 0,
+      vacationPay: vacationAmount,
       vacationRate: empVacation?.rate ?? 0,
+      bonus: bonusAmount,
     } as any);
 
     totals.gross += result.gross;
@@ -255,32 +258,35 @@ export async function finalizePayRun(formData: FormData) {
   // Create items and update YTD ledgers
   for (const item of preview.items) {
     const newYtd = item.result.newYtd;
+    // Safety: ensure all values are defined numbers (JSON.parse may produce nulls)
+    const n = (v: any, fallback = 0) => (typeof v === "number" ? v : fallback);
 
     await prisma.payRunItem.create({
       data: {
         payRunId: payRun.id,
         employeeId: item.employeeId,
-        gross: item.result.gross,
-        cpp: item.result.cpp,
-        cpp2: item.result.cpp2,
-        ei: item.result.ei,
-        federalTax: item.result.federalTax,
-        provincialTax: item.result.provincialTax,
-        totalDeductions: item.result.totalDeductions,
-        netPay: item.result.netPay,
-        employerCpp: item.result.employer.cpp,
-        employerCpp2: item.result.employer.cpp2,
-        employerEi: item.result.employer.ei,
-        employerTotal: item.result.employer.total,
-        ytdPensionable: newYtd.pensionableEarnings,
-        ytdCpp: newYtd.cpp,
-        ytdCpp2: newYtd.cpp2,
-        ytdInsurable: newYtd.insurableEarnings,
-        ytdEi: newYtd.ei,
-        warnings: item.result.warnings.join("; "),
-        hours: (item as any).hours ?? 0,
-        vacationPay: (item as any).vacationPay ?? 0,
-        vacationPayRate: (item as any).vacationRate ?? 0,
+        gross: n(item.result.gross),
+        cpp: n(item.result.cpp),
+        cpp2: n(item.result.cpp2),
+        ei: n(item.result.ei),
+        federalTax: n(item.result.federalTax),
+        provincialTax: n(item.result.provincialTax),
+        totalDeductions: n(item.result.totalDeductions),
+        netPay: n(item.result.netPay),
+        employerCpp: n(item.result.employer?.cpp),
+        employerCpp2: n(item.result.employer?.cpp2),
+        employerEi: n(item.result.employer?.ei),
+        employerTotal: n(item.result.employer?.total),
+        ytdPensionable: n(newYtd?.pensionableEarnings),
+        ytdCpp: n(newYtd?.cpp),
+        ytdCpp2: n(newYtd?.cpp2),
+        ytdInsurable: n(newYtd?.insurableEarnings),
+        ytdEi: n(newYtd?.ei),
+        warnings: Array.isArray(item.result.warnings) ? item.result.warnings.join("; ") : "",
+        hours: n((item as any).hours, 0),
+        vacationPay: n((item as any).vacationPay, 0),
+        vacationPayRate: n((item as any).vacationRate, 0),
+        bonus: n((item as any).bonus, 0),
       },
     });
 

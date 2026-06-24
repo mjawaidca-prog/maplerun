@@ -48,6 +48,17 @@ type Props = {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
+/** Default insurable hours by pay frequency (standard 37.5 hr week) */
+function defaultHours(frequency: string): string {
+  switch (frequency) {
+    case "WEEKLY": return "37.5";
+    case "BIWEEKLY": return "75";
+    case "SEMIMONTHLY": return "86";
+    case "MONTHLY": return "173";
+    default: return "75";
+  }
+}
+
 function fmtCAD(n: number): string {
   return `$${n.toFixed(2)}`;
 }
@@ -100,13 +111,16 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
           const match = Object.entries(importedHours).find(
             ([name]) => name.toLowerCase().trim() === fullName
           );
-          mapped[emp.id] = match?.[1] ?? "75";
+          const sel = payGroups.find(p => p.id === payGroupId);
+          mapped[emp.id] = match?.[1] ?? defaultHours(sel?.frequency ?? "BIWEEKLY");
         }
         try { sessionStorage.removeItem("maplerun-timesheet-hours"); } catch {}
         return mapped;
       }
       // Fall back to saved wizard state, then default 75
-      return saved?.hours ?? Object.fromEntries(employees.map((e) => [e.id, "75"]));
+      const sel = payGroups.find(p => p.id === saved?.payGroupId);
+      const freq = sel?.frequency ?? "BIWEEKLY";
+      return saved?.hours ?? Object.fromEntries(employees.map((e) => [e.id, defaultHours(freq)]));
     })()
   );
   const [vacationEnabled, setVacationEnabled] = useState<Record<string, boolean>>(
@@ -315,9 +329,9 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                           <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">hrs</span>
                           <Input
                             id={`hours-${emp.id}`}
-                            type="number" min="0" step="0.5" placeholder="75"
+                            type="number" min="0" step="0.5" placeholder={defaultHours(payGroups.find(p => p.id === payGroupId)?.frequency ?? "BIWEEKLY")}
                             className="pl-8 tabular-nums text-xs h-8"
-                            value={hours[emp.id] ?? "75"}
+                            value={hours[emp.id] ?? defaultHours(payGroups.find(p => p.id === payGroupId)?.frequency ?? "BIWEEKLY")}
                             onChange={(e) => { const next = { ...hours, [emp.id]: e.target.value }; setHours(next); }}
                           />
                         </div>

@@ -39,7 +39,7 @@ export default async function T4SummaryPage() {
               <Link key={slip.employeeId} href={`/reports/t4/${slip.employeeId}`} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3.5 border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
                 <div className="flex items-center gap-3">
                   <div className="w-[34px] h-[34px] rounded-full bg-gradient-to-br from-[#B3261E] to-[#E56A5C] flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0">{slip.employeeName[0]}</div>
-                  <div><p className="text-sm font-semibold">{slip.employeeName}</p><p className="text-xs text-[#A8A29E]">{slip.payPeriods} pay periods</p></div>
+                  <div><p className="text-sm font-semibold">{slip.employeeName}</p><p className="text-xs text-[#A8A29E]">{slip.payPeriods} pay period{slip.payPeriods !== 1 ? "s" : ""}</p></div>
                 </div>
                 <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box14)}</div>
                 <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box16)}</div>

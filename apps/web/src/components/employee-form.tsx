@@ -169,7 +169,11 @@ export function EmployeeForm({ payGroups }: Props) {
                 </div>
               </div>
               <div className="flex items-end pb-2">
-                {payRate && <span className="text-xs text-[#78716C]">Annual: ${(parseFloat(payRate||"0") * (payType==="hourly"?2000:26)).toFixed(2)}</span>}
+                {payRate && (
+                  <span className="text-xs text-[#78716C]">
+                    Annual: ${(parseFloat(payRate||"0") * (payType==="hourly" ? 2000 : (() => { const pg = payGroups.find(p => p.id === selectedPayGroup); return pg?.frequency === "MONTHLY" ? 12 : pg?.frequency === "SEMIMONTHLY" ? 24 : pg?.frequency === "WEEKLY" ? 52 : 26; })())).toFixed(2)}
+                  </span>
+                )}
               </div>
             </div>
           </CardContent>
