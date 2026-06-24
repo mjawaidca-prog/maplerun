@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 type Props = {
   companies: { id: string; name: string }[];
@@ -9,13 +8,12 @@ type Props = {
 };
 
 export function CompanySwitcher({ companies, activeId }: Props) {
-  const router = useRouter();
   const [switching, setSwitching] = useState(false);
 
   if (companies.length <= 1) return null;
 
   async function handleSwitch(companyId: string) {
-    if (companyId === activeId) return;
+    if (companyId === activeId || switching) return;
     setSwitching(true);
     try {
       await fetch("/api/company/switch", {
@@ -23,8 +21,8 @@ export function CompanySwitcher({ companies, activeId }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ companyId }),
       });
-      router.refresh();
-      router.push("/app");
+      // Full page reload to ensure the new cookie is sent to the server
+      window.location.href = "/app";
     } catch {
       setSwitching(false);
     }
