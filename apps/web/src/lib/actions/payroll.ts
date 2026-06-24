@@ -317,8 +317,8 @@ export async function finalizePayRun(formData: FormData) {
     data: { freePayRunsUsed: { increment: 1 } },
   });
 
-  revalidatePath("/app/payroll");
-  redirect("/app/payroll");
+  revalidatePath("/payroll");
+  redirect("/payroll");
 }
 
 /**

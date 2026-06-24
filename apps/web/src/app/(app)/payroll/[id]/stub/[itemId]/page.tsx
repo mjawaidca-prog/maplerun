@@ -22,6 +22,17 @@ export default async function PayStubPage({ params }: Props) {
   if (!item) notFound();
   const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } });
 
+  // Sum YTD income tax from all finalized pay run items for this employee in 2026
+  const ytdTaxAgg = await prisma.payRunItem.aggregate({
+    where: {
+      employeeId: item.employeeId,
+      payRun: { status: "FINALIZED", payDate: { startsWith: "2026" } },
+    },
+    _sum: { federalTax: true, provincialTax: true },
+  });
+  const ytdFederalTax = (ytdTaxAgg._sum.federalTax ?? 0);
+  const ytdProvincialTax = (ytdTaxAgg._sum.provincialTax ?? 0);
+
   return (
     <div className="space-y-6 max-w-[816px] print:max-w-full">
       {/* Actions */}
@@ -150,6 +161,7 @@ export default async function PayStubPage({ params }: Props) {
               {[
                 ["Pensionable", fmtCAD(item.ytdPensionable)], ["Insurable", fmtCAD(item.ytdInsurable)],
                 ["CPP", fmtCAD(item.ytdCpp)], ["EI", fmtCAD(item.ytdEi)], ["CPP2", fmtCAD(item.ytdCpp2)],
+                ["Federal Tax", fmtCAD(ytdFederalTax)], ["Provincial Tax", fmtCAD(ytdProvincialTax)],
               ].map(([label, value], i) => (
                 <div key={label} className={`flex justify-between px-3.5 py-[9px] text-[13px] ${i % 2 === 1 ? "bg-[#FAFAF9] dark:bg-[#1C1917]" : ""}`}>
                   <span className="text-[#57534E] dark:text-[#A8A29E]">{label}</span>

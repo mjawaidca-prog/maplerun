@@ -57,7 +57,7 @@ export default async function RoeDetailPage({ params }: Props) {
         <div>
           <h1 className="text-[26px] font-extrabold tracking-[-0.02em] flex items-center gap-3">
             {employee.firstName} {employee.lastName}
-            <span className="inline-flex items-center text-xs font-bold tracking-[0.03em] rounded-full px-[11px] py-1 bg-[#DCFCE7] text-[#15803D]">ROE ISSUED</span>
+            <span className="inline-flex items-center text-xs font-bold tracking-[0.03em] rounded-full px-[11px] py-1 bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E]">ROE READY</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Record of Employment · Service Canada</p>
         </div>

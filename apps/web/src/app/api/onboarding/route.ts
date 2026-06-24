@@ -54,5 +54,15 @@ export async function POST(request: Request) {
   // Note: Pay groups are created separately by the user inside the app.
   // No default pay group is auto-created — province and frequency are set per pay group.
 
-  return NextResponse.json({ success: true, companyId: company.id, slug: company.slug });
+  // Set the active company cookie so the user lands on the new company's dashboard
+  const response = NextResponse.json({ success: true, companyId: company.id, slug: company.slug });
+  response.cookies.set("maplerun-active-company", company.id, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+    secure: true,
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+  });
+
+  return response;
 }

@@ -19,6 +19,9 @@ export type Pd7aPeriod = {
   employerCpp: number;
   employerCpp2: number;
   employerEi: number;
+  federalTax: number;
+  provincialTax: number;
+  incomeTax: number; // federal + provincial
   totalRemittance: number;
 };
 
@@ -33,6 +36,9 @@ export type Pd7aReport = {
     employerCpp: number;
     employerCpp2: number;
     employerEi: number;
+    federalTax: number;
+    provincialTax: number;
+    incomeTax: number;
     totalRemittance: number;
   };
 };
@@ -69,6 +75,9 @@ export async function getPd7aReport(year: number, grouping: "monthly" | "quarter
     employerCpp: 0,
     employerCpp2: 0,
     employerEi: 0,
+    federalTax: 0,
+    provincialTax: 0,
+    incomeTax: 0,
     totalRemittance: 0,
   };
 
@@ -91,6 +100,9 @@ export async function getPd7aReport(year: number, grouping: "monthly" | "quarter
       employerCpp: 0,
       employerCpp2: 0,
       employerEi: 0,
+      federalTax: 0,
+      provincialTax: 0,
+      incomeTax: 0,
       totalRemittance: 0,
     };
 
@@ -102,13 +114,18 @@ export async function getPd7aReport(year: number, grouping: "monthly" | "quarter
       p.employerCpp += run.totalEmployerCpp;
       p.employerCpp2 += run.totalEmployerCpp2;
       p.employerEi += run.totalEmployerEi;
+      p.federalTax += run.totalFederalTax;
+      p.provincialTax += run.totalProvincialTax;
     }
 
-    // PD7A remittance = employee CPP + employer CPP + employee CPP2 + employer CPP2 + employee EI + employer EI
+    p.incomeTax = p.federalTax + p.provincialTax;
+
+    // PD7A remittance = all source deductions: CPP + CPP2 + EI + income tax
     p.totalRemittance =
       p.employeeCpp + p.employerCpp +
       p.employeeCpp2 + p.employerCpp2 +
-      p.employeeEi + p.employerEi;
+      p.employeeEi + p.employerEi +
+      p.federalTax + p.provincialTax;
 
     // Round everything
     for (const k of Object.keys(p) as Array<keyof Pd7aPeriod>) {
@@ -127,6 +144,9 @@ export async function getPd7aReport(year: number, grouping: "monthly" | "quarter
     totals.employerCpp += p.employerCpp;
     totals.employerCpp2 += p.employerCpp2;
     totals.employerEi += p.employerEi;
+    totals.federalTax += p.federalTax;
+    totals.provincialTax += p.provincialTax;
+    totals.incomeTax += p.incomeTax;
     totals.totalRemittance += p.totalRemittance;
   }
 
