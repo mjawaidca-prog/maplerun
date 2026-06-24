@@ -215,7 +215,8 @@ model PayRun {
   companyId       String
   payGroupId      String
   /// ISO date of the pay period end (selects tax-table edition)
-  payDate         String
+  payDate         String     /// Period end date (last day of pay period)
+  actualPayDate   String?    /// Actual deposit/payment date (can be later)
   status          String    @default("DRAFT") /// DRAFT | FINALIZED | REVERSED
   totalGross      Float     @default(0)
   totalCpp        Float     @default(0)

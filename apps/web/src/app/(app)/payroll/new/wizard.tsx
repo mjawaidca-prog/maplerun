@@ -223,6 +223,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
     const formData = new FormData();
     formData.set("payGroupId", payGroupId);
     formData.set("payDate", payDate);
+    formData.set("actualPayDate", actualPayDate || payDate);
     formData.set("preview", JSON.stringify(preview));
 
     startTransition(async () => {

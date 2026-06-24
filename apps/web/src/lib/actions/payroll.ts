@@ -202,6 +202,7 @@ export async function finalizePayRun(formData: FormData) {
 
   const payGroupId = formData.get("payGroupId") as string;
   const payDate = formData.get("payDate") as string;
+  const actualPayDate = (formData.get("actualPayDate") as string) || payDate;
   const previewJson = formData.get("preview") as string;
 
   if (!payGroupId || !payDate || !previewJson) {
@@ -237,6 +238,7 @@ export async function finalizePayRun(formData: FormData) {
       companyId,
       payGroupId,
       payDate,
+      actualPayDate: actualPayDate || null,
       status: "FINALIZED",
       totalGross: preview.totals.gross,
       totalCpp: preview.totals.cpp,

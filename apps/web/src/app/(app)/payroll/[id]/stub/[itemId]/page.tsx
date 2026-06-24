@@ -20,7 +20,11 @@ export default async function PayStubPage({ params }: Props) {
   if (!payRun || payRun.companyId !== companyId) notFound();
   const item = payRun.items.find((i) => i.id === itemId);
   if (!item) notFound();
-  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } });
+  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true, businessNumber: true } });
+  const employee = await prisma.employee.findUnique({
+    where: { id: item.employeeId },
+    select: { firstName: true, lastName: true, addressLine1: true, city: true, province: true, postalCode: true },
+  });
 
   // Sum YTD income tax from all finalized pay run items for this employee in 2026
   const ytdTaxAgg = await prisma.payRunItem.aggregate({
@@ -49,26 +53,37 @@ export default async function PayStubPage({ params }: Props) {
         {/* Header — premium dark */}
         <div className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] text-white px-10 py-8 flex justify-between items-start dark:from-[#0F172A] dark:to-[#1E293B]">
           <div>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 mb-1">
               <Logo size={30} />
             </div>
-            <p className="text-[13px] opacity-85 mt-1.5">{company?.name ?? "Nexvar Pay"}</p>
+            <p className="text-[20px] font-extrabold tracking-[-0.01em]">{company?.name ?? "Nexvar Pay"}</p>
+            {company?.businessNumber && (
+              <p className="text-[12px] opacity-70 mt-0.5">BN: {company.businessNumber}</p>
+            )}
           </div>
           <div className="text-right">
             <p className="text-[13px] font-semibold tracking-[0.18em] opacity-85">PAY STUB</p>
-            <p className="text-[13px] opacity-90 mt-1">Pay Date · {payRun.payDate}</p>
+            <p className="text-[13px] opacity-90 mt-1">Period End · {payRun.payDate}</p>
+            {payRun.actualPayDate && payRun.actualPayDate !== payRun.payDate && (
+              <p className="text-[13px] opacity-90 mt-1">Pay Date · {payRun.actualPayDate}</p>
+            )}
             <p className="text-[13px] opacity-90 mt-1">{payRun.payGroup.frequency.toLowerCase()}</p>
           </div>
         </div>
 
-        {/* Employee row */}
+        {/* Employee + Employer info row */}
         <div className="px-10 py-7 border-b border-[#E7E5E4] dark:border-[#292524] flex justify-between">
           <div>
             <p className="text-xs text-[#A8A29E] uppercase tracking-[0.08em] font-semibold">Employee</p>
             <p className="text-lg font-bold text-[#1C1917] dark:text-[#FAFAF9] mt-0.5">
               {item.employee.firstName} {item.employee.lastName}
             </p>
-            <p className="text-[13px] text-[#78716C] dark:text-[#A8A29E]">
+            {(employee?.addressLine1 || employee?.city) && (
+              <p className="text-[13px] text-[#78716C] dark:text-[#A8A29E] mt-0.5">
+                {[employee.addressLine1, employee.city, employee.province, employee.postalCode].filter(Boolean).join(", ")}
+              </p>
+            )}
+            <p className="text-[13px] text-[#78716C] dark:text-[#A8A29E] mt-0.5">
               {payRun.payGroup.defaultProvince ?? "ON"} · SIN •••-•••-•••
             </p>
           </div>
