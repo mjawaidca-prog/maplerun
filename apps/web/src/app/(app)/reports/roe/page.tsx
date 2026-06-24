@@ -25,10 +25,26 @@ export default async function RoeListPage() {
   const employees = await prisma.employee.findMany({
     where: { companyId },
     orderBy: { lastName: "asc" },
-    include: { _count: { select: { payRunItems: true } } },
+    include: {
+      _count: { select: { payRunItems: true } },
+      payRunItems: {
+        include: { payRun: { select: { payDate: true } } },
+        orderBy: { payRun: { payDate: "desc" } },
+        take: 1,
+      },
+    },
   });
 
-  const withHistory = employees.filter((e) => e._count.payRunItems > 0);
+  const withHistory = employees.filter((e) => e._count.payRunItems > 0).map((emp) => {
+    const lastItem = emp.payRunItems[0];
+    // Fast approximate: insurable earnings = gross when EI > 0
+    const insurableEarnings = lastItem ? (lastItem.ei > 0 ? lastItem.gross : 0) : 0;
+    return {
+      ...emp,
+      lastPayDate: lastItem?.payRun.payDate ?? null,
+      insurableEarnings,
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -67,8 +83,8 @@ export default async function RoeListPage() {
                   <p className="text-xs text-[#A8A29E]">SIN •••-•••-•••</p>
                 </div>
               </div>
-              <div className="text-[13px] text-[#57534E]">—</div>
-              <div className="text-[13px] text-[#57534E]">—</div>
+              <div className="text-[13px] text-[#57534E]">{emp.lastPayDate ?? "—"}</div>
+              <div className="text-[13px] text-[#57534E] font-mono tabular-nums">{emp.insurableEarnings > 0 ? `$${emp.insurableEarnings.toFixed(2)}` : "—"}</div>
               <div className="text-[13px] text-[#57534E]">{emp._count.payRunItems}</div>
               <div><span className="inline-flex items-center text-[11px] font-bold tracking-[0.03em] rounded-full px-2.5 py-1 bg-[#DCFCE7] text-[#15803D]">ACTIVE</span></div>
               <div className="text-[#A8A29E] text-right">→</div>

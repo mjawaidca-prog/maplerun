@@ -502,7 +502,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
                     <div>
                       <span className="text-muted-foreground">Gross</span>
                       <p className="tabular-nums">{fmtCAD(item.gross)}</p>
@@ -514,6 +514,10 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                     <div>
                       <span className="text-muted-foreground">EI</span>
                       <p className="tabular-nums">{fmtCAD(item.result.ei)}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">CPP2</span>
+                      <p className="tabular-nums">{fmtCAD(item.result.cpp2)}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Tax</span>

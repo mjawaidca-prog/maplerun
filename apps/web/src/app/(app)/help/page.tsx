@@ -42,7 +42,7 @@ export default function HelpPage() {
       {/* Technical */}
       <Section title="Data & security">
         <Q q="How is SIN protected?" a="SINs are encrypted at rest using AES-256-GCM. They are never logged, never exposed in API responses without explicit permission, and only accessible to authorized users in your company." />
-        <Q q="Where is my data stored?" a="Nexvar Pay uses Neon PostgreSQL. Data resides in Canada-adjacent infrastructure. All connections use SSL encryption." />
+        <Q q="Where is my data stored?" a="Nexvar Pay uses Neon PostgreSQL (US East region). All connections use SSL encryption. SINs and bank details are AES-256-GCM encrypted at rest. We recommend Canadian businesses review their PIPEDA compliance requirements." />
         <Q q="Can I export my data?" a="Yes. Payroll reports support PDF and CSV export. GL Journal entries are ready for QuickBooks and Xero import." />
       </Section>
 
