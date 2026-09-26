@@ -103,12 +103,14 @@ export function LandingFooter() {
             </svg>
             NEXVAR
           </div>
-          <div className="flex gap-[22px]">
-            <a href="#features" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navFeatures.fr : T.navFeatures.en}</a>
+          <div className="flex flex-wrap justify-end gap-x-[22px] gap-y-2">
+            <Link href="/features/canadian-payroll" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navFeatures.fr : T.navFeatures.en}</Link>
             <a href="#pricing" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navPricing.fr : T.navPricing.en}</a>
+            <Link href="/payroll-calculator" className="text-[13px] text-[#78716C] no-underline">{fr ? "Calculateur" : "Calculator"}</Link>
+            <a href="https://ledger.nexvarlab.com" className="text-[13px] text-[#78716C] no-underline">LedgerPro</a>
             <Link href="/sign-in" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navSignIn.fr : T.navSignIn.en}</Link>
-            <a href="#" className="text-[13px] text-[#78716C] no-underline">{fr ? T.footerPrivacy.fr : T.footerPrivacy.en}</a>
-            <a href="#" className="text-[13px] text-[#78716C] no-underline">{fr ? T.footerTerms.fr : T.footerTerms.en}</a>
+            <a href="https://www.nexvarlab.online/privacy" className="text-[13px] text-[#78716C] no-underline">{fr ? T.footerPrivacy.fr : T.footerPrivacy.en}</a>
+            <a href="https://www.nexvarlab.online/terms" className="text-[13px] text-[#78716C] no-underline">{fr ? T.footerTerms.fr : T.footerTerms.en}</a>
           </div>
         </div>
         <p className="text-xs text-[#A8A29E] mt-[18px] leading-relaxed max-w-[620px]">

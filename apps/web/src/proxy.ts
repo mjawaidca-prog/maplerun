@@ -13,6 +13,9 @@ export default auth((req) => {
   // Allow public routes
   if (
     pathname === "/" ||
+    pathname === "/signup" ||
+    pathname === "/payroll-calculator" ||
+    pathname.startsWith("/features/") ||
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/verify-request") ||
     pathname.startsWith("/api/auth")
@@ -29,5 +32,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.svg$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|opengraph-image|.*\\.svg$).*)"],
 };

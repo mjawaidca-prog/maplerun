@@ -8,6 +8,20 @@ import { LandingStats, LandingSecurity, LandingCalculatorHero, LandingFooter } f
 import { PricingHeader } from "@/components/pricing-header";
 import { StructuredData } from "@/components/structured-data";
 import Link from "next/link";
+import type { Metadata } from "next";
+import { PAY_URL } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: { absolute: "Canadian Payroll Software for Small Business | Nexvar Pay" },
+  description:
+    "Run Canadian payroll with CPP, EI, and tax calculations, pay stubs, payroll reports, EFT file preparation, and multi-company accountant tools.",
+  alternates: { canonical: PAY_URL },
+  openGraph: {
+    url: PAY_URL,
+    title: "Nexvar Pay — Canadian Payroll Software for Small Business",
+    description: "CRA-aligned payroll calculations, pay stubs, reports, and accountant workflows for Canadian employers.",
+  },
+};
 
 export default function Home() {
   return (

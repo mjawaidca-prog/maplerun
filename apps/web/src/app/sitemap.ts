@@ -1,26 +1,27 @@
 import type { MetadataRoute } from "next";
+import { PAYROLL_FEATURE_SLUGS, PAY_URL } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://pay.nexvarlab.com";
+  const lastModified = new Date();
 
   return [
     {
-      url: baseUrl,
-      lastModified: new Date(),
+      url: PAY_URL,
+      lastModified,
       changeFrequency: "weekly",
       priority: 1,
     },
     {
-      url: `${baseUrl}/signup`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
+      url: `${PAY_URL}/payroll-calculator`,
+      lastModified,
+      changeFrequency: "weekly",
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/sign-in`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
+    ...PAYROLL_FEATURE_SLUGS.map((slug) => ({
+      url: `${PAY_URL}/features/${slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
   ];
 }

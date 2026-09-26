@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
+import { PAY_URL } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -15,10 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://pay.nexvarlab.com"),
-  title: "Nexvar Pay — Canadian Payroll, Done in Minutes",
+  metadataBase: new URL(PAY_URL),
+  title: {
+    default: "Nexvar Pay — Canadian Payroll Software",
+    template: "%s | Nexvar Pay",
+  },
   description:
-    "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, and produce pay stubs in minutes. Supports all provinces and territories. 2026 T4127 tax tables. A product of NexvarLab.",
+    "CRA-aligned payroll software for Canadian small businesses and accountants. Calculate deductions, run payroll, and produce clear payroll records for every province and territory.",
+  applicationName: "Nexvar Pay",
+  authors: [{ name: "Nexvar Lab Inc.", url: "https://www.nexvarlab.online" }],
+  creator: "Nexvar Lab Inc.",
+  publisher: "Nexvar Lab Inc.",
   keywords: [
     "Canadian payroll",
     "payroll software",
@@ -30,14 +38,20 @@ export const metadata: Metadata = {
     "remittance",
     "PD7A",
     "Nexvar Pay",
-    "NexvarLab",
+    "Nexvar Lab",
   ],
   openGraph: {
-    title: "Nexvar Pay — Canadian Payroll, Done in Minutes",
+    title: "Nexvar Pay — Canadian Payroll Software",
     description:
-      "Accurate CRA-compliant payroll for Canadian small businesses. Calculate deductions, run payroll, produce pay stubs in minutes. A NexvarLab product.",
+      "CRA-aligned Canadian payroll calculations, pay stubs, payroll reports, and accountant workflows in one place.",
     type: "website",
     locale: "en_CA",
+    siteName: "Nexvar Pay",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Nexvar Pay — Canadian Payroll Software",
+    description: "Canadian payroll calculations, pay stubs, payroll reports, and accountant workflows in one place.",
   },
 };
 
