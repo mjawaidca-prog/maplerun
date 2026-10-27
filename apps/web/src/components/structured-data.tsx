@@ -8,14 +8,14 @@ export function StructuredData() {
     "@graph": [
       {
         "@type": "SoftwareApplication",
-        "@id": "https://pay.nexvarlab.com/#software",
+        "@id": "https://nexvarpay.nexvarlab.com/#software",
         name: "Nexvar Pay",
         applicationCategory: "FinanceApplication",
         applicationSubCategory: "PayrollSoftware",
         operatingSystem: "Web",
         description:
           "Canadian payroll software for small businesses and accountants with CPP, EI, and tax calculations, pay stubs, payroll reports, and year-end workflows.",
-        url: "https://pay.nexvarlab.com",
+        url: "https://nexvarpay.nexvarlab.com",
         featureList: [
           "CPP, CPP2, EI, and income-tax calculations",
           "Payroll for all Canadian provinces and territories",
@@ -30,15 +30,15 @@ export function StructuredData() {
           highPrice: "49.00",
           priceCurrency: "CAD",
           offerCount: "3",
-          url: "https://pay.nexvarlab.com/#pricing",
+          url: "https://nexvarpay.nexvarlab.com/#pricing",
         },
         provider: { "@id": "https://www.nexvarlab.online/#organization" },
       },
       {
         "@type": "WebSite",
-        "@id": "https://pay.nexvarlab.com/#website",
+        "@id": "https://nexvarpay.nexvarlab.com/#website",
         name: "Nexvar Pay",
-        url: "https://pay.nexvarlab.com",
+        url: "https://nexvarpay.nexvarlab.com",
         publisher: { "@id": "https://www.nexvarlab.online/#organization" },
       },
       {
