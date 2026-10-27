@@ -12,12 +12,15 @@ import {
   buildJournalPayload,
   DEFAULT_MAPPING,
   idempotencyKeyForRun,
+  mappedCodes,
   normalizeMapping,
   UnbalancedJournalError,
   type PayRunTotals,
 } from "../src/lib/ledgerpro-journal";
 import {
+  findMissingCodes,
   syncPayRun,
+  testConnection,
   voidPayRunSync,
   type PayRunForSync,
   type SyncConnection,
@@ -25,6 +28,11 @@ import {
   type SyncRecordData,
   type SyncStore,
 } from "../src/lib/ledgerpro-sync";
+import {
+  connectionFingerprint,
+  formStateFromConnection,
+  type LedgerProConnectionView,
+} from "../src/lib/ledgerpro-form-state";
 import type { LedgerProResult, CreatedJournal, LedgerProAccount } from "../src/lib/ledgerpro";
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -434,5 +442,199 @@ describe("createLedgerProClient error mapping", () => {
     const res = await client.listAccounts();
     expect(res.ok).toBe(false);
     if (!res.ok) expect(res.error.kind).toBe("network");
+  });
+});
+
+// ─── Client pagination (Fix 1) ────────────────────────────────────────────────
+// LedgerPro's GET /api/v1/accounts is cursor-paginated (default 50/page,
+// ordered by code asc). Muja has 52 accounts, so its two highest mapped
+// codes (6920, 6940) live on page 2 — a first-page-only client made the
+// pre-flight report them "missing or inactive" (the live pilot failure).
+
+describe("createLedgerProClient listAccounts pagination", () => {
+  const acct = (code: string): LedgerProAccount => ({ code, name: `Account ${code}`, active: true });
+
+  /** Muja-shaped chart: 50 accounts on page 1 (incl. the low mapped codes), 6920 + 6940 alone on page 2. */
+  function mujaPages() {
+    const fillers = Array.from({ length: 46 }, (_, i) => acct(`1${100 + i}`));
+    const page1 = [acct("2410"), acct("2420"), acct("2430"), acct("2440"), ...fillers];
+    const page2 = [acct("6920"), acct("6940")];
+    return { page1, page2 };
+  }
+
+  function fetchServing(handler: (url: string) => Response) {
+    const calls: string[] = [];
+    const fetchFn = vi.fn(async (input: string) => {
+      calls.push(String(input));
+      return handler(String(input));
+    });
+    return { fetchFn, calls };
+  }
+
+  function mujaFetch() {
+    const { page1, page2 } = mujaPages();
+    return fetchServing((url) => {
+      const cursor = new URL(url).searchParams.get("cursor");
+      if (cursor === "acct_050") {
+        return new Response(JSON.stringify({ data: page2, pagination: { nextCursor: null, hasMore: false } }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ data: page1, pagination: { nextCursor: "acct_050", hasMore: true } }), { status: 200 });
+    });
+  }
+
+  it("walks every page: the full 52-account chart comes back and no Mode 2 code is missing", async () => {
+    const { fetchFn, calls } = mujaFetch();
+    const client = createLedgerProClient({ baseUrl: "https://ledger.example.com", apiKey: "k", fetchFn: fetchFn as never });
+    const res = await client.listAccounts();
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.data).toHaveLength(52);
+    expect(res.data.map((a) => a.code)).toContain("6920");
+    expect(res.data.map((a) => a.code)).toContain("6940");
+    expect(findMissingCodes(res.data, mappedCodes("MODE2", DEFAULT_MAPPING))).toEqual([]);
+    // Page 2 was requested with page 1's cursor, at the max page size.
+    expect(calls).toHaveLength(2);
+    expect(calls[0]).toContain("limit=100");
+    expect(calls[1]).toContain("cursor=acct_050");
+  });
+
+  it("single-page behaviour is unchanged (with and without a pagination envelope)", async () => {
+    const withEnvelope = fetchServing(() =>
+      new Response(JSON.stringify({ data: ALL_ACCOUNTS, pagination: { nextCursor: null, hasMore: false } }), { status: 200 }));
+    const clientA = createLedgerProClient({ baseUrl: "https://ledger.example.com", apiKey: "k", fetchFn: withEnvelope.fetchFn as never });
+    const resA = await clientA.listAccounts();
+    expect(resA.ok).toBe(true);
+    if (resA.ok) expect(resA.data).toEqual(ALL_ACCOUNTS);
+    expect(withEnvelope.calls).toHaveLength(1);
+
+    const bare = fetchServing(() => new Response(JSON.stringify({ data: ALL_ACCOUNTS }), { status: 200 }));
+    const clientB = createLedgerProClient({ baseUrl: "https://ledger.example.com", apiKey: "k", fetchFn: bare.fetchFn as never });
+    const resB = await clientB.listAccounts();
+    expect(resB.ok).toBe(true);
+    if (resB.ok) expect(resB.data).toEqual(ALL_ACCOUNTS);
+    expect(bare.calls).toHaveLength(1);
+  });
+
+  it("a page-2 HTTP failure returns the typed error — never a partial list", async () => {
+    const { page1 } = mujaPages();
+    const { fetchFn, calls } = fetchServing((url) => {
+      if (new URL(url).searchParams.get("cursor")) return new Response("boom", { status: 500 });
+      return new Response(JSON.stringify({ data: page1, pagination: { nextCursor: "acct_050", hasMore: true } }), { status: 200 });
+    });
+    const client = createLedgerProClient({ baseUrl: "https://ledger.example.com", apiKey: "k", fetchFn: fetchFn as never });
+    const res = await client.listAccounts();
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.error).toBeInstanceOf(LedgerProError);
+      expect(res.error.kind).toBe("http");
+      expect(res.error.status).toBe(500);
+    }
+    expect(calls).toHaveLength(2);
+  });
+
+  it("a repeated cursor bails with a typed error instead of looping", async () => {
+    const { fetchFn, calls } = fetchServing(() =>
+      new Response(JSON.stringify({ data: [acct("1000")], pagination: { nextCursor: "loop", hasMore: true } }), { status: 200 }));
+    const client = createLedgerProClient({ baseUrl: "https://ledger.example.com", apiKey: "k", fetchFn: fetchFn as never });
+    const res = await client.listAccounts();
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error.message).toContain("repeated a pagination cursor");
+    expect(calls).toHaveLength(2); // first page + first cursor page, then stop
+  });
+
+  it("runaway pagination is capped with a typed error", async () => {
+    const { fetchFn, calls } = fetchServing((url) => {
+      const cursor = new URL(url).searchParams.get("cursor");
+      const n = cursor ? Number(cursor.slice(1)) : 0;
+      return new Response(JSON.stringify({ data: [acct("1000")], pagination: { nextCursor: `c${n + 1}`, hasMore: true } }), { status: 200 });
+    });
+    const client = createLedgerProClient({ baseUrl: "https://ledger.example.com", apiKey: "k", fetchFn: fetchFn as never });
+    const res = await client.listAccounts();
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error.message).toContain("did not finish");
+    expect(calls).toHaveLength(100); // MAX_ACCOUNT_PAGES — terminated, not infinite
+  });
+
+  it("malformed pagination (hasMore with no cursor) is a typed error", async () => {
+    const { fetchFn } = fetchServing(() =>
+      new Response(JSON.stringify({ data: [acct("1000")], pagination: { nextCursor: null, hasMore: true } }), { status: 200 }));
+    const client = createLedgerProClient({ baseUrl: "https://ledger.example.com", apiKey: "k", fetchFn: fetchFn as never });
+    const res = await client.listAccounts();
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error.message).toContain("no usable cursor");
+  });
+
+  it("testConnection passes end-to-end over a paginated chart (the pilot scenario)", async () => {
+    const { fetchFn } = mujaFetch();
+    const result = await testConnection(
+      { createClient: (conn) => createLedgerProClient({ ...conn, fetchFn: fetchFn as never }) },
+      { baseUrl: "https://ledger.example.com", apiKey: "k", mappingMode: "MODE2", mapping: DEFAULT_MAPPING },
+    );
+    expect(result.ok).toBe(true);
+    expect(result.missingCodes).toEqual([]);
+    expect(result.message).toContain("52 accounts found");
+  });
+});
+
+// ─── Integrations form state (Fix 2) ──────────────────────────────────────────
+// Persistence was never wrong: the save action stores the submitted mode
+// verbatim and the store/settings page read it back with the same
+// normalization a finalize-time sync uses. The bug was display-only — the
+// form kept its mount-time state and never re-synced from the saved
+// connection, so after a save it could show a different mode than the one
+// persisted. These tests pin the pure rules the component now applies:
+// derive form state from the saved connection, and detect "the saved
+// connection changed" via a stable fingerprint.
+
+describe("LedgerPro form state (Fix 2)", () => {
+  function makeView(overrides: Partial<LedgerProConnectionView> = {}): LedgerProConnectionView {
+    return {
+      baseUrl: "https://ledger.nexvarlab.com",
+      mappingMode: "MODE2",
+      mapping: { ...DEFAULT_MAPPING },
+      syncEnabled: true,
+      hasKey: true,
+      ...overrides,
+    };
+  }
+
+  it("derives the form state from the saved connection — Mode 2 stays Mode 2", () => {
+    const state = formStateFromConnection(makeView());
+    expect(state.mode).toBe("MODE2");
+    expect(state.baseUrl).toBe("https://ledger.nexvarlab.com");
+    expect(state.syncEnabled).toBe(true);
+    expect(state.mapping).toEqual(DEFAULT_MAPPING);
+  });
+
+  it("falls back to first-connect defaults when there is no saved connection", () => {
+    const state = formStateFromConnection(null);
+    expect(state.mode).toBe("MODE1");
+    expect(state.syncEnabled).toBe(false);
+    expect(state.mapping).toEqual(DEFAULT_MAPPING);
+  });
+
+  it("fingerprints equal saved connections equally, regardless of object identity or mapping key order", () => {
+    const a = makeView();
+    const reordered = { ...DEFAULT_MAPPING };
+    const b = makeView({ mapping: Object.fromEntries(Object.entries(reordered).reverse()) as never });
+    expect(connectionFingerprint(a)).toBe(connectionFingerprint(a));
+    expect(connectionFingerprint(b)).toBe(connectionFingerprint(a));
+    expect(connectionFingerprint(null)).toBe("null");
+  });
+
+  it("the fingerprint changes when the saved mode, a mapped code, or the key presence changes", () => {
+    const base = makeView();
+    expect(connectionFingerprint(makeView({ mappingMode: "MODE1" }))).not.toBe(connectionFingerprint(base));
+    expect(connectionFingerprint(makeView({ mapping: { ...DEFAULT_MAPPING, cppPayable: "2411" } }))).not.toBe(connectionFingerprint(base));
+    expect(connectionFingerprint(makeView({ hasKey: false }))).not.toBe(connectionFingerprint(base));
+    expect(connectionFingerprint(makeView({ syncEnabled: false }))).not.toBe(connectionFingerprint(base));
+  });
+
+  it("a save landing with a different mode re-derives the form from the new record", () => {
+    // The component's rule: fingerprint changed → form = formStateFromConnection(new saved view).
+    const before = makeView({ mappingMode: "MODE1" });
+    const afterSave = makeView({ mappingMode: "MODE2" });
+    expect(connectionFingerprint(afterSave)).not.toBe(connectionFingerprint(before));
+    expect(formStateFromConnection(afterSave).mode).toBe("MODE2");
   });
 });

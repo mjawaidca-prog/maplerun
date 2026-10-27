@@ -12,14 +12,13 @@
 import { useState } from "react";
 import { saveLedgerProConnection, disconnectLedgerPro } from "@/lib/actions/ledgerpro";
 import { DEFAULT_MAPPING, type LedgerProMapping, type MappingMode } from "@/lib/ledgerpro-journal";
+import {
+  connectionFingerprint,
+  formStateFromConnection,
+  type LedgerProConnectionView,
+} from "@/lib/ledgerpro-form-state";
 
-export interface ConnectionView {
-  baseUrl: string;
-  mappingMode: MappingMode;
-  mapping: LedgerProMapping;
-  syncEnabled: boolean;
-  hasKey: boolean;
-}
+export type ConnectionView = LedgerProConnectionView;
 
 type Props = {
   companyId: string;
@@ -48,13 +47,31 @@ const inputCls = "w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm 
 const labelCls = "text-xs font-semibold text-[#78716C] block mb-1.5";
 
 export function LedgerProIntegrations({ companyId, connection }: Props) {
-  const [baseUrl, setBaseUrl] = useState(connection?.baseUrl ?? "https://ledger.nexvarlab.com");
+  const [form, setForm] = useState(() => formStateFromConnection(connection));
+  const { baseUrl, mode, mapping, syncEnabled } = form;
+  const setBaseUrl = (v: string) => setForm((f) => ({ ...f, baseUrl: v }));
+  const setMode = (v: MappingMode) => setForm((f) => ({ ...f, mode: v }));
+  const setMapping = (v: LedgerProMapping) => setForm((f) => ({ ...f, mapping: v }));
+  const setSyncEnabled = (v: boolean) => setForm((f) => ({ ...f, syncEnabled: v }));
   const [apiKey, setApiKey] = useState("");
-  const [mode, setMode] = useState<MappingMode>(connection?.mappingMode ?? "MODE1");
-  const [mapping, setMapping] = useState<LedgerProMapping>(connection?.mapping ?? DEFAULT_MAPPING);
-  const [syncEnabled, setSyncEnabled] = useState(connection?.syncEnabled ?? false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+
+  // Re-sync the form from the SAVED connection whenever it changes (a
+  // save landed, or the connection was disconnected). The saved record is
+  // what a finalize-time sync reads, so the form must reflect it — before
+  // this, mount-time state lived forever and the displayed mode could
+  // disagree with the persisted one until some unrelated re-render.
+  // (React's "adjust state when a prop changes" pattern: setState during
+  // render re-renders immediately, before anything commits.)
+  const savedFingerprint = connectionFingerprint(connection);
+  const [syncedFingerprint, setSyncedFingerprint] = useState(savedFingerprint);
+  if (syncedFingerprint !== savedFingerprint) {
+    setSyncedFingerprint(savedFingerprint);
+    setForm(formStateFromConnection(connection));
+    setApiKey("");
+    setTestResult(null);
+  }
 
   async function handleTest() {
     setTesting(true);

@@ -223,13 +223,88 @@ export function createLedgerProClient(opts: LedgerProClientOptions): LedgerProCl
     return json;
   }
 
+  // ─── GET /accounts pagination ─────────────────────────────────────────────
+  // LedgerPro's list endpoints are cursor-paginated: default page size 50
+  // (max 100), ordered by code asc, envelope
+  //   { data: […], pagination: { nextCursor, hasMore } }
+  // with the next page at ?cursor=<nextCursor>. A company can hold more
+  // accounts than one page (Muja has 52 — its two highest mapped codes,
+  // 6920/6940, sort onto page 2), so listAccounts MUST walk every page or
+  // the pre-flight falsely reports mapped accounts as missing.
+  const ACCOUNTS_PAGE_LIMIT = 100;
+  /** Hard stop so a misbehaving server can never loop us forever. */
+  const MAX_ACCOUNT_PAGES = 100;
+
+  interface AccountsPage {
+    accounts: LedgerProAccount[];
+    /** Raw pagination block, or null when the response carried none. */
+    pagination: { nextCursor: unknown; hasMore: unknown } | null;
+  }
+
+  function parseAccountsPage(json: unknown): AccountsPage {
+    const data = unwrap(json);
+    const accounts = (Array.isArray(data) ? data : []) as LedgerProAccount[];
+    let pagination: AccountsPage["pagination"] = null;
+    if (json && typeof json === "object" && "pagination" in (json as Record<string, unknown>)) {
+      const raw = (json as Record<string, unknown>).pagination;
+      if (raw && typeof raw === "object") {
+        const rec = raw as Record<string, unknown>;
+        pagination = { nextCursor: rec.nextCursor, hasMore: rec.hasMore };
+      } else {
+        // Present but not an object — malformed; surfaced by listAccounts.
+        pagination = { nextCursor: undefined, hasMore: undefined };
+      }
+    }
+    return { accounts, pagination };
+  }
+
+  function paginationError(message: string): LedgerProResult<LedgerProAccount[]> {
+    return { ok: false, error: new LedgerProError({ kind: "http", status: null, message }) };
+  }
+
+  /**
+   * Fetch EVERY account, following cursors until `hasMore` is false.
+   * Any failure — an HTTP error mid-walk, malformed pagination metadata, a
+   * repeated cursor, or a runaway page count — returns the typed error and
+   * NO partial list: a truncated chart would make the pre-flight (and Test
+   * Connection) report mapped accounts as missing when they exist.
+   */
+  async function listAllAccounts(): Promise<LedgerProResult<LedgerProAccount[]>> {
+    const all: LedgerProAccount[] = [];
+    const seenCursors = new Set<string>();
+    let cursor: string | null = null;
+
+    for (let page = 0; page < MAX_ACCOUNT_PAGES; page++) {
+      const path: string = cursor
+        ? `/api/v1/accounts?limit=${ACCOUNTS_PAGE_LIMIT}&cursor=${encodeURIComponent(cursor)}`
+        : `/api/v1/accounts?limit=${ACCOUNTS_PAGE_LIMIT}`;
+      const res: LedgerProResult<AccountsPage> = await request(path, { method: "GET" }, parseAccountsPage);
+      if (!res.ok) return res;
+
+      all.push(...res.data.accounts);
+      const pagination: AccountsPage["pagination"] = res.data.pagination;
+      // No pagination envelope — a single-page response (older shape).
+      if (pagination === null) return { ok: true, data: all };
+      if (typeof pagination.hasMore !== "boolean") {
+        return paginationError("LedgerPro returned malformed pagination for the account list — aborting instead of trusting a partial chart.");
+      }
+      if (!pagination.hasMore) return { ok: true, data: all };
+
+      const next: unknown = pagination.nextCursor;
+      if (typeof next !== "string" || next.length === 0) {
+        return paginationError("LedgerPro said more accounts exist but sent no usable cursor — aborting instead of trusting a partial chart.");
+      }
+      if (seenCursors.has(next)) {
+        return paginationError("LedgerPro repeated a pagination cursor for the account list — aborting instead of looping.");
+      }
+      seenCursors.add(next);
+      cursor = next;
+    }
+    return paginationError(`LedgerPro's account list did not finish after ${MAX_ACCOUNT_PAGES} pages — aborting instead of trusting a partial chart.`);
+  }
+
   return {
-    listAccounts() {
-      return request("/api/v1/accounts", { method: "GET" }, (json) => {
-        const data = unwrap(json);
-        return (Array.isArray(data) ? data : []) as LedgerProAccount[];
-      });
-    },
+    listAccounts: listAllAccounts,
 
     createJournalEntry(payload, idempotencyKey) {
       return request(
