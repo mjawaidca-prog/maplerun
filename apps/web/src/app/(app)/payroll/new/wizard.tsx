@@ -44,6 +44,7 @@ type Props = {
   employees: EmployeeOption[];
   previewAction: (formData: FormData) => Promise<PayRunPreview>;
   finalizeAction: (formData: FormData) => Promise<void>;
+  finalizeBlockReason?: string | null;
 };
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -78,7 +79,7 @@ function clearWizardState() { try { sessionStorage.removeItem(STORAGE_KEY); } ca
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 
-export function PayRunWizard({ plan = "growth", payGroups, employees, previewAction, finalizeAction }: Props) {
+export function PayRunWizard({ plan = "growth", payGroups, employees, previewAction, finalizeAction, finalizeBlockReason = null }: Props) {
   const router = useRouter();
   const showExtendedPayTypes = plan === "growth" || plan === "accountant";
   const showFullPayGrid = plan === "accountant";
@@ -219,6 +220,11 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
 
   async function handleFinalize() {
     if (!preview) return;
+
+    if (finalizeBlockReason) {
+      setError(finalizeBlockReason);
+      return;
+    }
 
     const formData = new FormData();
     formData.set("payGroupId", payGroupId);
