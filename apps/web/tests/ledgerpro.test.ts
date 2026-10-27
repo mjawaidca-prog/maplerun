@@ -30,6 +30,7 @@ import {
 } from "../src/lib/ledgerpro-sync";
 import {
   connectionFingerprint,
+  connectionViewFromRecord,
   formStateFromConnection,
   type LedgerProConnectionView,
 } from "../src/lib/ledgerpro-form-state";
@@ -636,5 +637,50 @@ describe("LedgerPro form state (Fix 2)", () => {
     const afterSave = makeView({ mappingMode: "MODE2" });
     expect(connectionFingerprint(afterSave)).not.toBe(connectionFingerprint(before));
     expect(formStateFromConnection(afterSave).mode).toBe("MODE2");
+  });
+});
+
+// ─── LedgerPro save guard (Block B3) ─────────────────────────────────────────
+// The save action refuses to write when the stored connection changed after
+// the form was loaded: it recomputes the current record's fingerprint via
+// connectionViewFromRecord and compares it with the form's submitted
+// expectedFingerprint. These tests pin the parity that comparison needs.
+
+describe("LedgerPro save guard (Block B3)", () => {
+  const record = {
+    baseUrl: "https://ledgerpro.nexvarlab.com",
+    mappingMode: "MODE2",
+    mapping: { ...DEFAULT_MAPPING },
+    syncEnabled: true,
+    apiKeyEncrypted: "ciphertext",
+  };
+
+  it("a record fingerprints identically to the equivalent page-built view", () => {
+    const pageView: LedgerProConnectionView = {
+      baseUrl: record.baseUrl,
+      mappingMode: "MODE2",
+      mapping: { ...DEFAULT_MAPPING },
+      syncEnabled: true,
+      hasKey: true,
+    };
+    expect(connectionFingerprint(connectionViewFromRecord(record))).toBe(connectionFingerprint(pageView));
+  });
+
+  it("a record changed after the form loaded fingerprints differently (the refusal case)", () => {
+    const loadedWith = connectionFingerprint(connectionViewFromRecord(record));
+    const changed = { ...record, mappingMode: "MODE1" };
+    expect(connectionFingerprint(connectionViewFromRecord(changed))).not.toBe(loadedWith);
+    const urlChanged = { ...record, baseUrl: "https://ledger.nexvarlab.com" };
+    expect(connectionFingerprint(connectionViewFromRecord(urlChanged))).not.toBe(loadedWith);
+  });
+
+  it("no record yet yields the first-connect fingerprint", () => {
+    expect(connectionViewFromRecord(null)).toBeNull();
+    expect(connectionFingerprint(connectionViewFromRecord(null))).toBe("null");
+  });
+
+  it("an empty stored key reads as hasKey false", () => {
+    const view = connectionViewFromRecord({ ...record, apiKeyEncrypted: "" });
+    expect(view?.hasKey).toBe(false);
   });
 });

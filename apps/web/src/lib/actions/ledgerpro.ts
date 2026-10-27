@@ -20,6 +20,7 @@ import {
   type MappingMode,
 } from "@/lib/ledgerpro-journal";
 import { syncPayRun, voidPayRunSync } from "@/lib/ledgerpro-sync";
+import { connectionFingerprint, connectionViewFromRecord } from "@/lib/ledgerpro-form-state";
 import { ledgerProSyncDeps } from "@/lib/ledgerpro-store";
 
 const MAPPING_KEYS = Object.keys(DEFAULT_MAPPING) as (keyof LedgerProMapping)[];
@@ -58,6 +59,16 @@ export async function saveLedgerProConnection(formData: FormData) {
   const syncEnabled = formData.get("syncEnabled") === "on";
 
   const existing = await prisma.ledgerProConnection.findUnique({ where: { companyId } });
+
+  // Block B3 — stale-form guard: the form submits the fingerprint of the
+  // connection state it was loaded with. If the stored record has changed
+  // since (another tab, session, or a racing save), refuse rather than
+  // overwrite newer settings with stale values (the pilot-era Mode 1/2
+  // wobble class). A reload shows the current settings; nothing is saved.
+  const expectedFingerprint = ((formData.get("expectedFingerprint") as string) ?? "").trim();
+  if (!expectedFingerprint || connectionFingerprint(connectionViewFromRecord(existing)) !== expectedFingerprint) {
+    throw new Error("This LedgerPro connection changed since you opened this page. Reload the page and re-apply your change — nothing was saved.");
+  }
 
   if (!existing && !apiKeyInput) {
     throw new Error("Paste the LedgerPro API key to connect.");
