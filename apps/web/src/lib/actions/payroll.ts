@@ -8,6 +8,7 @@
  */
 
 import { requireCompany } from "@/lib/session";
+import { trialGate, trialBlockMessage } from "@/lib/trial";
 import { prisma } from "@/lib/prisma";
 import {
   calculatePay,
@@ -219,20 +220,19 @@ export async function finalizePayRun(formData: FormData) {
     throw new Error("Invalid pay group.");
   }
 
-  // Free trial gate — check trialEndsAt (14-day period) + pay-run cap
+  // Free trial gate — trialEndsAt (14-day period) + pay-run cap, via the
+  // shared helper in lib/trial. The New Pay Run page uses the same helper
+  // to explain the state up front; this throw is the server-side backstop
+  // (promo users, trialEndsAt = null, are never gated).
   const company = await prisma.company.findUnique({ where: { id: companyId }, select: { plan: true, freePayRunsUsed: true, maxFreePayRuns: true, trialEndsAt: true } });
-  const used = company?.freePayRunsUsed ?? 0;
-  const max = company?.maxFreePayRuns ?? 2;
-  const trialEnded = company?.trialEndsAt ? new Date(company.trialEndsAt) < new Date() : false;
-
-  // Promo users (trialEndsAt = null) have unlimited access
-  if (trialEnded) {
-    throw new Error(`Your 14-day free trial has ended. Upgrade to a paid plan to continue running payroll.`);
-  }
-
-  if (company?.trialEndsAt !== null && used >= max) {
-    throw new Error(`Free trial limit reached (${used}/${max} pay runs). Upgrade your plan to continue.`);
-  }
+  const blockMessage = trialBlockMessage(
+    trialGate({
+      trialEndsAt: company?.trialEndsAt ?? null,
+      freePayRunsUsed: company?.freePayRunsUsed ?? 0,
+      maxFreePayRuns: company?.maxFreePayRuns ?? 2,
+    }),
+  );
+  if (blockMessage) throw new Error(blockMessage);
 
   // Create the pay run
   const payRun = await prisma.payRun.create({
