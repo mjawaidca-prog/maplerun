@@ -7,6 +7,8 @@ import { PLAN_META, type Plan } from "@/lib/plan";
 import { BillingUpgradeCards } from "@/components/upgrade-plan-button";
 import { PlanSwitcher } from "@/components/plan-switcher";
 import { PayGroupsManager } from "@/components/pay-groups-manager";
+import { LedgerProIntegrations } from "@/components/ledgerpro-integrations";
+import { normalizeMapping, type MappingMode } from "@/lib/ledgerpro-journal";
 import Link from "next/link";
 
 type SearchParams = Promise<{ tab?: string }>;
@@ -25,6 +27,7 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
     { key: "profile", label: "Profile" },
     { key: "paygroups", label: "Pay Groups" },
     { key: "payroll", label: "Payroll" },
+    { key: "integrations", label: "Integrations" },
     { key: "billing", label: "Billing" },
   ];
 
@@ -33,6 +36,19 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
     where: { companyId },
     orderBy: { createdAt: "asc" },
   });
+
+  // LedgerPro connection for the integrations tab — the encrypted key is
+  // never sent to the client; only a hasKey flag.
+  const ledgerConnection = await prisma.ledgerProConnection.findUnique({ where: { companyId } });
+  const ledgerConnectionView = ledgerConnection
+    ? {
+        baseUrl: ledgerConnection.baseUrl,
+        mappingMode: (ledgerConnection.mappingMode === "MODE2" ? "MODE2" : "MODE1") as MappingMode,
+        mapping: normalizeMapping(ledgerConnection.mapping),
+        syncEnabled: ledgerConnection.syncEnabled,
+        hasKey: ledgerConnection.apiKeyEncrypted.length > 0,
+      }
+    : null;
 
   return (
     <div className="space-y-6">
@@ -127,6 +143,11 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
             </p>
           </div>
         </div>
+      )}
+
+      {/* ── Integrations tab ── */}
+      {activeTab === "integrations" && (
+        <LedgerProIntegrations companyId={companyId} connection={ledgerConnectionView} />
       )}
 
       {/* ── Billing tab ── */}

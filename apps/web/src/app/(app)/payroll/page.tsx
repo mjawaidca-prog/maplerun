@@ -4,6 +4,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { DeletePayRunButton } from "@/components/delete-payrun-button";
+import { LedgerProSyncBadge, type LedgerProSyncStatus } from "@/components/ledgerpro-sync-badge";
 import Link from "next/link";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
@@ -12,7 +13,10 @@ export default async function PayrollHistoryPage() {
   const { companyId } = await requireCompany();
   const runs = await prisma.payRun.findMany({
     where: { companyId },
-    include: { payGroup: { select: { name: true, frequency: true } } },
+    include: {
+      payGroup: { select: { name: true, frequency: true } },
+      ledgerProSync: { select: { status: true, syncedAt: true } },
+    },
     orderBy: { createdAt: "desc" },
     take: 50,
   });
@@ -47,9 +51,12 @@ export default async function PayrollHistoryPage() {
               <div className="text-[13px] font-mono tabular-nums">{run.itemCount}</div>
               <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(run.totalGross)}</div>
               <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(run.totalNetPay)}</div>
-              <div><span className={`inline-flex items-center text-[11px] font-bold tracking-[0.03em] rounded-full px-2.5 py-1 ${run.status==="FINALIZED"?"bg-[#DCFCE7] text-[#15803D]":"bg-[#FEF3C7] text-[#92400E]"}`}>{run.status}</span></div>
+              <div className="flex flex-col items-start gap-1">
+                <span className={`inline-flex items-center text-[11px] font-bold tracking-[0.03em] rounded-full px-2.5 py-1 ${run.status==="FINALIZED"?"bg-[#DCFCE7] text-[#15803D]":"bg-[#FEF3C7] text-[#92400E]"}`}>{run.status}</span>
+                <LedgerProSyncBadge status={(run.ledgerProSync?.status as LedgerProSyncStatus | undefined) ?? null} />
+              </div>
               </Link>
-              <div className="flex justify-end"><DeletePayRunButton id={run.id} date={run.payDate} /></div>
+              <div className="flex justify-end"><DeletePayRunButton id={run.id} date={run.payDate} ledgerSyncedAt={run.ledgerProSync?.status === "SYNCED" ? (run.ledgerProSync.syncedAt?.toISOString() ?? null) : null} /></div>
             </div>
           ))}
         </div>

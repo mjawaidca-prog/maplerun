@@ -5,6 +5,8 @@ import { getPayRun } from "@/lib/actions/payroll";
 import { requireCompany } from "@/lib/session";
 import { StubPrintButton } from "@/components/stub-actions";
 import { DeletePayRunButton } from "@/components/delete-payrun-button";
+import { LedgerProSyncBadge, type LedgerProSyncStatus } from "@/components/ledgerpro-sync-badge";
+import { LedgerProSyncActions } from "@/components/ledgerpro-sync-actions";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -30,9 +32,38 @@ export default async function PayRunDetailPage({ params }: Props) {
           <p className="text-sm text-muted-foreground mt-1">{run.payGroup.name} · {run.payGroup.frequency.toLowerCase()} · {run.items.length} employees</p>
         </div>
         <div className="flex gap-2.5 items-center">
-          <DeletePayRunButton id={run.id} date={run.payDate} />
+          <DeletePayRunButton id={run.id} date={run.payDate} ledgerSyncedAt={run.ledgerProSync?.status === "SYNCED" ? (run.ledgerProSync.syncedAt?.toISOString() ?? null) : null} />
           <StubPrintButton />
         </div>
+      </div>
+
+      {/* LedgerPro sync status (M6) */}
+      <div className="bg-white border border-[#E7E5E4] rounded-[14px] px-5 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex items-center justify-between gap-4">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2.5">
+            <span className="text-sm font-bold">LedgerPro journal</span>
+            <LedgerProSyncBadge status={(run.ledgerProSync?.status as LedgerProSyncStatus | undefined) ?? null} />
+          </div>
+          {run.ledgerProSync?.status === "SYNCED" && (
+            <p className="text-[13px] text-[#57534E]">
+              Entry <span className="font-mono">{run.ledgerProSync.ledgerEntryId}</span>
+              {run.ledgerProSync.syncedAt && <> · posted {run.ledgerProSync.syncedAt.toISOString().slice(0, 10)}</>}
+            </p>
+          )}
+          {run.ledgerProSync && run.ledgerProSync.status !== "SYNCED" && run.ledgerProSync.lastError && (
+            <p className="text-[13px] text-[#991B1B]">{run.ledgerProSync.lastError}</p>
+          )}
+          {!run.ledgerProSync && (
+            <p className="text-[13px] text-[#A8A29E]">No LedgerPro sync for this run. Connect LedgerPro in Company → Integrations and turn sync on before finalizing.</p>
+          )}
+        </div>
+        {run.ledgerProSync && (
+          <LedgerProSyncActions
+            payRunId={run.id}
+            status={run.ledgerProSync.status as LedgerProSyncStatus}
+            syncedAt={run.ledgerProSync.syncedAt?.toISOString() ?? null}
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-4 border border-[#E7E5E4] rounded-[14px] overflow-hidden">
