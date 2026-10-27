@@ -19,6 +19,8 @@ import {
 } from "@maplerun/tax-engine";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { syncPayRun, voidPayRunSync } from "@/lib/ledgerpro-sync";
+import { ledgerProSyncDeps } from "@/lib/ledgerpro-store";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -325,6 +327,17 @@ export async function finalizePayRun(formData: FormData) {
     data: { freePayRunsUsed: { increment: 1 } },
   });
 
+  // LedgerPro sync (M4) — AFTER all persistence above completes, and only
+  // when the company has a connection with sync enabled (checked inside
+  // syncPayRun). Failure-isolated: syncPayRun never throws, and this extra
+  // guard means a sync problem can never roll back or block finalization —
+  // a FAILED/BLOCKED sync record is left behind for Retry instead.
+  try {
+    await syncPayRun(ledgerProSyncDeps, payRun.id);
+  } catch {
+    // Intentionally swallowed — see above.
+  }
+
   revalidatePath("/payroll");
   redirect("/payroll");
 }
@@ -353,6 +366,21 @@ export async function deletePayRun(formData: FormData) {
   if (!id) throw new Error("Pay run ID required.");
   const run = await prisma.payRun.findUnique({ where: { id } });
   if (!run || run.companyId !== companyId) throw new Error("Pay run not found.");
+
+  // LedgerPro void-then-delete (M5): if this run was posted to LedgerPro,
+  // reverse that journal FIRST and only delete once the void confirms.
+  // If the void cannot complete, BLOCK the deletion — never leave a live
+  // LedgerPro journal pointing at a deleted pay run.
+  const syncRecord = await prisma.ledgerProSyncRecord.findUnique({ where: { payRunId: id } });
+  if (syncRecord?.status === "SYNCED" && syncRecord.ledgerEntryId) {
+    const voidResult = await voidPayRunSync(ledgerProSyncDeps, id);
+    if (voidResult.outcome === "failed") {
+      throw new Error(
+        `This pay run was posted to LedgerPro on ${syncRecord.syncedAt ? syncRecord.syncedAt.toISOString().slice(0, 10) : "an earlier date"}, and that journal could not be reversed (${voidResult.error}). Delete blocked — fix the LedgerPro connection or period, then try again.`,
+      );
+    }
+  }
+
   await prisma.payRun.delete({ where: { id } });
   revalidatePath("/payroll");
   redirect("/payroll");
@@ -365,6 +393,7 @@ export async function getPayRun(id: string) {
     where: { id },
     include: {
       payGroup: { select: { name: true, frequency: true, defaultProvince: true } },
+      ledgerProSync: true,
       items: {
         include: {
           employee: { select: { firstName: true, lastName: true } },

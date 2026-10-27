@@ -101,6 +101,8 @@ model Company {
   employees   Employee[]
   payGroups   PayGroup[]
   payRuns     PayRun[]
+  ledgerProConnection LedgerProConnection?
+  ledgerProSyncRecords LedgerProSyncRecord[]
 }
 
 /// Links a User to a Company with a role. Multi-tenancy gateway.
@@ -237,6 +239,7 @@ model PayRun {
   company  Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   payGroup PayGroup     @relation(fields: [payGroupId], references: [id], onDelete: Cascade)
   items    PayRunItem[]
+  ledgerProSync LedgerProSyncRecord?
 
   @@index([companyId])
   @@index([payGroupId])
@@ -280,4 +283,54 @@ model PayRunItem {
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
   @@index([payRunId])
+}
+
+// ─── LedgerPro integration (Nexvar Pay → LedgerPro payroll sync v1) ──────────
+
+/// Per-company LedgerPro connection. One API key = one LedgerPro company.
+/// The API key is stored AES-256-GCM encrypted (see lib/encryption.ts) and
+/// is never rendered back to the client.
+model LedgerProConnection {
+  id              String   @id @default(cuid())
+  companyId       String   @unique
+  /// LedgerPro base URL, e.g. https://ledger.nexvarlab.com (no trailing slash)
+  baseUrl         String
+  /// AES-256-GCM encrypted LedgerPro API key (lp_live_…)
+  apiKeyEncrypted String
+  /// MODE1 | MODE2 — see lib/ledgerpro-journal.ts
+  mappingMode     String   @default("MODE1")
+  /// Per-component GL account codes (JSON object, LedgerProMapping shape)
+  mapping         Json
+  /// Master switch — default OFF so connecting a key never starts posting
+  /// until the owner deliberately enables sync.
+  syncEnabled     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+/// One sync record per pay run. Tracks the LedgerPro journal created for the
+/// run so retries are idempotent and deletes can void before removing.
+model LedgerProSyncRecord {
+  id             String    @id @default(cuid())
+  payRunId       String    @unique
+  companyId      String
+  /// Idempotency-Key sent to LedgerPro: nexvarpay-payrun-<payRunId>
+  idempotencyKey String
+  /// LedgerPro journal entry ID returned on success (null until SYNCED)
+  ledgerEntryId  String?
+  /// PENDING | SYNCED | FAILED | BLOCKED | VOIDED
+  status         String    @default("PENDING")
+  /// Plain-language last error (null when SYNCED)
+  lastError      String?
+  syncedAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  payRun  PayRun  @relation(fields: [payRunId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
 }
