@@ -20,7 +20,7 @@
  * identical again, which is what a later finalize will read.
  */
 
-import { DEFAULT_MAPPING, type LedgerProMapping, type MappingMode } from "./ledgerpro-journal";
+import { DEFAULT_MAPPING, normalizeMapping, type LedgerProMapping, type MappingMode } from "./ledgerpro-journal";
 
 /** The saved connection as the settings page passes it to the form. */
 export interface LedgerProConnectionView {
@@ -82,4 +82,31 @@ export function connectionFingerprint(connection: LedgerProConnectionView | null
     connection.hasKey,
     ...mappingInOrder,
   ]);
+}
+
+/**
+ * Build the connection view from a stored record, in exactly the shape the
+ * company page builds for the form. Shared by the page and the save action
+ * (Block B3): the action recomputes the fingerprint of the CURRENT record
+ * with this and compares it to the fingerprint the form was loaded with —
+ * a mismatch means the record changed after the page loaded, so the save
+ * is refused instead of overwriting newer settings with stale form values.
+ */
+export function connectionViewFromRecord(
+  record: {
+    baseUrl: string;
+    mappingMode: string;
+    mapping: unknown;
+    syncEnabled: boolean;
+    apiKeyEncrypted: string;
+  } | null,
+): LedgerProConnectionView | null {
+  if (!record) return null;
+  return {
+    baseUrl: record.baseUrl,
+    mappingMode: record.mappingMode === "MODE2" ? "MODE2" : "MODE1",
+    mapping: normalizeMapping(record.mapping),
+    syncEnabled: record.syncEnabled,
+    hasKey: record.apiKeyEncrypted.length > 0,
+  };
 }

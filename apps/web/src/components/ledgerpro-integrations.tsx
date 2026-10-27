@@ -126,6 +126,7 @@ export function LedgerProIntegrations({ companyId, connection }: Props) {
         </div>
 
         <form action={saveLedgerProConnection} className="p-[22px] space-y-5">
+          <input type="hidden" name="expectedFingerprint" value={syncedFingerprint} />
           <p className="text-[13px] text-muted-foreground leading-relaxed">
             Post each finalized pay run to LedgerPro as one aggregate journal. In LedgerPro, go to
             Settings → Developer, enable API access, and create a key named e.g. “Nexvar Pay” with
