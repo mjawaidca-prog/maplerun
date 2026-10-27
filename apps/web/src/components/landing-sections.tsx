@@ -107,7 +107,7 @@ export function LandingFooter() {
             <Link href="/features/canadian-payroll" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navFeatures.fr : T.navFeatures.en}</Link>
             <a href="#pricing" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navPricing.fr : T.navPricing.en}</a>
             <Link href="/payroll-calculator" className="text-[13px] text-[#78716C] no-underline">{fr ? "Calculateur" : "Calculator"}</Link>
-            <a href="https://ledger.nexvarlab.com" className="text-[13px] text-[#78716C] no-underline">LedgerPro</a>
+            <a href="https://ledgerpro.nexvarlab.com" className="text-[13px] text-[#78716C] no-underline">LedgerPro</a>
             <Link href="/sign-in" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navSignIn.fr : T.navSignIn.en}</Link>
             <a href="https://www.nexvarlab.online/privacy" className="text-[13px] text-[#78716C] no-underline">{fr ? T.footerPrivacy.fr : T.footerPrivacy.en}</a>
             <a href="https://www.nexvarlab.online/terms" className="text-[13px] text-[#78716C] no-underline">{fr ? T.footerTerms.fr : T.footerTerms.en}</a>

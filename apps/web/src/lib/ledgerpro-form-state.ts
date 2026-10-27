@@ -40,7 +40,7 @@ export interface LedgerProFormState {
   syncEnabled: boolean;
 }
 
-export const DEFAULT_BASE_URL = "https://ledger.nexvarlab.com";
+export const DEFAULT_BASE_URL = "https://ledgerpro.nexvarlab.com";
 
 /** Initial (or re-synced) form state from the saved connection. */
 export function formStateFromConnection(connection: LedgerProConnectionView | null): LedgerProFormState {
