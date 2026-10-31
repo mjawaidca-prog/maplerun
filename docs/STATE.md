@@ -27,7 +27,7 @@
   - ✅ All 22 user-facing pages updated (landing, auth, sidebar, pay stubs, T4, reports, emails, Stripe)
   - ✅ Internal identifiers preserved (@maplerun/tax-engine package, cookie names)
 
-- **Public SEO guides (Oct 31, 2026): DONE** — /guides hub + 6 guides mirroring the LedgerPro PR #68 pattern (province of employment flagship, Quebec payroll, TD1 claim codes, CPP/CPP2/EI 2026, remittance due dates, LedgerPro sync story). Data layer `apps/web/src/lib/guides.ts` + `guides-content.ts`; sitemap carries hub + all 6; nav/footer/landing/feature pages cross-link; proxy opens only /guides (app routes stay gated). All figures verified against CRA T4127 121st ed. / canada.ca and Revenu Québec for 2026; no 2027 figures (unpublished at writing).
+- **Public SEO guides (Oct 31, 2026): DONE** — /guides hub + 6 guides mirroring the LedgerPro PR #68 pattern (province of employment flagship, Quebec payroll, TD1 claim codes, CPP/CPP2/EI 2026, remittance due dates, LedgerPro sync story). Data layer `apps/web/src/lib/guides.ts` + `guides-content.ts`; sitemap carries hub + all 6; nav/footer/landing/feature pages cross-link; proxy opens only /guides (app routes stay gated). All figures verified against CRA T4127 121st ed. / canada.ca and Revenu Québec for 2026. Accuracy follow-up (Oct 31): TD1 claim-code chart corrected to T4032 Chart 3 as published ($2,833 bands, code 10 tops at $41,949), and the CPP/EI guide now notes the published 2027 EI amounts (1.64%, MIE $70,800) while 2027 CPP/CPP2 amounts remain unpublished.
 
 ## Live
 - **Production URL:** https://pay.nexvarlab.com (Cloudflare + Vercel, Next.js 16, Auth.js v5)
