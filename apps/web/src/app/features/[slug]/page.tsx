@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { notFound } from "next/navigation";
+import { GuideCard } from "@/components/guide-card";
 import { MarketingFooter, MarketingNav } from "@/components/marketing-shell";
+import { getPublicGuide } from "@/lib/guides";
 import { PAYROLL_FEATURES, PAYROLL_FEATURE_SLUGS, PAY_URL } from "@/lib/seo";
+
+const FEATURE_GUIDE_SLUGS = ["province-of-employment-rules", "payroll-remittance-due-dates", "payroll-sync-nexvar-pay-ledgerpro"];
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -122,6 +126,24 @@ export default async function PayrollFeaturePage({ params }: Props) {
               Nexvar Pay calculates and organizes payroll information. Employers remain responsible for verifying employee inputs, remittances, payment files, and filings against current CRA and bank requirements.
             </p>
           </aside>
+        </section>
+
+        <section className="mx-auto max-w-[1120px] px-5 pb-16 sm:px-8">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#B3261E]">Keep learning</p>
+              <h2 className="mt-2 text-3xl font-extrabold">Payroll guides behind the features</h2>
+            </div>
+            <Link href="/guides" className="inline-flex items-center gap-2 text-sm font-semibold text-[#B3261E] no-underline">
+              Browse all guides <ArrowRight size={15} />
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {FEATURE_GUIDE_SLUGS.map((guideSlug) => {
+              const guide = getPublicGuide(guideSlug);
+              return guide ? <GuideCard key={guide.slug} guide={guide} /> : null;
+            })}
+          </div>
         </section>
 
         <section className="mx-auto max-w-4xl px-5 pb-16 sm:px-8">

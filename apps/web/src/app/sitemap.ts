@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { PUBLIC_GUIDES, getGuideUrl } from "@/lib/guides";
 import { PAYROLL_FEATURE_SLUGS, PAY_URL } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -22,6 +23,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.8,
+    })),
+    {
+      url: `${PAY_URL}/guides`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    },
+    ...PUBLIC_GUIDES.map((guide) => ({
+      url: getGuideUrl(guide),
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: guide.priority,
     })),
   ];
 }
