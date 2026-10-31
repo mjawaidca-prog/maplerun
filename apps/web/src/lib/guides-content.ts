@@ -7,8 +7,9 @@ import type { PayrollGuide } from "./guides";
  * 2026 figure from CRA (T4127 121st ed. / canada.ca payroll pages) or
  * Revenu Québec / Retraite Québec, cross-checked against the tax
  * engine's verified 2026 tables in packages/tax-engine/src/data/2026/.
- * 2027 CPP/CPP2/EI amounts were not yet published when these guides
- * were written, so no 2027 figures appear anywhere in this file.
+ * 2027 CPP/CPP2 amounts were not yet published when these guides were
+ * written, so no 2027 CPP/CPP2 figures appear anywhere in this file;
+ * the 2027 EI amounts (published September 2026) are noted as such.
  */
 export const GUIDE_CONTENT: PayrollGuide[] = [
   {
@@ -241,26 +242,25 @@ export const GUIDE_CONTENT: PayrollGuide[] = [
       {
         heading: "The 2026 federal claim code chart",
         paragraphs: [
-          "Payroll tables and software translate the total claim amount into a claim code. For 2026, the federal basic personal amount is $16,452, so claim code 1 covers total claims up to that amount, and each higher code adds a band of $2,513. Claim code 0 means no credits at all are being claimed.",
+          "Payroll tables and software translate the total claim amount into a claim code. For 2026, the federal basic personal amount is $16,452, so claim code 1 covers total claims up to that amount, and each higher code adds a band of $2,833. Claim code 0 means no credits at all are being claimed.",
         ],
         table: {
           headers: ["Claim code", "2026 federal total claim amount"],
           rows: [
-            ["0", "$0 — no claim amounts"],
-            ["1", "$0.01 to $16,452.00"],
-            ["2", "$16,452.01 to $18,965.10"],
-            ["3", "$18,965.11 to $21,478.20"],
-            ["4", "$21,478.21 to $23,991.30"],
-            ["5", "$23,991.31 to $26,504.40"],
-            ["6", "$26,504.41 to $29,017.50"],
-            ["7", "$29,017.51 to $31,530.60"],
-            ["8", "$31,530.61 to $34,043.70"],
-            ["9", "$34,043.71 to $36,556.80"],
-            ["10", "$36,556.81 to $39,069.90"],
-            ["E", "Above the claim code 10 range — use the exact claim amount, not a code"],
+            ["0", "No claim amount"],
+            ["1", "$0.00 to $16,452.00"],
+            ["2", "$16,452.01 to $19,285.00"],
+            ["3", "$19,285.01 to $22,118.00"],
+            ["4", "$22,118.01 to $24,951.00"],
+            ["5", "$24,951.01 to $27,784.00"],
+            ["6", "$27,784.01 to $30,617.00"],
+            ["7", "$30,617.01 to $33,450.00"],
+            ["8", "$33,450.01 to $36,283.00"],
+            ["9", "$36,283.01 to $39,116.00"],
+            ["10", "$39,116.01 to $41,949.00"],
           ],
           caption:
-            "Federal chart for 2026 (CRA T4032 claim codes). Each province publishes its own chart with its own basic amount — the code an employee has federally is not automatically their provincial code. Code E is not a band: it tells the calculation to use the employee's actual total claim amount.",
+            "Chart 3 of CRA's T4032 for 2026 (federal claim codes, using the maximum basic personal amount), read from canada.ca. Each province publishes its own chart with its own basic amount — the code an employee has federally is not automatically their provincial code. The chart tops out at claim code 10: for total claims above $41,949.00, formula-based payroll (T4127, and Nexvar Pay) applies the employee's exact total claim amount.",
         },
       },
       {
@@ -325,7 +325,7 @@ export const GUIDE_CONTENT: PayrollGuide[] = [
             ["Employer share", "Matches the employee, dollar for dollar", "Matches the employee", "1.4 × the employee premium"],
           ],
           caption:
-            "Published 2026 amounts (CRA T4127, 121st edition). CRA had not yet published the 2027 amounts when this guide was written — the same structure will apply to new numbers.",
+            "Published 2026 amounts (CRA T4127, 121st edition). The 2027 EI amounts are already published (see the last question below); the 2027 CPP and CPP2 amounts had not been published when this guide was written — the same structure will apply to new numbers.",
         },
       },
       {
@@ -376,7 +376,7 @@ export const GUIDE_CONTENT: PayrollGuide[] = [
       {
         question: "Are the 2027 CPP and EI amounts available yet?",
         answer:
-          "Not when this guide was published. CRA releases each year's rates and maximums in the fall, and payroll tables follow. The 2026 figures here remain the ones to use for 2026 pay dates.",
+          "Partly. The 2027 EI amounts were announced in September 2026: a 1.64% employee rate on insurable earnings up to $70,800, for a maximum premium of $1,161.12 (Quebec: 1.29%, maximum $913.32). The 2027 CPP and CPP2 earnings ceilings and maximums had not been published when this guide was written — they normally appear in the fall. The 2026 figures in this guide remain the ones to use for 2026 pay dates.",
       },
     ],
   },
@@ -411,7 +411,7 @@ export const GUIDE_CONTENT: PayrollGuide[] = [
             ],
             [
               "Regular",
-              "$3,000 to $24,999.99 (and the default for new employers)",
+              "Under $25,000 — the default, including new employers (smaller employers who qualify remit quarterly instead)",
               "The 15th of the month after the month you paid your employees",
             ],
             [

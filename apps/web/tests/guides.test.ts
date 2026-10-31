@@ -76,10 +76,11 @@ describe("public guides registry", () => {
     }
   });
 
-  it("states no 2027 deduction figures anywhere in the copy", () => {
+  it("states no 2027 CPP/CPP2 figures anywhere in the copy", () => {
     const corpus = JSON.stringify(PUBLIC_GUIDES);
-    // The guides may *mention* that 2027 figures are unpublished, but must
-    // not present 2027 rates/ceilings. Guard the risky pairings.
+    // 2027 EI amounts are published and may be cited; 2027 CPP/CPP2 amounts
+    // were unpublished at writing, so the 2026 CPP/EI values must never be
+    // presented as 2027 figures. Guard the risky pairings.
     expect(corpus).not.toMatch(/2027[^.]{0,60}(5\.95%|1\.63%|\$74,600|\$85,000|\$68,900)/);
   });
 });
