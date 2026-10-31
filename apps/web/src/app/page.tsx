@@ -34,6 +34,7 @@ export default function Home() {
         </Link>
         <div className="flex items-center gap-7">
           <a href="#features" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Features</a>
+          <Link href="/guides" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Guides</Link>
           <a href="#pricing" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Pricing</a>
           <a href="#calculator" className="text-sm text-[#57534E] hover:text-[#1C1917] font-medium no-underline">Calculator</a>
           <LangToggle />

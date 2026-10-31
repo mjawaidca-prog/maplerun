@@ -15,6 +15,8 @@ export default auth((req) => {
     pathname === "/" ||
     pathname === "/signup" ||
     pathname === "/payroll-calculator" ||
+    pathname === "/guides" ||
+    pathname.startsWith("/guides/") ||
     pathname.startsWith("/features/") ||
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/verify-request") ||

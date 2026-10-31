@@ -10,6 +10,7 @@ export function MarketingNav() {
       </Link>
       <div className="hidden items-center gap-6 md:flex">
         <Link href="/features/canadian-payroll" className="text-sm font-medium text-[#57534E] no-underline hover:text-[#1C1917]">Features</Link>
+        <Link href="/guides" className="text-sm font-medium text-[#57534E] no-underline hover:text-[#1C1917]">Guides</Link>
         <Link href="/payroll-calculator" className="text-sm font-medium text-[#57534E] no-underline hover:text-[#1C1917]">Payroll Calculator</Link>
         <Link href="/#pricing" className="text-sm font-medium text-[#57534E] no-underline hover:text-[#1C1917]">Pricing</Link>
         <Link href="/sign-in" className="text-sm font-medium text-[#57534E] no-underline hover:text-[#1C1917]">Sign in</Link>
@@ -37,6 +38,9 @@ export function MarketingFooter() {
             <Link href="/features/pay-stubs-t4" className="text-[#78716C] no-underline hover:text-[#B3261E]">Pay stubs &amp; T4</Link>
             <Link href="/features/direct-deposit" className="text-[#78716C] no-underline hover:text-[#B3261E]">EFT &amp; direct deposit files</Link>
             <Link href="/features/payroll-for-accountants" className="text-[#78716C] no-underline hover:text-[#B3261E]">Payroll for accountants</Link>
+            <Link href="/guides" className="text-[#78716C] no-underline hover:text-[#B3261E]">Payroll guides</Link>
+            <Link href="/guides/province-of-employment-rules" className="text-[#78716C] no-underline hover:text-[#B3261E]">Province of employment</Link>
+            <Link href="/guides/payroll-remittance-due-dates" className="text-[#78716C] no-underline hover:text-[#B3261E]">Remittance due dates</Link>
             <Link href="/payroll-calculator" className="text-[#78716C] no-underline hover:text-[#B3261E]">Payroll calculator</Link>
           </div>
         </div>

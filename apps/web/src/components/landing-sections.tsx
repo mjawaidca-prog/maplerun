@@ -105,6 +105,7 @@ export function LandingFooter() {
           </div>
           <div className="flex flex-wrap justify-end gap-x-[22px] gap-y-2">
             <Link href="/features/canadian-payroll" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navFeatures.fr : T.navFeatures.en}</Link>
+            <Link href="/guides" className="text-[13px] text-[#78716C] no-underline">Guides</Link>
             <a href="#pricing" className="text-[13px] text-[#78716C] no-underline">{fr ? T.navPricing.fr : T.navPricing.en}</a>
             <Link href="/payroll-calculator" className="text-[13px] text-[#78716C] no-underline">{fr ? "Calculateur" : "Calculator"}</Link>
             <a href="https://ledgerpro.nexvarlab.com" className="text-[13px] text-[#78716C] no-underline">LedgerPro</a>
