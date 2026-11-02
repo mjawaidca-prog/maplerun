@@ -21,6 +21,13 @@ export {
 } from './calc/quebec-tax';
 export type { QpipTable } from './calc/quebec-tax';
 export { calculatePay } from './calc/pay-run';
+export {
+  calcStatHolidayPay,
+  albertaAverageDailyWage,
+  ontarioPublicHolidayPay,
+  type StatHolidayInput,
+  type StatHolidayResult,
+} from './calc/stat-holiday';
 export { calculateBonus, type BonusInput, type BonusResult } from './calc/bonus';
 export { calcCpp, maxCppContribution, maxCpp2Contribution } from './calc/cpp';
 export { calcEi, eiRateFor, maxEiPremium } from './calc/ei';
