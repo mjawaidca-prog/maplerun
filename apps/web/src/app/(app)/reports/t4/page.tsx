@@ -3,6 +3,7 @@
  */
 import { getT4Report } from "@/lib/actions/t4";
 import { StubPrintButton } from "@/components/stub-actions";
+import { T4XmlExport } from "@/components/t4-xml-export";
 import Link from "next/link";
 
 function fmtCAD(n: number): string { return `$${(n ?? 0).toFixed(2)}`; }
@@ -20,7 +21,10 @@ export default async function T4SummaryPage() {
           <h1 className="text-[28px] font-extrabold tracking-[-0.02em]">T4 slips · {year}</h1>
           <p className="text-sm text-muted-foreground mt-1">Statement of remuneration paid{report ? ` · ${report.companyName}` : ""}</p>
         </div>
-        <StubPrintButton />
+        <div className="flex gap-2.5 print:hidden">
+          <T4XmlExport year={year} />
+          <StubPrintButton />
+        </div>
       </div>
 
       {!report || report.slips.length === 0 ? (
