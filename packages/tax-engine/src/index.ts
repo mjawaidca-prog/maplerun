@@ -8,6 +8,8 @@ export {
 } from './data/vacation-pay';
 export type { VacationPayTier, VacationPayStandard } from './data/vacation-pay';
 export { QPP_2026, QPIP_2026, QC_FEDERAL_ABATEMENT } from './data/2026/quebec';
+export { CPP_2027, EI_2027 } from './data/2027/cpp-ei';
+export { QPP_2027, QPIP_2027 } from './data/2027/quebec';
 export {
   calcQpp,
   calcQpip,
