@@ -19,6 +19,7 @@ export default async function ReportsDashboardPage() {
 
   const allCards = [
     { href: "/reports/t4", icon: "📄", title: "T4 slips", desc: "Statement of remuneration paid for each employee.", metric: `${year} · available`, metricVal: "Ready", feature: null },
+    { href: "/reports/rl1", icon: "📄", title: "RL-1 slips", desc: "Québec statement of employment income (Revenu Québec).", metric: `${year} · available`, metricVal: "Ready", feature: null },
     { href: "/reports/remittance", icon: "🧾", title: "PD7A remittance", desc: "Source deductions owed to the CRA. View breakdown, history, and due dates.", metric: pd7aTotal > 0 ? `YTD ${year} total` : "No data", metricVal: pd7aTotal > 0 ? fmtCAD(pd7aTotal) : "—", feature: null },
     { href: "/reports/summary", icon: "📄", title: "Payroll summary", desc: "Aggregated wages, deductions, and employer costs.", metric: "All runs", metricVal: "View", feature: "reportsCore" },
     { href: "/reports/gl", icon: "📒", title: "GL journal", desc: "Debit/credit entries ready for accounting software.", metric: "Per pay run", metricVal: "View", feature: "payrollJournal" },
