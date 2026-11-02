@@ -40,11 +40,19 @@ export const prismaSyncStore: SyncStore = {
         payGroup: { select: { name: true } },
         // Wave 3 B6 — the journal needs the run's reimbursement and
         // custom-deduction totals; they live on the items, not the run.
-        items: { select: { reimbursement: true, customDeductions: true } },
+        // W4-D1 — same for the employee QPIP total: PayRun has no QPIP
+        // total column, and PayRun.totalEi EXCLUDES employee QPIP (the
+        // engine folds only the employer premium into totalEmployerEi),
+        // so the journal builder needs Σ PayRunItem.qpip from here.
+        items: { select: { reimbursement: true, customDeductions: true, qpip: true } },
       },
     });
     if (!run) return null;
-    type SyncItem = { reimbursement?: number | null; customDeductions?: unknown };
+    type SyncItem = { reimbursement?: number | null; customDeductions?: unknown; qpip?: number | null };
+    const totalQpip = (run.items ?? []).reduce(
+      (s: number, i: SyncItem) => s + (i.qpip ?? 0),
+      0,
+    );
     const totalReimbursement = (run.items ?? []).reduce(
       (s: number, i: SyncItem) => s + (i.reimbursement ?? 0),
       0,
@@ -78,6 +86,7 @@ export const prismaSyncStore: SyncStore = {
       totalEmployerCost: run.totalEmployerCost,
       totalReimbursement: Math.round(totalReimbursement * 100) / 100,
       totalCustomDeductions: Math.round(totalCustomDeductions * 100) / 100,
+      totalQpip: Math.round(totalQpip * 100) / 100,
     };
   },
 

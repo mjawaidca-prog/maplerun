@@ -56,7 +56,16 @@ const BASE_RUN: PayRunTotals = {
   totalEmployerCost: 768.2, // contributions only
 };
 
-/** Quebec: QPP rides in the cpp fields; QPIP is folded into the EI fields. */
+/**
+ * Quebec: QPP rides in the cpp fields. QPIP is ASYMMETRIC (W4-D1):
+ * the EMPLOYER premium is folded into totalEmployerEi by the engine,
+ * but the EMPLOYEE premium is NOT in totalEi — it is totalQpip.
+ * (This fixture previously claimed totalEi included employee QPIP;
+ * that false premise is exactly how the W4-D1 sync failure shipped —
+ * the real engine totals never matched it.)
+ * Here: EI-only 118.30 + employee QPIP 31.80 = the 150.10 that used to
+ * sit in totalEi; net pay is unchanged (it was always net of both).
+ */
 const QC_RUN: PayRunTotals = {
   id: "run_qc987654321",
   payDate: "2026-11-13",
@@ -65,14 +74,42 @@ const QC_RUN: PayRunTotals = {
   totalGross: 8000,
   totalCpp: 504, // QPP
   totalCpp2: 0,
-  totalEi: 150.1, // EI + employee QPIP, folded by the engine
+  totalEi: 118.3, // EI only — employee QPIP is totalQpip below
+  totalQpip: 31.8, // employee QPIP (employer QPIP is inside totalEmployerEi)
   totalFederalTax: 900,
   totalProvincialTax: 700, // Quebec tax
-  totalNetPay: 5745.9, // 8000 − (504+0+150.10+900+700)
+  totalNetPay: 5745.9, // 8000 − (504+0+118.30+31.80+900+700)
   totalEmployerCpp: 504,
   totalEmployerCpp2: 0,
   totalEmployerEi: 190.3, // incl. employer QPIP
   totalEmployerCost: 694.3,
+};
+
+/**
+ * W4-D1 regression fixture — Sophie Tremblay's actual Prairie Peak run
+ * (Nov 2, 2026 proof): the sync FAILED with "debits $5,200.28 ≠ credits
+ * $5,179.64", the $20.64 gap being exactly her employee QPIP, because
+ * the journal builder never credited it. These are the run's real
+ * stored totals (engine EI excludes employee QPIP; employer EI folds
+ * employer QPIP 28.90 into 116.26).
+ */
+const SOPHIE_RUN: PayRunTotals = {
+  id: "run_sophie_qc2026",
+  payDate: "2026-09-30",
+  actualPayDate: "2026-09-30",
+  itemCount: 1,
+  totalGross: 4800,
+  totalCpp: 284.02, // QPP (the proof ran on the pre-W4-D2 engine)
+  totalCpp2: 0,
+  totalEi: 62.4, // EI only
+  totalQpip: 20.64, // employee QPIP — the missing credit
+  totalFederalTax: 343.32,
+  totalProvincialTax: 432.95, // Quebec tax
+  totalNetPay: 3656.67, // 4800 − (284.02+62.40+20.64+343.32+432.95)
+  totalEmployerCpp: 284.02,
+  totalEmployerCpp2: 0,
+  totalEmployerEi: 116.26, // EI er 87.36 + QPIP er 28.90
+  totalEmployerCost: 400.28,
 };
 
 function sumCents(lines: { debit: number; credit: number }[], side: "debit" | "credit") {
@@ -217,13 +254,14 @@ describe("buildJournalPayload — Mode 2", () => {
 });
 
 describe("buildJournalPayload — Quebec fixture", () => {
-  it("balances to the cent with QPP in cpp fields and QPIP folded into EI", () => {
+  it("balances to the cent with QPP in cpp fields and QPIP credited into EI payable", () => {
     const payload = buildJournalPayload(QC_RUN, "QC Staff", "MODE2", DEFAULT_MAPPING);
     expect(payload.entryDate).toBe("2026-11-13"); // no actualPayDate → payDate
     expect(sumCents(payload.lines, "debit")).toBe(869430);
     expect(sumCents(payload.lines, "debit")).toBe(sumCents(payload.lines, "credit"));
-    // EI payable carries EI + folded QPIP (ee + er).
-    expect(payload.lines.find((l) => l.description === "EI payable")).toMatchObject({ credit: 340.4 });
+    // EI/QPIP payable carries EI (ee + er) + employee QPIP:
+    // 118.30 + 190.30 + 31.80 = 340.40.
+    expect(payload.lines.find((l) => l.description === "EI/QPIP payable")).toMatchObject({ credit: 340.4 });
     // Zero CPP2 → both CPP2 lines omitted.
     expect(payload.lines.some((l) => l.description?.includes("CPP2"))).toBe(false);
   });
@@ -231,6 +269,25 @@ describe("buildJournalPayload — Quebec fixture", () => {
   it("balances in Mode 1 too", () => {
     const payload = buildJournalPayload(QC_RUN, "QC Staff", "MODE1", DEFAULT_MAPPING);
     expect(sumCents(payload.lines, "debit")).toBe(sumCents(payload.lines, "credit"));
+  });
+
+  it("W4-D1 regression — Sophie's real run balances in Mode 2, QPIP inside the 2420 credit", () => {
+    const payload = buildJournalPayload(SOPHIE_RUN, "Monthly — Quebec (test fixture)", "MODE2", DEFAULT_MAPPING);
+    // The failed live attempt showed debits $5,200.28 vs credits $5,179.64.
+    expect(sumCents(payload.lines, "debit")).toBe(520028);
+    expect(sumCents(payload.lines, "credit")).toBe(520028);
+    // 2420 (EI payable code) = EI ee 62.40 + EI/QPIP er 116.26 + QPIP ee 20.64.
+    const eiLine = payload.lines.find((l) => l.glAccountCode === "2420");
+    expect(eiLine).toMatchObject({ credit: 199.3 });
+    expect(eiLine!.credit).toBeGreaterThanOrEqual(SOPHIE_RUN.totalQpip!);
+    // 2410 carries QPP ee + er; 6940 carries the employer side incl. QPIP er.
+    expect(payload.lines.find((l) => l.glAccountCode === "2410")).toMatchObject({ credit: 568.04 });
+  });
+
+  it("W4-D1 regression — Sophie's real run balances in Mode 1 too", () => {
+    const payload = buildJournalPayload(SOPHIE_RUN, "Monthly — Quebec (test fixture)", "MODE1", DEFAULT_MAPPING);
+    expect(sumCents(payload.lines, "debit")).toBe(520028);
+    expect(sumCents(payload.lines, "credit")).toBe(520028);
   });
 });
 
