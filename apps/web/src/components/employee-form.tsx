@@ -253,6 +253,14 @@ export function EmployeeForm({ payGroups }: Props) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="provinceOfEmployment">Province of employment (payroll)</Label>
+              <select id="provinceOfEmployment" name="provinceOfEmployment" defaultValue="" className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white" disabled={submitting}>
+                <option value="">Pay group default</option>
+                {["AB","BC","MB","NB","NL","NS","NT","NU","ON","PE","QC","SK","YT"].map((p) => <option key={p} value={p}>{p}</option>)}
+              </select>
+              <p className="text-[11px] text-[#A8A29E]">Only set this when the employee works in a different province than their pay group.</p>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="vacationMode">Vacation pay</Label>

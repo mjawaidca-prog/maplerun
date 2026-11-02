@@ -27,6 +27,13 @@
  * EI fields by the tax engine, so QC runs use the same lines; the balance
  * identity (gross + employer cost = net + remittance) still holds because
  * the folded amounts stay inside the same totals.
+ *
+ * Wave 3 B6 note: reimbursements and custom deductions break the naive
+ * identity (they move net pay without moving gross or statutory
+ * totals), so each gets its OWN line below — Dr reimbursements, Cr
+ * custom-deductions payable — restoring the balance exactly. The
+ * identity is now: gross + employer cost + reimbursements =
+ * remittance + custom deductions + net pay.
  */
 
 import type { CreateJournalPayload, JournalLine } from "./ledgerpro";
@@ -40,6 +47,16 @@ export interface LedgerProMapping {
   mode1Expense: string;
   mode1RemittancePayable: string;
   mode1NetPayPayable: string;
+  // Wave 3 B6 — reimbursement expense and custom-deduction payable.
+  // These post as DISTINCT journal lines (never folded into the wages
+  // line) whenever a run carries those amounts. The defaults reuse
+  // codes that already exist in the LedgerPro template (6920 wages,
+  // 2400 payroll payable) so existing connections keep syncing; point
+  // them at dedicated accounts to split the amounts out in the GL.
+  // Deliberately NOT added to mappedCodes(): the pre-flight account
+  // set must not grow for companies that never use these features.
+  reimbursementExpense: string;
+  customDeductionsPayable: string;
   // Mode 2
   wagesExpense: string;
   employerCppExpense: string;
@@ -56,6 +73,8 @@ export const DEFAULT_MAPPING: LedgerProMapping = {
   mode1Expense: "6920",
   mode1RemittancePayable: "2400",
   mode1NetPayPayable: "2400",
+  reimbursementExpense: "6920",
+  customDeductionsPayable: "2400",
   wagesExpense: "6920",
   // LedgerPro's template adds a single 6940 Employer Payroll Taxes Expense
   // (6940, not 6930 — 6930 is already Repairs & Maintenance in LedgerPro);
@@ -123,6 +142,15 @@ export interface PayRunTotals {
   totalEmployerCpp2: number;
   totalEmployerEi: number;
   totalEmployerCost: number;
+  /** Wave 3 B6 — sum of item reimbursements in this run (optional:
+   *  absent/0 for pre-B6 runs and fakes). The reimbursement is inside
+   *  totalNetPay but NOT in totalGross, so the journal needs its own
+   *  debit line or it cannot balance. */
+  totalReimbursement?: number;
+  /** Wave 3 B6 — sum of named custom deductions withheld in this run.
+   *  They reduced totalNetPay without touching any statutory total,
+   *  so the journal needs a payable credit line or it cannot balance. */
+  totalCustomDeductions?: number;
 }
 
 // ─── Building ─────────────────────────────────────────────────────────────────
@@ -160,10 +188,19 @@ export function buildJournalLines(
   mode: MappingMode,
   mapping: LedgerProMapping,
 ): JournalLine[] {
+  // Wave 3 B6 — reimbursement (Dr) and custom-deduction (Cr) lines.
+  // Both amounts are already inside totalNetPay (reimbursement added,
+  // custom deductions withheld) but belong to NEITHER totalGross NOR
+  // any statutory total, so without these two lines the journal would
+  // be out of balance by exactly those amounts. Each posts as its own
+  // line — the reimbursement is never folded into the wages line.
+  const reimbursement = run.totalReimbursement ?? 0;
+  const customDeductions = run.totalCustomDeductions ?? 0;
   const raw: (JournalLine | null)[] =
     mode === "MODE1"
       ? [
           line(mapping.mode1Expense, run.totalGross + run.totalEmployerCost, 0, "Payroll expense (gross + employer contributions)"),
+          line(mapping.reimbursementExpense, reimbursement, 0, "Employee reimbursements (non-taxable)"),
           line(
             mapping.mode1RemittancePayable,
             0,
@@ -172,10 +209,12 @@ export function buildJournalLines(
               run.totalFederalTax + run.totalProvincialTax,
             "Source deductions payable (CPP/EI/tax remittance)",
           ),
+          line(mapping.customDeductionsPayable, 0, customDeductions, "Custom deductions payable (withheld from employees)"),
           line(mapping.mode1NetPayPayable, 0, run.totalNetPay, "Net pay payable"),
         ]
       : [
           line(mapping.wagesExpense, run.totalGross, 0, "Wages & salaries"),
+          line(mapping.reimbursementExpense, reimbursement, 0, "Employee reimbursements (non-taxable)"),
           line(mapping.employerCppExpense, run.totalEmployerCpp, 0, "Employer CPP"),
           line(mapping.employerCpp2Expense, run.totalEmployerCpp2, 0, "Employer CPP2"),
           line(mapping.employerEiExpense, run.totalEmployerEi, 0, "Employer EI"),
@@ -183,6 +222,7 @@ export function buildJournalLines(
           line(mapping.cpp2Payable, 0, run.totalCpp2 + run.totalEmployerCpp2, "CPP2 payable"),
           line(mapping.eiPayable, 0, run.totalEi + run.totalEmployerEi, "EI payable"),
           line(mapping.incomeTaxPayable, 0, run.totalFederalTax + run.totalProvincialTax, "Income tax payable"),
+          line(mapping.customDeductionsPayable, 0, customDeductions, "Custom deductions payable (withheld from employees)"),
           line(mapping.wagesPayable, 0, run.totalNetPay, "Net pay payable"),
         ];
   // Lines are returned exactly per the §2 tables — separate lines may

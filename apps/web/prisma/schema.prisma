@@ -171,6 +171,11 @@ model Employee {
   vacationRatePct    Float?
   /// Accrued vacation balance owed, in cents (ACCRUE mode)
   vacationBalanceCents Int @default(0)
+  /// Wave 3 B6 — province of employment for THIS employee when it
+  /// differs from the pay group's default (e.g. a remote worker in
+  /// another province). Null = use PayGroup.defaultProvince. Preview
+  /// and finalize resolve per employee: this field ?? group default.
+  provinceOfEmployment String?
   /// The pay group this employee belongs to (null = unassigned; unassigned
   /// employees are included in every pay-group run until assigned — Wave 1).
   payGroupId    String?
@@ -348,6 +353,17 @@ model PayRunItem {
   /// employees and pre-B5 runs. A snapshot, so later runs never rewrite
   /// what this stub showed.
   vacationBalanceAfterCents Int?
+  /// Wave 3 B6 — the named custom deductions applied to this item:
+  /// [{ name, amount, reducesPensionable, reducesInsurable,
+  /// reducesTaxable }]. Persisted so the stub, reversal and reports
+  /// can reproduce exactly what was withheld and why.
+  customDeductions Json?
+  /// Wave 3 B6 — non-taxable reimbursement paid with this item:
+  /// excluded from gross and every deduction base; added to net pay.
+  reimbursement   Float    @default(0)
+  /// Wave 3 B6 — non-cash taxable benefits included in the CPP/EI/tax
+  /// bases for this item (never in gross, never in net pay).
+  taxableBenefits Float    @default(0)
 
   payRun   PayRun   @relation(fields: [payRunId], references: [id], onDelete: Cascade)
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)

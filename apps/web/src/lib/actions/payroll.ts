@@ -12,8 +12,11 @@ import { trialGate, trialBlockMessage } from "@/lib/trial";
 import { prisma } from "@/lib/prisma";
 import {
   calculatePay,
+  calculateBonus,
   ZERO_YTD,
   type PayResult,
+  type BonusResult,
+  type NamedDeduction,
   type ProvinceCode,
   type PayFrequency,
   type EmployeeYtd,
@@ -59,6 +62,23 @@ export type PayRunPreviewItem = {
    *  (PAYOUT employees' wizard payout is ordinary pay — see
    *  vacationPay — and never touches a balance.) */
   vacationPayoutCents: number;
+  /** Wave 3 B6 — province of employment resolved for THIS employee
+   *  (employee.provinceOfEmployment ?? payGroup.defaultProvince). */
+  province: ProvinceCode;
+  /** Wave 3 B6 — named custom deductions applied this run (persisted
+   *  on the item as JSON). Their total is withheld from net pay. */
+  customDeductions: NamedDeduction[];
+  customDeductionsTotal: number;
+  /** Wave 3 B6 — non-taxable reimbursement: outside gross and every
+   *  deduction base, added to net pay. */
+  reimbursement: number;
+  /** Wave 3 B6 — non-cash taxable benefits included in the bases. */
+  taxableBenefits: number;
+  /** Item-level totals AFTER the custom-deduction / reimbursement
+   *  adjustments (result.* stays the pure engine output): what
+   *  finalize persists as the item's totalDeductions / netPay. */
+  totalDeductions: number;
+  netPay: number;
 };
 
 export type PayRunPreview = {
@@ -92,6 +112,48 @@ export type PayRunPreview = {
 export async function previewPayRun(formData: FormData): Promise<PayRunPreview> {
   const { companyId } = await requireCompany();
   return computePayRun(companyId, formData);
+}
+
+/**
+ * Wave 3 B6 — merge a calculateBonus result into the regular-pay
+ * result so the rest of the pipeline (preview, finalize persistence,
+ * YTD) sees one PayResult per employee. Employer CPP/CPP2 match the
+ * employee amounts 1:1; employer EI is the employee premium × 1.4
+ * (the engine's employer multiple). YTD rolls forward by the bonus's
+ * own pensionable/insurable earnings and contributions.
+ */
+function mergeBonusResult(regular: PayResult, bonus: BonusResult): PayResult {
+  const r2 = (n: number) => Math.round(n * 100) / 100;
+  const employerCpp = r2(regular.employer.cpp + bonus.bonusCpp);
+  const employerCpp2 = r2(regular.employer.cpp2 + bonus.bonusCpp2);
+  const employerEi = r2(regular.employer.ei + bonus.bonusEi * 1.4);
+  return {
+    gross: r2(regular.gross + bonus.bonus),
+    taxableBenefits: regular.taxableBenefits ?? 0,
+    cpp: r2(regular.cpp + bonus.bonusCpp),
+    cpp2: r2(regular.cpp2 + bonus.bonusCpp2),
+    ei: r2(regular.ei + bonus.bonusEi),
+    qpip: regular.qpip,
+    federalTax: r2(regular.federalTax + bonus.bonusFederalTax),
+    provincialTax: r2(regular.provincialTax + bonus.bonusProvincialTax),
+    totalDeductions: r2(regular.totalDeductions + bonus.totalDeductions),
+    netPay: r2(regular.netPay + bonus.netBonus),
+    annualTaxableIncome: regular.annualTaxableIncome,
+    employer: {
+      cpp: employerCpp,
+      cpp2: employerCpp2,
+      ei: employerEi,
+      total: r2(employerCpp + employerCpp2 + employerEi),
+    },
+    newYtd: {
+      pensionableEarnings: r2(regular.newYtd.pensionableEarnings + bonus.bonusPensionableEarnings),
+      cpp: r2(regular.newYtd.cpp + bonus.bonusCpp),
+      cpp2: r2(regular.newYtd.cpp2 + bonus.bonusCpp2),
+      insurableEarnings: r2(regular.newYtd.insurableEarnings + bonus.bonusInsurableEarnings),
+      ei: r2(regular.newYtd.ei + bonus.bonusEi),
+    },
+    warnings: [...regular.warnings, ...bonus.warnings],
+  };
 }
 
 /**
@@ -135,6 +197,48 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
   const statStr = formData.get("stat") as string;
   const overtimeData: Record<string, { hours: number; amount: number }> = overtimeStr ? JSON.parse(overtimeStr) : {};
   const statData: Record<string, { hours: number; amount: number }> = statStr ? JSON.parse(statStr) : {};
+
+  // Wave 3 B6 — per-employee breadth inputs: named custom deductions,
+  // non-taxable reimbursements, non-cash taxable benefits. Validated
+  // here (server-side recompute path — client input is never trusted):
+  // deduction names must be non-empty, every amount finite and ≥ 0
+  // (deductions strictly > 0 to be kept).
+  const customDeductionsStr = formData.get("customDeductions") as string;
+  const customDeductionsRaw: Record<string, unknown> = customDeductionsStr ? JSON.parse(customDeductionsStr) : {};
+  const customDeductionsData: Record<string, NamedDeduction[]> = {};
+  for (const [empId, list] of Object.entries(customDeductionsRaw)) {
+    if (!Array.isArray(list)) throw new Error("Custom deductions must be a list per employee.");
+    const cleaned: NamedDeduction[] = [];
+    for (const entry of list) {
+      const rec = (entry ?? {}) as Record<string, unknown>;
+      const name = typeof rec.name === "string" ? rec.name.trim() : "";
+      const amount = typeof rec.amount === "number" ? rec.amount : NaN;
+      if (!name) throw new Error("Every custom deduction needs a name.");
+      if (!Number.isFinite(amount) || amount < 0) {
+        throw new Error(`Custom deduction "${name}" must have a non-negative amount.`);
+      }
+      if (amount === 0) continue;
+      cleaned.push({
+        name,
+        amount,
+        reducesPensionable: rec.reducesPensionable === true,
+        reducesInsurable: rec.reducesInsurable === true,
+        reducesTaxable: rec.reducesTaxable === true,
+      });
+    }
+    if (cleaned.length > 0) customDeductionsData[empId] = cleaned;
+  }
+  const reimbursementsStr = formData.get("reimbursements") as string;
+  const taxableBenefitsStr = formData.get("taxableBenefits") as string;
+  const reimbursementData: Record<string, number> = reimbursementsStr ? JSON.parse(reimbursementsStr) : {};
+  const taxableBenefitsData: Record<string, number> = taxableBenefitsStr ? JSON.parse(taxableBenefitsStr) : {};
+  for (const [label, data] of [["Reimbursement", reimbursementData], ["Taxable benefits", taxableBenefitsData]] as const) {
+    for (const [empId, amount] of Object.entries(data)) {
+      if (typeof amount !== "number" || !Number.isFinite(amount) || amount < 0) {
+        throw new Error(`${label} for employee ${empId} must be a non-negative amount.`);
+      }
+    }
+  }
 
   // Load active employees with YTD and TD1.
   // Wave 1 pay-group scoping rule: an employee assigned to THIS pay group
@@ -220,17 +324,64 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     const vacationPayoutCents =
       emp.vacationMode === "ACCRUE" ? Math.round(vacationAmount * 100) : 0;
 
-    const result = calculatePay({
+    // ── Wave 3 B6 wiring ─────────────────────────────────────────────
+    // Province of employment resolves PER EMPLOYEE (B6.6).
+    const empProvince = (emp.provinceOfEmployment ?? payGroup.defaultProvince) as ProvinceCode;
+    const customDeductions = customDeductionsData[emp.id] ?? [];
+    const customDeductionsTotal =
+      Math.round(customDeductions.reduce((s, d) => s + d.amount, 0) * 100) / 100;
+    const reimbursement = reimbursementData[emp.id] ?? 0;
+    const empTaxableBenefits = taxableBenefitsData[emp.id] ?? 0;
+
+    // Regular pay = entered gross + vacation payout. The bonus is NO
+    // LONGER lumped in (B6.1): it is taxed by the engine's T4127
+    // lump-sum path (calculateBonus) and merged back below.
+    const regularGross = gross + vacationAmount;
+    const engineInput = {
       payDate,
-      province,
+      province: empProvince,
       frequency,
-      grossPeriodIncome: effectiveGross,
       federalClaim: td1?.federalClaim ?? undefined,
       provincialClaim: td1?.provincialClaim ?? undefined,
       cppExempt: td1?.cppExempt ?? false,
       eiExempt: td1?.eiExempt ?? false,
+      // B6.5 — TD1 additional tax per period, stored on the TD1
+      // profile and never applied until now (engine adds it to the
+      // period's federal tax). Shared compute path: preview and
+      // finalize both get it.
+      extraTaxPerPeriod: td1?.extraTaxPerPeriod ?? undefined,
+      // B6.4 — non-cash taxable benefits widen the CPP/EI/tax bases.
+      taxableBenefits: empTaxableBenefits,
+      // B6.2 — named custom deductions (engine resolves per base).
+      periodDeductions: customDeductions.length > 0 ? customDeductions : undefined,
       ytd,
-    });
+    };
+
+    const regularResult = calculatePay({ ...engineInput, grossPeriodIncome: regularGross });
+    let result: PayResult;
+    if (bonusAmount > 0 && empProvince !== "QC") {
+      const bonusResult = calculateBonus({
+        ...engineInput,
+        grossPeriodIncome: regularGross,
+        bonusAmount,
+      });
+      result = mergeBonusResult(regularResult, bonusResult);
+    } else if (bonusAmount > 0) {
+      // QC: calculateBonus has no QPP/QPIP path (it prices the bonus
+      // with CPP/EI tables), so a Quebec bonus stays on the pre-B6
+      // lumped calculatePay path rather than being mis-priced. The
+      // bonus is still recorded on the item's `bonus` field.
+      result = calculatePay({ ...engineInput, grossPeriodIncome: regularGross + bonusAmount });
+    } else {
+      result = regularResult;
+    }
+
+    // Item-level totals (B6.2/B6.3): custom deductions are withheld
+    // from the employee (the engine models only their base effects),
+    // and the non-taxable reimbursement is added to net pay. Gross is
+    // untouched by both.
+    const itemTotalDeductions = Math.round((result.totalDeductions + customDeductionsTotal) * 100) / 100;
+    const itemNetPay = Math.round((result.netPay - customDeductionsTotal + reimbursement) * 100) / 100;
 
     // Wave 3 B5 — earnings split. Overtime/stat are components OF the
     // gross; regular is what remains. An over-claimed split is a data
@@ -263,6 +414,13 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
       vacationMode: emp.vacationMode ?? "PAYOUT",
       vacationAccruedCents,
       vacationPayoutCents,
+      province: empProvince,
+      customDeductions,
+      customDeductionsTotal,
+      reimbursement,
+      taxableBenefits: empTaxableBenefits,
+      totalDeductions: itemTotalDeductions,
+      netPay: itemNetPay,
     });
 
     totals.gross += result.gross;
@@ -271,8 +429,8 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     totals.ei += result.ei;
     totals.federalTax += result.federalTax;
     totals.provincialTax += result.provincialTax;
-    totals.deductions += result.totalDeductions;
-    totals.netPay += result.netPay;
+    totals.deductions += itemTotalDeductions;
+    totals.netPay += itemNetPay;
     totals.employerCpp += result.employer.cpp;
     totals.employerCpp2 += result.employer.cpp2;
     totals.employerEi += result.employer.ei;
@@ -410,13 +568,18 @@ export async function finalizePayRun(formData: FormData) {
         // Wave 1 Quebec split (dual-write): for QC runs the engine's
         // cpp/cpp2 ARE the QPP/QPP2 amounts; qpip is surfaced separately.
         // Legacy cpp/cpp2/ei keep holding the combined totals.
-        qpp: preview.province === "QC" ? n(item.result.cpp) : 0,
-        qpp2: preview.province === "QC" ? n(item.result.cpp2) : 0,
+        // Wave 3 B6: keyed off the ITEM's resolved province of
+        // employment, not the pay group's — a mixed-province run can
+        // now contain both QC and non-QC items.
+        qpp: item.province === "QC" ? n(item.result.cpp) : 0,
+        qpp2: item.province === "QC" ? n(item.result.cpp2) : 0,
         qpip: n((item.result as any).qpip),
         federalTax: n(item.result.federalTax),
         provincialTax: n(item.result.provincialTax),
-        totalDeductions: n(item.result.totalDeductions),
-        netPay: n(item.result.netPay),
+        // Wave 3 B6 — item-level totals include the custom-deduction
+        // withholding and the reimbursement (see computePayRun).
+        totalDeductions: n(item.totalDeductions),
+        netPay: n(item.netPay),
         employerCpp: n(item.result.employer?.cpp),
         employerCpp2: n(item.result.employer?.cpp2),
         employerEi: n(item.result.employer?.ei),
@@ -441,6 +604,13 @@ export async function finalizePayRun(formData: FormData) {
         overtimeHours: n(item.overtimeHours, 0),
         statHours: n(item.statHours, 0),
         vacationBalanceAfterCents,
+        // Wave 3 B6 — breadth inputs persisted for stub/reversal/reports.
+        // (Spread into fresh object literals: anonymous object types
+        // carry implicit index signatures, which Prisma's Json input
+        // type requires.)
+        customDeductions: item.customDeductions.length > 0 ? item.customDeductions.map((d) => ({ ...d })) : undefined,
+        reimbursement: n(item.reimbursement, 0),
+        taxableBenefits: n(item.taxableBenefits, 0),
       },
     });
     createdItems.push({ id: (createdItem as { id?: string })?.id, employeeId: item.employeeId, employeeName: item.employeeName, warnings: Array.isArray(item.result.warnings) ? item.result.warnings.join("; ") : "" });

@@ -21,6 +21,7 @@ export {
 } from './calc/quebec-tax';
 export type { QpipTable } from './calc/quebec-tax';
 export { calculatePay } from './calc/pay-run';
+export { resolveDeductions, type ResolvedDeductions } from './calc/deductions';
 export {
   calcStatHolidayPay,
   albertaAverageDailyWage,
