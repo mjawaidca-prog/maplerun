@@ -170,13 +170,17 @@ export const ZERO_YTD: EmployeeYtd = {
  * The amount itself is withheld from net pay by the CALLER — the
  * engine only models its effect on the bases (see resolveDeductions).
  */
-export interface NamedDeduction {
+// Declared as a type alias (not an interface) on purpose: object
+// type aliases get implicit index signatures, which is what lets a
+// NamedDeduction[] be assigned to a Prisma `Json` column
+// (Prisma.InputJsonValue) by callers persisting the applied list.
+export type NamedDeduction = {
   name: string;
   amount: number;
   reducesPensionable: boolean;
   reducesInsurable: boolean;
   reducesTaxable: boolean;
-}
+};
 
 export interface PayInput {
   /** ISO yyyy-mm-dd — selects the tax-table edition. */

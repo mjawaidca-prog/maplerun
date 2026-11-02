@@ -605,7 +605,10 @@ export async function finalizePayRun(formData: FormData) {
         statHours: n(item.statHours, 0),
         vacationBalanceAfterCents,
         // Wave 3 B6 — breadth inputs persisted for stub/reversal/reports.
-        customDeductions: item.customDeductions.length > 0 ? item.customDeductions : undefined,
+        // (Spread into fresh object literals: anonymous object types
+        // carry implicit index signatures, which Prisma's Json input
+        // type requires.)
+        customDeductions: item.customDeductions.length > 0 ? item.customDeductions.map((d) => ({ ...d })) : undefined,
         reimbursement: n(item.reimbursement, 0),
         taxableBenefits: n(item.taxableBenefits, 0),
       },
