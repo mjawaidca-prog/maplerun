@@ -121,8 +121,34 @@ model Company {
   payGroups   PayGroup[]
   payRuns     PayRun[]
   employeePendingUpdates EmployeePendingUpdate[]
+  remittanceSubmissions RemittanceSubmission[]
   ledgerProConnection LedgerProConnection?
   ledgerProSyncRecords LedgerProSyncRecord[]
+}
+
+/// One recorded CRA remittance submission per company + period (Wave 2
+/// remittance wiring). Created by markRemittanceSubmitted, which snapshots
+/// the period's totalRemittance from the shared aggregation at submission
+/// time — the amount actually remitted, immune to later run corrections.
+/// periodKey is the shared aggregation key: "2026-01" monthly, "2026-Q1"
+/// quarterly (grouping follows Company.remitterType).
+model RemittanceSubmission {
+  id              String   @id @default(cuid())
+  companyId       String
+  /// Aggregation period key: "2026-01" | "2026-Q1"
+  periodKey       String
+  /// Snapshot of the period's total remittance at submission time
+  totalRemittance Float
+  /// Optional filer-supplied reference (e.g. CRA confirmation number)
+  reference       String?
+  submittedAt     DateTime @default(now())
+  /// User id of whoever marked it submitted (null = system/unknown)
+  createdById     String?
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, periodKey])
+  @@index([companyId])
 }
 
 /// Links a User to a Company with a role. Multi-tenancy gateway.
