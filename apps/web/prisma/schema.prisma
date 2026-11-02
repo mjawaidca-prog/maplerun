@@ -91,6 +91,17 @@ model Company {
   active    Boolean  @default(true)
   plan      String   @default("growth")
   businessNumber    String?
+  /// CRA remitter type (Wave 1 foundation; due-date logic lands in Wave 2):
+  /// REGULAR | QUARTERLY | ACCELERATED1 | ACCELERATED2 — null = not yet set
+  remitterType      String?
+  /// EFT originator profile (Wave 1 foundation; consumed by the CPA-005
+  /// generator in Wave 2). The company's own bank details for the debit side
+  /// of a direct-deposit file — never fabricated.
+  eftOriginatorName String?
+  eftOriginatorId   String?
+  eftInstitution    String?
+  eftTransit        String?
+  eftAccount        String?
   freePayRunsUsed Int @default(0)
   maxFreePayRuns  Int @default(2)
   trialEndsAt     DateTime?
@@ -101,6 +112,7 @@ model Company {
   employees   Employee[]
   payGroups   PayGroup[]
   payRuns     PayRun[]
+  employeePendingUpdates EmployeePendingUpdate[]
   ledgerProConnection LedgerProConnection?
   ledgerProSyncRecords LedgerProSyncRecord[]
 }
@@ -142,16 +154,70 @@ model Employee {
   payType      String?
   /// Per-period gross rate (auto-fills wizard)
   payRate      Float?
+  /// Employment lifecycle (Wave 1) — hire and termination dates.
+  startDate       DateTime?
+  terminationDate DateTime?
+  jobTitle        String?
+  department      String?
+  /// Vacation handling (Wave 1): ACCRUE | PAYOUT | NONE.
+  /// ACCRUE adds vacationRatePct% of each run's gross to vacationBalanceCents;
+  /// PAYOUT keeps the per-run wizard payout; NONE tracks nothing.
+  vacationMode       String @default("PAYOUT")
+  /// Vacation rate as a percentage number (e.g. 4 = 4%)
+  vacationRatePct    Float?
+  /// Accrued vacation balance owed, in cents (ACCRUE mode)
+  vacationBalanceCents Int @default(0)
+  /// The pay group this employee belongs to (null = unassigned; unassigned
+  /// employees are included in every pay-group run until assigned — Wave 1).
+  payGroupId    String?
+  /// Employee portal link (Wave 3, Clerk): the Clerk user id once the
+  /// employee has signed in and been linked (resolution: clerkUserId first,
+  /// else verified-email first-link against portalInvitedAt — see
+  /// lib/employee-portal-session.ts). Null = not linked.
+  clerkUserId     String?   @unique
+  /// When the employer invited this employee to the portal (Wave 3).
+  /// Null = never invited. Cleared together with clerkUserId on revoke.
+  portalInvitedAt DateTime?
   active        Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  payGroup     PayGroup?     @relation(fields: [payGroupId], references: [id], onDelete: SetNull)
   td1Profiles  TD1Profile[]
   ytdLedgers   YtdLedger[]
   payRunItems  PayRunItem[]
+  pendingUpdates EmployeePendingUpdate[]
 
   @@index([companyId])
+  @@index([payGroupId])
+}
+
+/// Employee-portal self-service change request (Wave 3). An employee submits
+/// proposed profile / TD1 / banking changes; they take effect ONLY when an
+/// employer approves (applied in one transaction by the review action).
+/// Banking travels inside `payload` already AES-256-GCM encrypted
+/// (payload.bankEncrypted) — never plaintext at rest.
+model EmployeePendingUpdate {
+  id               String    @id @default(cuid())
+  employeeId       String
+  companyId        String
+  /// PENDING | APPROVED | REJECTED | SUPERSEDED (a newer submission
+  /// supersedes the employee's previous PENDING row)
+  status           String    @default("PENDING")
+  /// Validated payload: { profile?, td1?, bankEncrypted? } —
+  /// see lib/employee-portal-core.ts (sanitizePendingPayload).
+  payload          Json
+  submittedAt      DateTime  @default(now())
+  reviewedAt       DateTime?
+  reviewedByUserId String?
+  reviewNote       String?
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, status])
+  @@index([companyId, status])
 }
 
 /// Federal and provincial TD1 claim amounts for an employee.
@@ -207,6 +273,7 @@ model PayGroup {
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   payRuns PayRun[]
+  employees Employee[]
 
   @@index([companyId])
 }
@@ -235,6 +302,8 @@ model PayRun {
   itemCount       Int       @default(0)
   createdAt       DateTime  @default(now())
   finalizedAt     DateTime?
+  /// Set when the run is reversed (status REVERSED) — Wave 1 reversal workflow
+  reversedAt      DateTime?
 
   company  Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   payGroup PayGroup     @relation(fields: [payGroupId], references: [id], onDelete: Cascade)
@@ -254,6 +323,13 @@ model PayRunItem {
   cpp             Float
   cpp2            Float
   ei              Float
+  /// Quebec split (Wave 1): for QC runs, qpp/qpp2 carry the QPP/QPP2 amounts
+  /// (the same values also remain in cpp/cpp2, which keep holding the
+  /// pension-plan totals), and qpip carries the employee QPIP premium that
+  /// legacy `ei` alone never contained. All zero for non-QC runs.
+  qpp             Float    @default(0)
+  qpp2            Float    @default(0)
+  qpip            Float    @default(0)
   federalTax      Float
   provincialTax   Float
   totalDeductions Float
@@ -274,6 +350,9 @@ model PayRunItem {
   hours           Float    @default(0)
   /// Vacation pay paid this period (4%/6% of gross)
   vacationPay     Float    @default(0)
+  /// Vacation accrued into the employee's balance this run, in cents
+  /// (ACCRUE mode only; reversal subtracts exactly this amount) — Wave 1
+  vacationAccruedCents Int @default(0)
   /// Vacation pay rate used (e.g. 0.04 = 4%)
   vacationPayRate Float    @default(0)
   /// Bonus or non-periodic payment included in this pay run

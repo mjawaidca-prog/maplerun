@@ -39,6 +39,14 @@ export default function HelpPage() {
         <Q q="How do I upgrade?" a="Go to Company → Billing tab → select a plan → complete checkout through Stripe. Your plan updates immediately." />
       </Section>
 
+      {/* Employee portal */}
+      <Section title="Employee portal">
+        <Q q="What is the employee portal?" a="A self-service page where your employees can view and download their pay stubs, check the personal details you hold for them, and submit updates to their address, TD1 amounts, and direct-deposit banking. You control invitations and approvals from the Employee Portal admin page." />
+        <Q q="How do employees sign in?" a="You invite an employee from the Employee Portal admin page using the email address on their employee record. They sign in at the portal with that same email address — that's how the portal knows which record is theirs. There is no separate portal password to manage." />
+        <Q q="Do employee changes take effect immediately?" a="No. Everything an employee submits waits on the Employee Portal admin page as a change request. Nothing changes on their record until you approve it; banking details are stored encrypted even while pending, and employees can never change their own SIN." />
+        <Q q="How do I remove an employee's portal access?" a="Use Revoke next to the employee on the Employee Portal admin page. Their portal link is cleared immediately; their payroll records are unaffected." />
+      </Section>
+
       {/* Technical */}
       <Section title="Data & security">
         <Q q="How is SIN protected?" a="SINs are encrypted at rest using AES-256-GCM. They are never logged, never exposed in API responses without explicit permission, and only accessible to authorized users in your company." />

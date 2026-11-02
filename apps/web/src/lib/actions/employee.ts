@@ -66,6 +66,21 @@ export async function createEmployee(formData: FormData) {
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       payType: payType || null,
       payRate: payRate ? parseFloat(payRate) : null,
+      // Wave 1: persist the pay-group assignment (previously validated
+      // above and then discarded — the run loader now scopes by it).
+      payGroupId: payGroupId || null,
+      // Wave 1 PR E: employment facts + vacation policy (schema PR A).
+      startDate: (formData.get("startDate") as string)
+        ? new Date(formData.get("startDate") as string)
+        : null,
+      jobTitle: ((formData.get("jobTitle") as string) || "").trim() || null,
+      department: ((formData.get("department") as string) || "").trim() || null,
+      vacationMode: ["ACCRUE", "PAYOUT", "NONE"].includes(formData.get("vacationMode") as string)
+        ? (formData.get("vacationMode") as string)
+        : "PAYOUT",
+      vacationRatePct: formData.get("vacationRatePct")
+        ? parseFloat(formData.get("vacationRatePct") as string)
+        : null,
       bankEncrypted: (bankTransit || bankInstitution || bankAccount)
         ? encrypt(JSON.stringify({ transit: bankTransit, institution: bankInstitution, account: bankAccount }))
         : null,
@@ -104,7 +119,6 @@ export async function updateEmployee(formData: FormData) {
   const city = formData.get("city") as string;
   const province = formData.get("province") as string;
   const postalCode = formData.get("postalCode") as string;
-  const active = formData.get("active") === "true";
 
   if (!id || !firstName || !lastName) {
     throw new Error("First name and last name are required.");
@@ -127,8 +141,60 @@ export async function updateEmployee(formData: FormData) {
     city: city || null,
     province: province || null,
     postalCode: postalCode || null,
-    active,
   };
+
+  // Only touch `active` when the form actually carries the field. The
+  // edit form does not render one, and reading a missing field as
+  // false silently deactivated the employee on every save (pre-Wave-1
+  // bug). Reactivation clears the termination date (PR E).
+  if (formData.has("active")) {
+    updateData.active = formData.get("active") === "true";
+    if (updateData.active) updateData.terminationDate = null;
+  }
+
+  // Wave 1 PR E+F — employment facts, vacation policy, pay terms,
+  // date of birth, pay group and bank details are editable here too
+  // (all were create-only before). Fields are applied only when the
+  // submitting form carries them, so partial forms can't wipe data.
+  if (formData.has("startDate")) {
+    const v = formData.get("startDate") as string;
+    updateData.startDate = v ? new Date(v) : null;
+  }
+  if (formData.has("jobTitle")) {
+    updateData.jobTitle = ((formData.get("jobTitle") as string) || "").trim() || null;
+  }
+  if (formData.has("department")) {
+    updateData.department = ((formData.get("department") as string) || "").trim() || null;
+  }
+  if (["ACCRUE", "PAYOUT", "NONE"].includes(formData.get("vacationMode") as string)) {
+    updateData.vacationMode = formData.get("vacationMode") as string;
+  }
+  if (formData.has("vacationRatePct")) {
+    const v = formData.get("vacationRatePct") as string;
+    updateData.vacationRatePct = v ? parseFloat(v) : null;
+  }
+  if (formData.has("payType")) {
+    updateData.payType = (formData.get("payType") as string) || null;
+  }
+  if (formData.has("payRate")) {
+    const v = parseFloat(formData.get("payRate") as string);
+    if (Number.isFinite(v)) updateData.payRate = v;
+  }
+  if (formData.has("dateOfBirth")) {
+    const v = formData.get("dateOfBirth") as string;
+    updateData.dateOfBirth = v ? new Date(v) : null;
+  }
+  if (formData.has("payGroupId")) {
+    updateData.payGroupId = (formData.get("payGroupId") as string) || null;
+  }
+  const bankTransit = (formData.get("bankTransit") as string) || "";
+  const bankInstitution = (formData.get("bankInstitution") as string) || "";
+  const bankAccount = (formData.get("bankAccount") as string) || "";
+  if (bankTransit || bankInstitution || bankAccount) {
+    updateData.bankEncrypted = encrypt(
+      JSON.stringify({ transit: bankTransit, institution: bankInstitution, account: bankAccount }),
+    );
+  }
 
   if (sin) {
     const sinDigits = sin.replace(/\s/g, "");
@@ -160,7 +226,9 @@ export async function terminateEmployee(formData: FormData) {
 
   await prisma.employee.update({
     where: { id },
-    data: { active: false },
+    // Wave 1 PR E: termination is a dated event, not just a flag —
+    // ROE and final-pay work (Wave 2) key off terminationDate.
+    data: { active: false, terminationDate: new Date() },
   });
 
   revalidatePath("/app/employees");

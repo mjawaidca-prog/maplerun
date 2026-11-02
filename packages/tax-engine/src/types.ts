@@ -192,6 +192,10 @@ export interface PayResult {
   cpp: number;
   cpp2: number;
   ei: number;
+  /** Employee QPIP premium (Quebec only; 0 elsewhere). For QC, `cpp`/`cpp2`
+   * carry the QPP/QPP2 amounts and `ei` excludes QPIP — this field exposes
+   * the QPIP component that totalDeductions already includes. */
+  qpip: number;
   federalTax: number;
   provincialTax: number;
   totalDeductions: number;
