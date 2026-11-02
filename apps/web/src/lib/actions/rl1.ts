@@ -51,8 +51,6 @@ import {
   type Rl1Slip,
 } from "@/lib/filings/rl1-boxes";
 
-export type { Rl1Slip };
-
 export type Rl1Report = {
   year: number;
   companyName: string;
