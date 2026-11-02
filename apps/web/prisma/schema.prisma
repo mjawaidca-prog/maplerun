@@ -110,6 +110,10 @@ model Company {
   /// portal (Clerk track) is the delivery surface, and email stays
   /// opt-in per company until that lands.
   stubEmailOnFinalize Boolean @default(false)
+  /// Bank-assigned processing/data centre (5 digits) for the CPA-005
+  /// header — Wave 2 EFT wiring. Without it no valid file can be built,
+  /// and fabricating one is forbidden, hence this column.
+  eftDataCentre     String?
   freePayRunsUsed Int @default(0)
   maxFreePayRuns  Int @default(2)
   trialEndsAt     DateTime?
