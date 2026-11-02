@@ -117,6 +117,7 @@ model Company {
   employees   Employee[]
   payGroups   PayGroup[]
   payRuns     PayRun[]
+  employeePendingUpdates EmployeePendingUpdate[]
   ledgerProConnection LedgerProConnection?
   ledgerProSyncRecords LedgerProSyncRecord[]
 }
@@ -140,6 +141,14 @@ model Membership {
 model Employee {
   id            String    @id @default(cuid())
   companyId     String
+  /// Employee portal link (Wave 3, Clerk): the Clerk user id once the
+  /// employee has signed in and been linked (resolution: clerkUserId first,
+  /// else verified-email first-link against portalInvitedAt — see
+  /// lib/employee-portal-session.ts). Null = not linked.
+  clerkUserId     String?   @unique
+  /// When the employer invited this employee to the portal (Wave 3).
+  /// Null = never invited. Cleared together with clerkUserId on revoke.
+  portalInvitedAt DateTime?
   firstName     String
   lastName      String
   /// AES-256-GCM encrypted SIN — never log, never expose in API responses without explicit permission
@@ -188,6 +197,7 @@ model Employee {
   td1Profiles  TD1Profile[]
   ytdLedgers   YtdLedger[]
   payRunItems  PayRunItem[]
+  pendingUpdates EmployeePendingUpdate[]
 
   @@index([companyId])
   @@index([payGroupId])
@@ -419,4 +429,31 @@ model LedgerProSyncRecord {
 
   @@index([companyId])
   @@index([status])
+}
+
+/// Employee-portal self-service change request (Wave 3). An employee submits
+/// proposed profile / TD1 / banking changes; they take effect ONLY when an
+/// employer approves (applied in one transaction by the review action).
+/// Banking travels inside `payload` already AES-256-GCM encrypted
+/// (payload.bankEncrypted) — never plaintext at rest.
+model EmployeePendingUpdate {
+  id               String    @id @default(cuid())
+  employeeId       String
+  companyId        String
+  /// PENDING | APPROVED | REJECTED | SUPERSEDED (a newer submission
+  /// supersedes the employee's previous PENDING row)
+  status           String    @default("PENDING")
+  /// Validated payload: { profile?, td1?, bankEncrypted? } —
+  /// see lib/employee-portal-core.ts (sanitizePendingPayload).
+  payload          Json
+  submittedAt      DateTime  @default(now())
+  reviewedAt       DateTime?
+  reviewedByUserId String?
+  reviewNote       String?
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, status])
+  @@index([companyId, status])
 }
