@@ -160,6 +160,24 @@ export const ZERO_YTD: EmployeeYtd = {
   ei: 0,
 };
 
+/**
+ * A named per-period deduction (Wave 3 B6) — e.g. an RRSP contribution,
+ * union dues, or a benefits premium withheld from this period's pay.
+ * Each flag controls which statutory base the amount reduces:
+ *  - reducesTaxable:     the T4127 factor F (lowers income tax only);
+ *  - reducesPensionable: the CPP/QPP pensionable base;
+ *  - reducesInsurable:   the EI (and QPIP) insurable base.
+ * The amount itself is withheld from net pay by the CALLER — the
+ * engine only models its effect on the bases (see resolveDeductions).
+ */
+export interface NamedDeduction {
+  name: string;
+  amount: number;
+  reducesPensionable: boolean;
+  reducesInsurable: boolean;
+  reducesTaxable: boolean;
+}
+
 export interface PayInput {
   /** ISO yyyy-mm-dd — selects the tax-table edition. */
   payDate: string;
@@ -167,8 +185,26 @@ export interface PayInput {
   frequency: PayFrequency;
   /** Gross taxable income for the period (earnings + taxable benefits). */
   grossPeriodIncome: number;
-  /** Per-period tax-deductible amounts (RPP, RRSP, union dues) — F in T4127. */
-  periodDeductions?: number;
+  /**
+   * Per-period tax-deductible amounts (RPP, RRSP, union dues) — F in T4127.
+   * Either a bare total (legacy form: reduces the taxable base only,
+   * exactly as before) or a list of NamedDeduction (Wave 3 B6), whose
+   * per-flag amounts reduce the pensionable / insurable / taxable bases.
+   */
+  periodDeductions?: number | NamedDeduction[];
+  /**
+   * Wave 3 B6 — non-cash taxable benefits for the period (e.g. employer
+   * paid group insurance, car benefit). CPP/EI/tax are computed on
+   * (gross + benefits); the cash gross and the amount the employee is
+   * paid do NOT include the benefit. Defaults to 0.
+   */
+  taxableBenefits?: number;
+  /**
+   * Wave 3 B6 — TD1 additional tax to deduct per period (TD1 line 2).
+   * Added to the period's federal tax after the T4127 computation.
+   * Defaults to 0.
+   */
+  extraTaxPerPeriod?: number;
   /** CRA-authorized annual deductions (e.g. prescribed-zone) — HD in T4127. */
   annualDeductions?: number;
   /** TD1 federal total claim (TC). Defaults to the income-tested federal BPA. */
@@ -189,6 +225,10 @@ export interface EmployerCosts {
 
 export interface PayResult {
   gross: number;
+  /** Wave 3 B6 — the taxable-benefits amount the deduction bases
+   *  included (echo of PayInput.taxableBenefits; 0 when none). Not
+   *  part of `gross` and never added to net pay. */
+  taxableBenefits: number;
   cpp: number;
   cpp2: number;
   ei: number;

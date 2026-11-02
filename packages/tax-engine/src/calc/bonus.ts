@@ -8,6 +8,7 @@ import { clamp, roundCent } from '../money';
 import { getTables } from '../data/index';
 import { calcCpp, maxCpp2Contribution, maxCppContribution } from './cpp';
 import { calcEi, eiRateFor, maxEiPremium } from './ei';
+import { resolveDeductions } from './deductions';
 import {
   annualFederalTax,
   annualProvincialTax,
@@ -25,6 +26,12 @@ export interface BonusInput extends PayInput {
 
 export interface BonusResult {
   bonus: number;
+  /** Wave 3 B6 — pensionable/insurable earnings the bonus adds to YTD
+   *  (the full bonus: consistent with calculatePay, whose YTD bases
+   *  track gross earnings even past the premium caps). Lets callers
+   *  merging a bonus into a regular result roll YTD forward exactly. */
+  bonusPensionableEarnings: number;
+  bonusInsurableEarnings: number;
   bonusCpp: number;
   bonusCpp2: number;
   bonusEi: number;
@@ -62,9 +69,19 @@ export function calculateBonus(input: BonusInput): BonusResult {
   const eiT = tables.ei;
   const warnings: string[] = [];
 
+  // Wave 3 B6 — the regular baseline uses the same statutory bases as
+  // calculatePay: gross + taxable benefits, minus per-base deductions.
+  const deductions = resolveDeductions(input.periodDeductions);
+  const taxableBenefits = input.taxableBenefits ?? 0;
+  if (!Number.isFinite(taxableBenefits) || taxableBenefits < 0) {
+    throw new TaxEngineError(`taxableBenefits must be a non-negative number, got ${taxableBenefits}`);
+  }
+  const pensionableBase = Math.max(0, gross + taxableBenefits - deductions.pensionable);
+  const insurableBase = Math.max(0, gross + taxableBenefits - deductions.insurable);
+
   // Regular-period CPP/EI establish the baseline (exemption + remaining caps).
-  const regularCpp = calcCpp(gross, P, ytd, cppT, input.cppExempt ?? false);
-  const regularEi = calcEi(gross, input.province, ytd, eiT, input.eiExempt ?? false);
+  const regularCpp = calcCpp(pensionableBase, P, ytd, cppT, input.cppExempt ?? false);
+  const regularEi = calcEi(insurableBase, input.province, ytd, eiT, input.eiExempt ?? false);
 
   // CPP on the bonus: no per-period exemption, capped by remaining annual room.
   let bonusCpp = 0;
@@ -75,7 +92,7 @@ export function calculateBonus(input: BonusInput): BonusResult {
       bonusCpp,
       Math.max(0, roundCent(maxCppContribution(cppT) - ytd.cpp - regularCpp.cpp)),
     );
-    const baseEarnings = ytd.pensionableEarnings + gross;
+    const baseEarnings = ytd.pensionableEarnings + pensionableBase;
     const cpp2Earnings =
       clamp(baseEarnings + B, cppT.ympe, cppT.yampe) - clamp(baseEarnings, cppT.ympe, cppT.yampe);
     bonusCpp2 = roundCent(cppT.cpp2Rate * cpp2Earnings);
@@ -88,7 +105,7 @@ export function calculateBonus(input: BonusInput): BonusResult {
   // EI on the bonus: insurable up to the remaining MIE room after regular pay.
   let bonusEi = 0;
   if (!(input.eiExempt ?? false)) {
-    const insurableRoom = Math.max(0, eiT.maxInsurableEarnings - ytd.insurableEarnings - gross);
+    const insurableRoom = Math.max(0, eiT.maxInsurableEarnings - ytd.insurableEarnings - insurableBase);
     bonusEi = roundCent(eiRateFor(input.province, eiT) * Math.min(B, insurableRoom));
     bonusEi = Math.min(
       bonusEi,
@@ -97,13 +114,13 @@ export function calculateBonus(input: BonusInput): BonusResult {
   }
 
   // Annual income without (A1) and with (A2) the bonus, each net of its F5.
-  const periodDeductions = input.periodDeductions ?? 0;
+  const periodDeductions = deductions.taxable;
   const annualDeductions = input.annualDeductions ?? 0;
   const f5Regular = cppDeductionF5(regularCpp.cpp, regularCpp.cpp2, cppT);
   const f5Bonus = cppDeductionF5(bonusCpp, bonusCpp2, cppT);
   const A1 = Math.max(
     0,
-    P * (gross - periodDeductions - f5Regular) - annualDeductions + (input.ytdBonuses ?? 0),
+    P * (gross + taxableBenefits - periodDeductions - f5Regular) - annualDeductions + (input.ytdBonuses ?? 0),
   );
   const A2 = A1 + Math.max(0, B - f5Bonus);
 
@@ -135,6 +152,8 @@ export function calculateBonus(input: BonusInput): BonusResult {
 
   return {
     bonus: roundCent(B),
+    bonusPensionableEarnings: roundCent(B),
+    bonusInsurableEarnings: roundCent(B),
     bonusCpp,
     bonusCpp2,
     bonusEi,

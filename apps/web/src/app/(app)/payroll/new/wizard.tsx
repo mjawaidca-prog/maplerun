@@ -134,6 +134,12 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
   const [statHours, setStatHours] = useState<Record<string, string>>({});
   const [overtimeAmounts, setOvertimeAmounts] = useState<Record<string, string>>({});
   const [overtimeHours, setOvertimeHours] = useState<Record<string, string>>({});
+  // Wave 3 B6 — breadth inputs: non-cash taxable benefits, non-taxable
+  // reimbursements, and named custom deductions per employee.
+  const [taxableBenefits, setTaxableBenefits] = useState<Record<string, string>>({});
+  const [reimbursements, setReimbursements] = useState<Record<string, string>>({});
+  type CustomDeductionRow = { name: string; amount: string; reducesTaxable: boolean; reducesPensionable: boolean; reducesInsurable: boolean };
+  const [customDeductions, setCustomDeductions] = useState<Record<string, CustomDeductionRow[]>>({});
   const [vacationEnabled, setVacationEnabled] = useState<Record<string, boolean>>(
     Object.fromEntries(employees.map((e) => [e.id, false]))
   );
@@ -281,6 +287,24 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
     if (Object.keys(bonusData).length > 0) formData.set("bonus", JSON.stringify(bonusData));
     if (Object.keys(overtimeData).length > 0) formData.set("overtime", JSON.stringify(overtimeData));
     if (Object.keys(statData).length > 0) formData.set("stat", JSON.stringify(statData));
+
+    // Wave 3 B6 — taxable benefits / reimbursements / custom deductions.
+    const benefitsData: Record<string, number> = {};
+    const reimbursementData: Record<string, number> = {};
+    const customData: Record<string, { name: string; amount: number; reducesTaxable: boolean; reducesPensionable: boolean; reducesInsurable: boolean }[]> = {};
+    for (const emp of employees) {
+      const benefits = parseFloat(taxableBenefits[emp.id] ?? "") || 0;
+      if (benefits > 0) benefitsData[emp.id] = benefits;
+      const reimb = parseFloat(reimbursements[emp.id] ?? "") || 0;
+      if (reimb > 0) reimbursementData[emp.id] = reimb;
+      const rows = (customDeductions[emp.id] ?? [])
+        .map((r) => ({ name: r.name.trim(), amount: parseFloat(r.amount) || 0, reducesTaxable: r.reducesTaxable, reducesPensionable: r.reducesPensionable, reducesInsurable: r.reducesInsurable }))
+        .filter((r) => r.name && r.amount > 0);
+      if (rows.length > 0) customData[emp.id] = rows;
+    }
+    if (Object.keys(benefitsData).length > 0) formData.set("taxableBenefits", JSON.stringify(benefitsData));
+    if (Object.keys(reimbursementData).length > 0) formData.set("reimbursements", JSON.stringify(reimbursementData));
+    if (Object.keys(customData).length > 0) formData.set("customDeductions", JSON.stringify(customData));
   }
 
   async function handleFinalize() {
@@ -451,7 +475,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                       {showExtendedPayTypes && (
                         <details className="group ml-[13.5rem] mt-2">
                           <summary className="text-xs text-muted-foreground cursor-pointer hover:text-[#1C1917] transition-colors">
-                            ▸ Add bonus · stat · vacation
+                            ▸ Add bonus · stat · benefits · deductions
                           </summary>
                           <div className={`grid ${showFullPayGrid ? "grid-cols-3" : "grid-cols-2"} gap-3 mt-3 pl-1`}>
                             <div>
@@ -521,6 +545,59 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                               </>
                             )}
                           </div>
+
+                          {/* Wave 3 B6 — benefits / reimbursement / custom deductions */}
+                          <div className="grid grid-cols-2 gap-3 mt-3 pl-1">
+                            <div>
+                              <Label className="text-[11px] text-[#A8A29E]">Taxable benefits (non-cash)</Label>
+                              <div className="relative mt-1">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8"
+                                  value={taxableBenefits[emp.id] ?? ""}
+                                  onChange={(e) => setTaxableBenefits((prev) => ({ ...prev, [emp.id]: e.target.value }))} />
+                              </div>
+                              <p className="text-[10px] text-[#A8A29E] mt-1">Added to CPP/EI/tax bases, not to pay.</p>
+                            </div>
+                            <div>
+                              <Label className="text-[11px] text-[#A8A29E]">Reimbursement (non-taxable)</Label>
+                              <div className="relative mt-1">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8"
+                                  value={reimbursements[emp.id] ?? ""}
+                                  onChange={(e) => setReimbursements((prev) => ({ ...prev, [emp.id]: e.target.value }))} />
+                              </div>
+                              <p className="text-[10px] text-[#A8A29E] mt-1">Added to net pay; never taxed.</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 pl-1 space-y-2">
+                            <Label className="text-[11px] text-[#A8A29E]">Custom deductions</Label>
+                            {(customDeductions[emp.id] ?? []).map((row, idx) => (
+                              <div key={idx} className="flex flex-wrap items-center gap-2">
+                                <input type="text" placeholder="Name (e.g. RRSP)" value={row.name}
+                                  onChange={(e) => setCustomDeductions((prev) => ({ ...prev, [emp.id]: (prev[emp.id] ?? []).map((r, i) => i === idx ? { ...r, name: e.target.value } : r) }))}
+                                  className="w-32 border border-[#D6D3D1] rounded-md px-2 py-1 text-xs" />
+                                <input type="number" min="0" step="0.01" placeholder="0.00" value={row.amount}
+                                  onChange={(e) => setCustomDeductions((prev) => ({ ...prev, [emp.id]: (prev[emp.id] ?? []).map((r, i) => i === idx ? { ...r, amount: e.target.value } : r) }))}
+                                  className="w-20 border border-[#D6D3D1] rounded-md px-2 py-1 text-xs text-right" />
+                                {([["reducesTaxable", "Tax"], ["reducesPensionable", "CPP"], ["reducesInsurable", "EI"]] as const).map(([key, label]) => (
+                                  <label key={key} className="flex items-center gap-1 text-[11px] text-[#78716C]">
+                                    <input type="checkbox" checked={row[key]}
+                                      onChange={(e) => setCustomDeductions((prev) => ({ ...prev, [emp.id]: (prev[emp.id] ?? []).map((r, i) => i === idx ? { ...r, [key]: e.target.checked } : r) }))} />
+                                    ↓{label}
+                                  </label>
+                                ))}
+                                <button type="button" className="text-[11px] text-[#B3261E]"
+                                  onClick={() => setCustomDeductions((prev) => ({ ...prev, [emp.id]: (prev[emp.id] ?? []).filter((_, i) => i !== idx) }))}>
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                            <button type="button" className="text-[11px] text-primary underline"
+                              onClick={() => setCustomDeductions((prev) => ({ ...prev, [emp.id]: [...(prev[emp.id] ?? []), { name: "", amount: "", reducesTaxable: true, reducesPensionable: false, reducesInsurable: false }] }))}>
+                              + Add deduction (RRSP, union dues, benefits…)
+                            </button>
+                            <p className="text-[10px] text-[#A8A29E]">↓Tax lowers taxable income (RRSP/RPP/union dues); ↓CPP / ↓EI also lower those bases. The amount is always withheld from net pay and printed on the stub.</p>
+                          </div>
                         </details>
                       )}
                     </div>
@@ -589,11 +666,21 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                   className="rounded-lg border border-border/40 p-4 space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <p className="font-semibold text-sm">{item.employeeName}</p>
+                    <p className="font-semibold text-sm">{item.employeeName} <span className="font-normal text-muted-foreground">· {item.province}</span></p>
                     <p className="text-sm tabular-nums font-bold">
-                      Net {fmtCAD(item.result.netPay)}
+                      Net {fmtCAD(item.netPay)}
                     </p>
                   </div>
+                  {(item.bonus > 0 || item.taxableBenefits > 0 || item.reimbursement > 0 || item.customDeductions.length > 0) && (
+                    <div className="text-xs text-muted-foreground space-y-0.5">
+                      {item.bonus > 0 && <p>Bonus {fmtCAD(item.bonus)} — taxed by the T4127 lump-sum method (included in gross above)</p>}
+                      {item.taxableBenefits > 0 && <p>Taxable benefits {fmtCAD(item.taxableBenefits)} — in CPP/EI/tax bases, not in gross</p>}
+                      {item.customDeductions.map((d) => (
+                        <p key={d.name}>{d.name}: −{fmtCAD(d.amount)} withheld</p>
+                      ))}
+                      {item.reimbursement > 0 && <p>Reimbursement +{fmtCAD(item.reimbursement)} added to net (non-taxable)</p>}
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
                     <div>

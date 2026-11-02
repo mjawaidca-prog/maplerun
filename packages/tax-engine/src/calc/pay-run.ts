@@ -11,6 +11,7 @@ import { getTables } from '../data/index';
 import { QPP_2026, QPIP_2026 } from '../data/2026/quebec';
 import { calcCpp } from './cpp';
 import { calcEi } from './ei';
+import { resolveDeductions } from './deductions';
 import {
   calcIncomeTax,
   cppDeductionF5,
@@ -31,11 +32,28 @@ export function calculatePay(input: PayInput): PayResult {
   if (!Number.isFinite(gross) || gross < 0) {
     throw new TaxEngineError(`grossPeriodIncome must be a non-negative number, got ${gross}`);
   }
-  const periodDeductions = input.periodDeductions ?? 0;
+  // Wave 3 B6 — named deductions resolve per base; the legacy bare
+  // number keeps meaning factor F (taxable base only).
+  const deductions = resolveDeductions(input.periodDeductions);
+  const periodDeductions = deductions.taxable;
   const annualDeductions = input.annualDeductions ?? 0;
-  if (periodDeductions < 0 || annualDeductions < 0) {
+  if (annualDeductions < 0) {
     throw new TaxEngineError('Deductions cannot be negative');
   }
+  const taxableBenefits = input.taxableBenefits ?? 0;
+  if (!Number.isFinite(taxableBenefits) || taxableBenefits < 0) {
+    throw new TaxEngineError(`taxableBenefits must be a non-negative number, got ${taxableBenefits}`);
+  }
+  const extraTax = input.extraTaxPerPeriod ?? 0;
+  if (!Number.isFinite(extraTax) || extraTax < 0) {
+    throw new TaxEngineError(`extraTaxPerPeriod must be a non-negative number, got ${extraTax}`);
+  }
+  // Statutory bases (Wave 3 B6): CPP/EI/tax see gross + non-cash
+  // taxable benefits, minus any deductions flagged for that base.
+  // Cash gross itself never changes.
+  const pensionableBase = Math.max(0, gross + taxableBenefits - deductions.pensionable);
+  const insurableBase = Math.max(0, gross + taxableBenefits - deductions.insurable);
+  const taxableGross = gross + taxableBenefits;
 
   const P = PERIODS_PER_YEAR[input.frequency];
   if (!P) throw new TaxEngineError(`Unknown pay frequency "${input.frequency}"`);
@@ -51,13 +69,13 @@ export function calculatePay(input: PayInput): PayResult {
   // ── CPP/QPP ──────────────────────────────────────────────────────────────
   // Quebec uses QPP (6.30%) instead of CPP (5.95%). Same formula, different table.
   const cppTable = isQC ? QPP_2026 : tables.cpp;
-  const cppRes = calcCpp(gross, P, ytd, cppTable, input.cppExempt ?? false);
+  const cppRes = calcCpp(pensionableBase, P, ytd, cppTable, input.cppExempt ?? false);
 
   // ── EI (QC gets reduced rate) + QPIP (QC only) ───────────────────────────
-  const eiRes = calcEi(gross, input.province, ytd, tables.ei, input.eiExempt ?? false);
+  const eiRes = calcEi(insurableBase, input.province, ytd, tables.ei, input.eiExempt ?? false);
   let qpipRes = { qpip: 0, insurableEarnings: 0 };
   if (isQC && !(input.eiExempt ?? false)) {
-    qpipRes = calcQpip(gross, ytd.insurableEarnings, 0, QPIP_2026);
+    qpipRes = calcQpip(insurableBase, ytd.insurableEarnings, 0, QPIP_2026);
   }
 
   // ── Income tax ───────────────────────────────────────────────────────────
@@ -68,7 +86,7 @@ export function calculatePay(input: PayInput): PayResult {
   if (isQC) {
     // Quebec provincial tax via TP-1015.3, NOT T4127 provincial formulas.
     const f5 = cppDeductionF5(cppRes.cpp, cppRes.cpp2, cppTable);
-    const A = Math.max(0, P * (gross - periodDeductions - f5) - annualDeductions);
+    const A = Math.max(0, P * (taxableGross - periodDeductions - f5) - annualDeductions);
 
     // K2 credit bases: QPP base fraction + EI (QC-reduced rate)
     const baseQppFraction = cppTable.baseRate / cppTable.employeeRate;
@@ -98,7 +116,7 @@ export function calculatePay(input: PayInput): PayResult {
     // Standard T4127 path for all non-QC provinces
     const tax = calcIncomeTax(
       {
-        grossPeriodIncome: gross,
+        grossPeriodIncome: taxableGross,
         periodDeductions,
         annualDeductions,
         periodsPerYear: P,
@@ -116,6 +134,13 @@ export function calculatePay(input: PayInput): PayResult {
     federalTax = tax.federalPeriod;
     provincialTax = tax.provincialPeriod;
     annualTaxableIncome = tax.annualTaxableIncome;
+  }
+
+  // Wave 3 B6 — TD1 additional tax per period (TD1 line 2): a flat
+  // amount the employee asked to have withheld, added to federal tax
+  // after the T4127 computation (both the standard and QC paths).
+  if (extraTax > 0) {
+    federalTax = roundCent(federalTax + extraTax);
   }
 
   // ── Verification warnings ────────────────────────────────────────────────
@@ -141,6 +166,7 @@ export function calculatePay(input: PayInput): PayResult {
 
   return {
     gross: roundCent(gross),
+    taxableBenefits: roundCent(taxableBenefits),
     cpp: cppRes.cpp,
     cpp2: cppRes.cpp2,
     ei: eiRes.ei,

@@ -109,6 +109,14 @@ export default async function EditEmployeePage({ params }: Props) {
                 <Input id="postalCode" name="postalCode" defaultValue={employee.postalCode ?? ""} />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="provinceOfEmployment">Province of employment (payroll)</Label>
+              <select id="provinceOfEmployment" name="provinceOfEmployment" className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white" defaultValue={employee.provinceOfEmployment ?? ""}>
+                <option value="">Pay group default</option>
+                {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
+              </select>
+              <p className="text-[11px] text-[#A8A29E]">Where this employee&apos;s income is taxed for payroll. Leave on the pay-group default unless they work in a different province than the group.</p>
+            </div>
           </CardContent>
         </Card>
 
