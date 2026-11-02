@@ -19,6 +19,38 @@
  *  remitter-type-driven schedules (accelerated etc.) arrive later. */
 export type RemittanceFrequency = "monthly" | "quarterly";
 
+/**
+ * CRA remitter type as stored on Company.remitterType (Wave 1 foundation).
+ * null / unset = not yet chosen — treated as REGULAR (monthly) everywhere.
+ */
+export type RemitterType = "REGULAR" | "QUARTERLY" | "ACCELERATED1" | "ACCELERATED2";
+
+export const REMITTER_TYPES: readonly RemitterType[] = [
+  "REGULAR", "QUARTERLY", "ACCELERATED1", "ACCELERATED2",
+];
+
+export function isRemitterType(v: unknown): v is RemitterType {
+  return typeof v === "string" && (REMITTER_TYPES as readonly string[]).includes(v);
+}
+
+/** Human label for a remitter type (null → Regular, the CRA default). */
+export function remitterTypeLabel(t: string | null | undefined): string {
+  switch (t) {
+    case "QUARTERLY": return "Quarterly remitter";
+    case "ACCELERATED1": return "Accelerated remitter — Threshold 1";
+    case "ACCELERATED2": return "Accelerated remitter — Threshold 2";
+    default: return "Regular remitter";
+  }
+}
+
+/** Aggregation grouping implied by a remitter type: QUARTERLY groups by
+ *  quarter; every other type (incl. unset) groups monthly. */
+export function groupingForRemitterType(
+  t: string | null | undefined,
+): RemittanceGrouping {
+  return t === "QUARTERLY" ? "quarterly" : "monthly";
+}
+
 /** Grouping for aggregation — same dimension as remittance frequency. */
 export type RemittanceGrouping = RemittanceFrequency;
 
@@ -141,7 +173,8 @@ export function periodLabel(periodKey: string): string {
  * Regular remitter: the 15th of the month following the period —
  * monthly: 15th of the next month; quarterly: 15th of the month after
  * the quarter ends. (No weekend/holiday shift here: this is the nominal
- * statutory date; presentation layers may annotate business-day shifts.)
+ * statutory date. For the business-day-adjusted, remitter-aware date that
+ * pages should display, use remittanceDueDateFor below.)
  */
 export function remittanceDueDate(
   periodKey: string,
@@ -161,6 +194,116 @@ export function remittanceDueDate(
   const dueMonth = month + 1;
   const dueYear = dueMonth > 12 ? year + 1 : year;
   return `${dueYear}-${pad2(dueMonth > 12 ? dueMonth - 12 : dueMonth)}-15`;
+}
+
+// ─── Business-day adjustment + remitter-aware due dates ──────────────────────
+
+function isoToUTCDate(iso: string): Date {
+  const [y, m, d] = iso.split("-").map((s) => parseInt(s, 10)) as [number, number, number];
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
+function utcDateToISO(d: Date): string {
+  return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+}
+
+function addDaysISO(iso: string, days: number): string {
+  const d = isoToUTCDate(iso);
+  d.setUTCDate(d.getUTCDate() + days);
+  return utcDateToISO(d);
+}
+
+/** Last calendar day of the month containing an ISO date, as ISO. */
+function monthEndISO(iso: string): string {
+  const [y, m] = iso.split("-").map((s) => parseInt(s, 10)) as [number, number];
+  // Day 0 of month m+1 (1-indexed trick via 0-indexed month m) = last day of m.
+  return utcDateToISO(new Date(Date.UTC(y, m, 0)));
+}
+
+/**
+ * CRA business-day rule: when a due date falls on a Saturday, Sunday, or a
+ * public holiday, the deadline moves to the NEXT business day — never
+ * earlier. (The Remittances page previously shifted Saturday BACK to the
+ * Friday 14th; that was wrong — Saturday → Monday the 17th, Sunday →
+ * Monday the 16th.)
+ *
+ * Federal holidays are NOT modelled here: only the weekend shift is
+ * applied. A nominal date that lands on a federal holiday will read one
+ * business day early; treat the result as "on or before" guidance.
+ */
+export function adjustToNextBusinessDay(isoDate: string): string {
+  let cur = isoDate;
+  for (;;) {
+    const day = isoToUTCDate(cur).getUTCDay(); // 0 = Sunday, 6 = Saturday
+    if (day !== 0 && day !== 6) return cur;
+    cur = addDaysISO(cur, 1);
+  }
+}
+
+/** The date `n` business days (Mon–Fri) AFTER an ISO date. The start date
+ *  itself is not counted; weekend days are skipped. Holidays not modelled
+ *  (see adjustToNextBusinessDay). */
+export function addBusinessDays(isoDate: string, n: number): string {
+  let cur = isoDate;
+  let remaining = n;
+  while (remaining > 0) {
+    cur = addDaysISO(cur, 1);
+    const day = isoToUTCDate(cur).getUTCDay();
+    if (day !== 0 && day !== 6) remaining -= 1;
+  }
+  return cur;
+}
+
+/**
+ * Remitter-aware, business-day-ADJUSTED CRA due date for a period.
+ *
+ * - REGULAR (and null/unset): monthly period — the 15th of the following
+ *   month, shifted to the next business day when it lands on a weekend.
+ * - QUARTERLY: quarter period ("2026-Q1") — the 15th of the month after
+ *   the quarter ends, adjusted the same way. A monthly key is first mapped
+ *   to its quarter.
+ * - ACCELERATED1 (Threshold 1): monthly period — the FINAL deadline is the
+ *   10th of the following month, adjusted. Note there are TWO deadlines per
+ *   month for Threshold 1: amounts for the 1st–15th are due by the 25th of
+ *   the same month, and amounts for the 16th–month-end by the 10th of the
+ *   following month. This function returns the 10th (the deadline that
+ *   closes the period); the page copy surfaces the 25th mid-period one.
+ * - ACCELERATED2 (Threshold 2): 3 business days after the period's last
+ *   day (periods are the 1st–7th, 8th–14th, 15th–21st and 22nd–month-end;
+ *   a monthly key resolves to the month-end period, whose deadline is
+ *   3 business days after month-end).
+ *
+ * Federal holidays are NOT modelled — weekend shifts only.
+ */
+export function remittanceDueDateFor(
+  periodKey: string,
+  remitterType: string | null | undefined,
+): string {
+  const type: RemitterType = isRemitterType(remitterType) ? remitterType : "REGULAR";
+
+  if (type === "QUARTERLY") {
+    const key = /-Q[1-4]$/.test(periodKey)
+      ? periodKey
+      : periodKeyForPayDate(`${periodKey}-01`, "quarterly");
+    return adjustToNextBusinessDay(remittanceDueDate(key, "quarterly"));
+  }
+
+  if (type === "ACCELERATED1") {
+    // Nominal 10th of the following month.
+    const year = parseInt(periodKey.slice(0, 4), 10);
+    const month = parseInt(periodKey.slice(5, 7), 10);
+    const dueMonth = month + 1;
+    const dueYear = dueMonth > 12 ? year + 1 : year;
+    const nominal = `${dueYear}-${pad2(dueMonth > 12 ? dueMonth - 12 : dueMonth)}-10`;
+    return adjustToNextBusinessDay(nominal);
+  }
+
+  if (type === "ACCELERATED2") {
+    return addBusinessDays(monthEndISO(`${periodKey}-01`), 3);
+  }
+
+  // REGULAR
+  return adjustToNextBusinessDay(remittanceDueDate(periodKey, "monthly"));
 }
 
 // ─── Aggregation ──────────────────────────────────────────────────────────────
