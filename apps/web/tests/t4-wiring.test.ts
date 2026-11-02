@@ -105,7 +105,10 @@ function fixtures() {
             employerCpp2: 200.1,
             employerEi: 1120,
             // No YtdLedger row for QC → these last-item snapshots are the fallback.
-            ytdInsurable: 55000,
+            // ytdInsurable is the BLENDED engine accumulation (EI base +
+            // QPIP base over the same 60000 of earnings = 120000) — the
+            // W4-D3 wiring splits it back into 60000 EI + 60000 QPIP.
+            ytdInsurable: 120000,
             ytdPensionable: 58000,
           }),
           employee: {
@@ -164,17 +167,19 @@ describe("getT4Report — assembly over computeT4Slip", () => {
     expect(slip.payPeriods).toBe(1);
   });
 
-  it("QC: box 22 excludes Québec tax, 55/56 come from qpip + the QPIP cap, 24/26 fall back to the last item snapshot", async () => {
+  it("QC: box 22 excludes Québec tax, 55/56 come from qpip + the QPIP cap, 24 is the EI share of the blended insurable", async () => {
     const report = await getT4Report(2026);
     const slip = report.slips.find((s) => s.employeeId === "e_qc")!;
     expect(slip.box14).toBe(60000);
     expect(slip.box22).toBe(11000); // federal only — the 9500 Québec tax is excluded
     expect(slip.box55).toBe(315.4);
-    expect(slip.box56).toBe(60000); // min(gross 60000, QPIP 2026 cap 103000)
-    expect(slip.box24).toBe(55000); // fallback: last item's ytdInsurable
+    expect(slip.box56).toBe(60000); // QPIP share of the blended 120000, under the 103000 cap
+    expect(slip.box24).toBe(60000); // EI share only — W4-D3 (was the blended figure)
     expect(slip.box26).toBe(58000); // fallback: last item's ytdPensionable
-    // QPP lives in module boxes 17/17A, which the legacy shape does not carry;
+    // QPP rides in legacy boxes 17/17A (W4-D3 — the shape carries them now);
     // the dual-written cpp duplicates must NOT leak into box 16.
+    expect(slip.box17).toBe(4100.25);
+    expect(slip.box17A).toBe(200.1);
     expect(slip.box16).toBe(0);
     expect(slip.box16A).toBe(0);
   });
@@ -182,9 +187,57 @@ describe("getT4Report — assembly over computeT4Slip", () => {
   it("QC box 56 is capped at the QPIP 2026 maximum insurable earnings (103000)", async () => {
     const run = h.payRuns[0] as { items: Array<Record<string, unknown>> };
     run.items[1]!.gross = 150000;
+    run.items[1]!.ytdInsurable = 300000; // blended: 2 × the 150000 base
     const report = await getT4Report(2026);
     const slip = report.slips.find((s) => s.employeeId === "e_qc")!;
     expect(slip.box56).toBe(103000);
+    expect(slip.box24).toBe(150000); // EI share of the blended 300000
+  });
+
+  it("W4-D3 regression — Sophie's Prairie Peak slip: box 24 is 4,800, not the blended 9,600", async () => {
+    h.company = { name: "Prairie Peak Renovations", businessNumber: "812345678" };
+    h.payRuns = [
+      {
+        id: "run_qc",
+        payDate: "2026-09-30",
+        items: [
+          {
+            ...item({
+              employeeId: "e_sophie",
+              gross: 4800,
+              cpp: 284.02, cpp2: 0, qpp: 284.02, qpp2: 0, qpip: 20.64,
+              ei: 62.4, federalTax: 343.32, provincialTax: 432.95,
+              employerCpp: 284.02, employerCpp2: 0, employerEi: 116.26,
+              ytdInsurable: 9600, // blended snapshot (4800 EI + 4800 QPIP)
+              ytdPensionable: 4800,
+            }),
+            employee: {
+              id: "e_sophie",
+              firstName: "Sophie",
+              lastName: "Tremblay",
+              province: "QC",
+              sinEncrypted: encrypt(QC_SIN),
+              addressLine1: "10 Rue Saint-Jean",
+              addressLine2: null,
+              city: "Québec",
+              postalCode: "G1R1R5",
+            },
+          },
+        ],
+      },
+    ];
+    h.ledgers = [
+      { employeeId: "e_sophie", year: 2026, insurableEarnings: 9600, pensionableEarnings: 4800 },
+    ];
+    const report = await getT4Report(2026);
+    const slip = report.slips.find((s) => s.employeeId === "e_sophie")!;
+    expect(slip.box14).toBe(4800);
+    expect(slip.box17).toBe(284.02);
+    expect(slip.box18).toBe(62.4);
+    expect(slip.box22).toBe(343.32); // federal only
+    expect(slip.box24).toBe(4800); // NOT 9600
+    expect(slip.box55).toBe(20.64);
+    expect(slip.box56).toBe(4800);
   });
 
   it("totals keep the legacy shape and sum the slips", async () => {
@@ -193,8 +246,10 @@ describe("getT4Report — assembly over computeT4Slip", () => {
     expect(report.totals.box14).toBe(150000);
     expect(report.totals.box16).toBe(3867.5); // AB CPP only — QPP is not folded in
     expect(report.totals.box22).toBe(29000); // 18000 + 11000 (QC federal only)
-    expect(report.totals.box24).toBe(65700 + 55000);
+    expect(report.totals.box24).toBe(65700 + 60000);
     expect(report.totals.box26).toBe(71300 + 58000);
+    expect(report.totals.box17).toBe(4100.25); // QPP total (W4-D3)
+    expect(report.totals.box17A).toBe(200.1);
   });
 
   it("contains NO real SIN anywhere — neither plaintext nor ciphertext", async () => {
@@ -210,18 +265,39 @@ describe("getT4Report — assembly over computeT4Slip", () => {
 });
 
 describe("exportT4Xml", () => {
-  it("rejects a missing transmitter email before building (T619 schema-required)", async () => {
-    await expect(exportT4Xml(2026, { ...transmitter, email: "  " })).rejects.toThrow(/email is required/i);
-    await expect(exportT4Xml(2026, { ...transmitter, email: "" })).rejects.toThrow(/T619/);
+  // W4-D7 — expected failures return { ok: false, error } with the real
+  // reason instead of throwing (production masks thrown action errors
+  // behind a generic render message).
+  it("returns an error result for a missing transmitter email (T619 schema-required)", async () => {
+    const blank = await exportT4Xml(2026, { ...transmitter, email: "  " });
+    expect(blank.ok).toBe(false);
+    if (!blank.ok) expect(blank.error).toMatch(/email is required/i);
+    const empty = await exportT4Xml(2026, { ...transmitter, email: "" });
+    expect(empty.ok).toBe(false);
+    if (!empty.ok) expect(empty.error).toMatch(/T619/);
   });
 
-  it("rejects when the company business number is not set", async () => {
+  it("returns an error result when the company business number is not set", async () => {
     h.company = { name: "Acme & Sons Inc", businessNumber: null };
-    await expect(exportT4Xml(2026, transmitter)).rejects.toThrow(/business number/i);
+    const result = await exportT4Xml(2026, transmitter);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/business number/i);
+  });
+
+  it("W4-D7 — a full 10-digit phone entry is split into area code + local number", async () => {
+    const result = await exportT4Xml(2026, { ...transmitter, areaCode: "", phone: "(403) 555-1234" });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.content).toContain("<cntc_area_cd>403</cntc_area_cd>");
+      expect(result.content).toContain("<cntc_phn_nbr>555-1234</cntc_phn_nbr>");
+    }
   });
 
   it("produces a <Submission> whose slip count equals the summary count, with bn15 derived from the 9-digit BN", async () => {
-    const { filename, content } = await exportT4Xml(2026, transmitter);
+    const result = await exportT4Xml(2026, transmitter);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const { filename, content } = result;
     expect(filename).toBe("T4-2026.xml");
     expect(content).toContain("<Submission");
     expect(content).toContain("<bn15>123456789RP0001</bn15>");
@@ -234,7 +310,10 @@ describe("exportT4Xml", () => {
   });
 
   it("carries the decrypted SINs and the module's QC rules into the XML", async () => {
-    const { content } = await exportT4Xml(2026, transmitter);
+    const result = await exportT4Xml(2026, transmitter);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const { content } = result;
     expect(content).toContain(`<sin>${AB_SIN}</sin>`);
     expect(content).toContain(`<sin>${QC_SIN}</sin>`);
     // QC slip: QPP elements, QPIP boxes, federal-only box 22.
@@ -251,7 +330,10 @@ describe("exportT4Xml", () => {
 
   it("uses an already-15-char business number as-is", async () => {
     h.company = { name: "Acme & Sons Inc", businessNumber: "123456789RP0002" };
-    const { content } = await exportT4Xml(2026, transmitter);
+    const result = await exportT4Xml(2026, transmitter);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const { content } = result;
     expect(content).toContain("<bn15>123456789RP0002</bn15>");
     expect(content).toContain("<bn>123456789RP0002</bn>");
   });

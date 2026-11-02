@@ -37,7 +37,7 @@ export default async function T4SummaryPage() {
           <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[0.06em]">Employees</p>
           <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3 bg-[#FAFAF9] border-b border-[#E7E5E4]">
-              {["Employee","Income (14)","CPP (16)","EI (18)","Tax (22)",""].map(h=><div key={h} className={`text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em] ${h!=="Employee"?"text-right":""}`}>{h}</div>)}
+              {["Employee","Income (14)","CPP/QPP (16/17)","EI (18)","Tax (22)",""].map(h=><div key={h} className={`text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em] ${h!=="Employee"?"text-right":""}`}>{h}</div>)}
             </div>
             {report.slips.map(slip=>(
               <Link key={slip.employeeId} href={`/reports/t4/${slip.employeeId}`} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3.5 border-b border-[#F0EFED] last:border-b-0 items-center hover:bg-[#FAFAF9] no-underline text-inherit">
@@ -46,7 +46,8 @@ export default async function T4SummaryPage() {
                   <div><p className="text-sm font-semibold">{slip.employeeName}</p><p className="text-xs text-[#A8A29E]">{slip.payPeriods} pay period{slip.payPeriods !== 1 ? "s" : ""}</p></div>
                 </div>
                 <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box14)}</div>
-                <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box16)}</div>
+                {/* W4-D3 — QC slips carry QPP in box 17, not CPP in box 16. */}
+                <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.province.trim().toUpperCase() === "QC" ? slip.box17 : slip.box16)}</div>
                 <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box18)}</div>
                 <div className="text-[13px] text-right font-mono tabular-nums">{fmtCAD(slip.box22)}</div>
                 <div className="text-right text-[#B3261E] text-[13px] font-semibold">Slip →</div>
@@ -55,7 +56,7 @@ export default async function T4SummaryPage() {
             <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_32px] gap-3 px-5 py-3.5 bg-[#1C1917] text-white font-bold text-[13px] items-center">
               <div>T4 Summary · all employees</div>
               <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box14)}</div>
-              <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box16)}</div>
+              <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box16 + report.totals.box17)}</div>
               <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box18)}</div>
               <div className="text-right font-mono tabular-nums">{fmtCAD(report.totals.box22)}</div>
               <div></div>
@@ -66,7 +67,10 @@ export default async function T4SummaryPage() {
           <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="px-5 py-4 border-b border-[#F0EFED] flex justify-between items-center"><span className="text-[15px] font-bold">{report.companyName}</span></div>
             <div className="grid grid-cols-4 gap-3.5 p-5">
-              {[["Box 14 · Employment income",report.totals.box14],["Box 16 · CPP",report.totals.box16],["Box 16A · CPP2",report.totals.box16A],["Box 18 · EI",report.totals.box18],["Box 22 · Income tax",report.totals.box22],["Box 24 · EI earnings",report.totals.box24],["Box 26 · Pensionable",report.totals.box26],["Employer remitted","—"]].map(([label,value])=>(
+              {[["Box 14 · Employment income",report.totals.box14],["Box 16 · CPP",report.totals.box16],["Box 16A · CPP2",report.totals.box16A],["Box 18 · EI",report.totals.box18],["Box 22 · Income tax",report.totals.box22],["Box 24 · EI earnings",report.totals.box24],["Box 26 · Pensionable",report.totals.box26],
+              // W4-D3 — Quebec summary tiles appear when any QC slip exists.
+              ...(report.totals.box17 > 0 || report.totals.box17A > 0 ? [["Box 17 · QPP",report.totals.box17],["Box 17A · QPP2",report.totals.box17A]] as [string, number][] : []),
+              ["Employer remitted","—"]].map(([label,value])=>(
                 <div key={label as string}><p className="text-[11px] text-[#A8A29E] uppercase tracking-[0.05em]"><b className="text-[#1C1917] font-bold">{label as string}</b></p><p className="text-base font-bold mt-1.5 font-mono tabular-nums">{typeof value === "number" ? fmtCAD(value) : value}</p></div>
               ))}
             </div>

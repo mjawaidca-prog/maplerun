@@ -12,6 +12,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { previewEftFile, type EftPreviewResult } from "@/lib/actions/eft";
+import { bankDetailsCompleteFromEncrypted } from "@/lib/banking";
 import Link from "next/link";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
@@ -27,11 +28,17 @@ export default async function DirectDepositPage() {
     take: 10,
   });
 
-  // Check which employees have bank details
-  const empWithBank = await prisma.employee.count({
-    where: { companyId, active: true, bankEncrypted: { not: "" } },
+  // W4-D5 — "have bank details" uses the ONE completeness rule
+  // (lib/banking.ts): institution + transit + account all present and
+  // well-formed. The old count treated any non-empty encrypted blob as
+  // complete — it claimed 6/6 while one employee's account was blank
+  // (the CPA-005 preview below excluded her, correctly).
+  const bankRows = await prisma.employee.findMany({
+    where: { companyId, active: true },
+    select: { bankEncrypted: true },
   });
-  const totalEmp = await prisma.employee.count({ where: { companyId, active: true } });
+  const empWithBank = bankRows.filter((e) => bankDetailsCompleteFromEncrypted(e.bankEncrypted)).length;
+  const totalEmp = bankRows.length;
 
   // Preview every listed run (pure dry-run build — no side effects).
   const previews = new Map<string, EftPreviewResult>();

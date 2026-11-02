@@ -63,18 +63,34 @@ export default async function T4SlipPage({ params }: Props) {
           </div>
         </div>
 
-        {/* T4 boxes — 4×2 grid */}
+        {/* T4 boxes — 4×2 grid. W4-D3: Quebec slips show the QPP boxes
+            (17/17A) and QPIP boxes (55/56) — previously a QC slip showed
+            CPP $0.00 and no QPIP anywhere, with box 24 doubled. */}
         <div className="px-10 py-6 grid grid-cols-4 gap-3.5">
-          {[
-            [14, "Employment income", fmtCAD(slip.box14)],
-            [22, "Income tax deducted", fmtCAD(slip.box22)],
-            [16, "Employee CPP contributions", fmtCAD(slip.box16)],
-            ["16A", "Employee CPP2 contributions", fmtCAD(slip.box16A)],
-            [18, "Employee EI premiums", fmtCAD(slip.box18)],
-            [24, "EI insurable earnings", fmtCAD(slip.box24)],
-            [26, "CPP/QPP pensionable earnings", fmtCAD(slip.box26)],
-            [28, "CPP/EI exempt", "—"],
-          ].map(([num, label, value]) => (
+          {(slip.province.trim().toUpperCase() === "QC"
+            ? [
+                [14, "Employment income", fmtCAD(slip.box14)],
+                [22, "Income tax deducted", fmtCAD(slip.box22)],
+                [17, "Employee QPP contributions", fmtCAD(slip.box17)],
+                ["17A", "Employee QPP2 contributions", fmtCAD(slip.box17A)],
+                [18, "Employee EI premiums", fmtCAD(slip.box18)],
+                [55, "Employee QPIP premiums", fmtCAD(slip.box55)],
+                [24, "EI insurable earnings", fmtCAD(slip.box24)],
+                [56, "QPIP insurable earnings", fmtCAD(slip.box56)],
+                [26, "CPP/QPP pensionable earnings", fmtCAD(slip.box26)],
+                [28, "CPP/EI exempt", "—"],
+              ]
+            : [
+                [14, "Employment income", fmtCAD(slip.box14)],
+                [22, "Income tax deducted", fmtCAD(slip.box22)],
+                [16, "Employee CPP contributions", fmtCAD(slip.box16)],
+                ["16A", "Employee CPP2 contributions", fmtCAD(slip.box16A)],
+                [18, "Employee EI premiums", fmtCAD(slip.box18)],
+                [24, "EI insurable earnings", fmtCAD(slip.box24)],
+                [26, "CPP/QPP pensionable earnings", fmtCAD(slip.box26)],
+                [28, "CPP/EI exempt", "—"],
+              ]
+          ).map(([num, label, value]) => (
             <div key={String(num)} className="border border-[#D6D3D1] rounded-[10px] p-3.5 bg-white">
               <div className="flex items-center gap-2 mb-2">
                 <span className="inline-flex items-center justify-center min-w-[26px] h-[22px] px-1.5 bg-[#1C1917] text-white text-xs font-bold rounded-[5px] font-mono tabular-nums">

@@ -34,8 +34,11 @@
  *     for QC runs those item fields hold the employer's QPP/QPP2 share, and
  *     the T4 summary has no QPP employer totals (they must not be folded
  *     into CPP), so QC slips carry 0 there.
- *   - Box 56 (QPIP insurable earnings, QC only): min(Σ gross, cap) where the
- *     cap is QPIP_2026.maxInsurableEarnings from @maplerun/tax-engine
+ *   - Box 56 (QPIP insurable earnings, QC only): the QPIP share of the
+ *     blended insurable accumulation, derived from per-item snapshot
+ *     deltas (W4-D3 — the stored total blends EI + QPIP bases, which is
+ *     also why box 24 for QC is blended minus that share), capped at
+ *     QPIP_2026.maxInsurableEarnings from @maplerun/tax-engine
  *     (packages/tax-engine/src/data/2026/quebec.ts, cleanly re-exported from
  *     the package index). Only applied for tax year 2026, the year that cap
  *     describes; for other years the field is omitted so the module's
@@ -81,6 +84,10 @@ export type T4Slip = {
   box14: number; // Employment income
   box16: number; // Employee CPP
   box16A: number; // Employee CPP2
+  /** Wave 4 (W4-D3) — Employee QPP / QPP2 (QC only; the filing module
+   *  computed them all along, the legacy report shape dropped them). */
+  box17: number;
+  box17A: number;
   box18: number; // Employee EI
   box22: number; // Income tax deducted
   box24: number; // EI insurable earnings
@@ -99,6 +106,8 @@ export type T4Report = {
     box14: number;
     box16: number;
     box16A: number;
+    box17: number;
+    box17A: number;
     box18: number;
     box22: number;
     box24: number;
@@ -145,6 +154,12 @@ type EmployeeYearAggregate = {
   /** Capped snapshots from the most recent finalized item (fallback only). */
   lastYtdInsurable?: number;
   lastYtdPensionable?: number;
+  /** Wave 4 (W4-D3) — the QPIP share of the blended insurable
+   *  accumulation, derived from per-item ytdInsurable deltas (the
+   *  engine feeds the same insurable base to EI and QPIP, so a
+   *  QPIP-bearing item's blended delta is half QPIP). */
+  qpipInsurable: number;
+  prevYtdInsurable: number;
 };
 
 type AssembledT4 = {
@@ -233,6 +248,8 @@ async function assembleT4(year: number, opts: { decryptSin: boolean }): Promise<
           employerCpp: 0,
           employerCpp2: 0,
           employerEi: 0,
+          qpipInsurable: 0,
+          prevYtdInsurable: 0,
         };
         empMap.set(item.employeeId, agg);
       }
@@ -249,6 +266,12 @@ async function assembleT4(year: number, opts: { decryptSin: boolean }): Promise<
       agg.employerCpp += item.employerCpp;
       agg.employerCpp2 += item.employerCpp2;
       agg.employerEi += item.employerEi;
+      // W4-D3 — track the QPIP share of the blended insurable total:
+      // runs are payDate-ascending (finalization order in practice), so
+      // each item's snapshot delta is its own insurable contribution.
+      const insurableDelta = item.ytdInsurable - agg.prevYtdInsurable;
+      if (item.qpip > 0) agg.qpipInsurable += insurableDelta / 2;
+      agg.prevYtdInsurable = item.ytdInsurable;
       // Runs are ordered by payDate ascending, so the last write wins and
       // holds the year-end capped snapshot for the fallback path.
       agg.lastYtdInsurable = item.ytdInsurable;
@@ -292,6 +315,25 @@ async function assembleT4(year: number, opts: { decryptSin: boolean }): Promise<
       if (agg.qpp2 > 0) qpp2 = agg.qpp2;
     }
 
+    // W4-D3 — boxes 24/56 for Quebec: the stored insurable total
+    // BLENDS the EI and QPIP bases (Sophie's read 9,600 for 4,800 of
+    // earnings, so box 24 showed double). Box 24 is the EI share only
+    // (blended − QPIP share); box 56 is the QPIP share, capped at the
+    // QPIP maximum. When premiums exist but no snapshot split could be
+    // derived (pre-split items), fall back to the capped-gross figure
+    // the wiring used before.
+    const blendedInsurable = ledger ? ledger.insurableEarnings : agg.lastYtdInsurable;
+    const qpipInsurableDerived =
+      agg.qpipInsurable > 0
+        ? round2(agg.qpipInsurable)
+        : agg.qpip > 0
+          ? Math.min(agg.gross, QPIP_2026.maxInsurableEarnings)
+          : 0;
+    const eiInsurableEarnings =
+      isQuebec && blendedInsurable !== undefined
+        ? Math.max(0, round2(blendedInsurable - qpipInsurableDerived))
+        : blendedInsurable;
+
     return {
       surname: agg.lastName,
       givenName: agg.firstName,
@@ -315,12 +357,15 @@ async function assembleT4(year: number, opts: { decryptSin: boolean }): Promise<
       qpipPremiums: agg.qpip,
       federalTax: agg.federalTax,
       provincialTax: agg.provincialTax,
-      eiInsurableEarnings: ledger ? ledger.insurableEarnings : agg.lastYtdInsurable,
+      eiInsurableEarnings,
       cppPensionableEarnings: ledger ? ledger.pensionableEarnings : agg.lastYtdPensionable,
-      // Box 56 cap: QPIP 2026 maximum insurable earnings (see header).
+      // Box 56: the derived QPIP insurable share, capped (see above).
+      // Only applied for tax year 2026, the year that cap describes;
+      // for other years the field is omitted so the module's "QPIP
+      // insurable unknown" warning fires instead of a wrong cap.
       qpipInsurableEarnings:
         isQuebec && year === QPIP_2026.year
-          ? Math.min(agg.gross, QPIP_2026.maxInsurableEarnings)
+          ? Math.min(qpipInsurableDerived, QPIP_2026.maxInsurableEarnings)
           : undefined,
       // QC item employerCpp/CPP2 are the employer's QPP share — not T4
       // summary amounts (see header); EI employer share applies everywhere.
@@ -355,6 +400,8 @@ export async function getT4Report(year: number): Promise<T4Report> {
       box14: slip.box14,
       box16: slip.box16,
       box16A: slip.box16A,
+      box17: slip.box17,
+      box17A: slip.box17A,
       box18: slip.box18,
       box22: slip.box22,
       box24: slip.box24,
@@ -371,6 +418,8 @@ export async function getT4Report(year: number): Promise<T4Report> {
     box14: sum((s) => s.box14),
     box16: sum((s) => s.box16),
     box16A: sum((s) => s.box16A),
+    box17: sum((s) => s.box17),
+    box17A: sum((s) => s.box17A),
     box18: sum((s) => s.box18),
     box22: sum((s) => s.box22),
     box24: sum((s) => s.box24),
@@ -396,10 +445,37 @@ function toPayrollBn15(businessNumber: string | null | undefined): string {
   );
 }
 
+/**
+ * Wave 4 (W4-D7) — the export returns a DISCRIMINATED RESULT instead of
+ * throwing for expected failures. In production, Next.js masks a thrown
+ * server-action error behind the generic "Server Components render"
+ * message, which is exactly what the Prairie Peak proof hit: a valid
+ * slip existed, the export died (most plausibly on the transmitter
+ * phone format — the CRA builder wants a 7-digit local number and the
+ * dialog invited a full number), and the user saw no actionable text.
+ * Expected failures now travel back as { ok: false, error } with the
+ * real reason; the phone is also normalized here (a 10-digit entry is
+ * split into area code + local number) so the common case just works.
+ */
+export type T4XmlExportResult =
+  | { ok: true; filename: string; content: string }
+  | { ok: false; error: string };
+
 export async function exportT4Xml(
   year: number,
   transmitter: T4TransmitterInput,
-): Promise<{ filename: string; content: string }> {
+): Promise<T4XmlExportResult> {
+  try {
+    return await buildT4XmlExport(year, transmitter);
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "T4 XML export failed." };
+  }
+}
+
+async function buildT4XmlExport(
+  year: number,
+  transmitter: T4TransmitterInput,
+): Promise<{ ok: true; filename: string; content: string }> {
   // The T619 transmitter contact email is schema-REQUIRED (CRA 1-27-1) —
   // fail with a clear message before any building happens.
   const email = transmitter?.email?.trim() ?? "";
@@ -410,10 +486,24 @@ export async function exportT4Xml(
   }
   const contactName = transmitter?.contactName?.trim() ?? "";
   if (!contactName) throw new Error("Transmitter contact name is required for the T4 XML export.");
-  const areaCode = transmitter?.areaCode?.trim() ?? "";
-  if (!areaCode) throw new Error("Transmitter contact area code is required for the T4 XML export.");
-  const phone = transmitter?.phone?.trim() ?? "";
-  if (!phone) throw new Error("Transmitter contact phone number is required for the T4 XML export.");
+
+  // Phone normalization (W4-D7): strip punctuation; a 10-digit entry
+  // with no separate area code is split; a leading country "1" drops.
+  let areaCode = (transmitter?.areaCode ?? "").replace(/\D/g, "");
+  let phone = (transmitter?.phone ?? "").replace(/\D/g, "");
+  if (!areaCode && phone.length === 11 && phone.startsWith("1")) phone = phone.slice(1);
+  if (!areaCode && phone.length === 10) {
+    areaCode = phone.slice(0, 3);
+    phone = phone.slice(3);
+  }
+  if (areaCode.length !== 3) {
+    throw new Error("Transmitter contact area code must be 3 digits for the T4 XML export.");
+  }
+  if (phone.length !== 7) {
+    throw new Error(
+      "Transmitter contact phone must be a 7-digit local number for the T4 XML export (the area code goes in its own field).",
+    );
+  }
 
   const { companyName, businessNumber, slips, summary } = await assembleT4(year, {
     decryptSin: true,
@@ -440,5 +530,5 @@ export async function exportT4Xml(
     summary,
   };
 
-  return { filename: `T4-${year}.xml`, content: buildT4Xml(input) };
+  return { ok: true, filename: `T4-${year}.xml`, content: buildT4Xml(input) };
 }

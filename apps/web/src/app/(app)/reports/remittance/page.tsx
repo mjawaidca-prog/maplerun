@@ -9,6 +9,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import {
+  aggregateQuebecRemittances,
   aggregateRemittances,
   groupingForRemitterType,
   periodKeyForDate,
@@ -16,6 +17,7 @@ import {
   periodLabel,
   remittanceDueDateFor,
   remitterTypeLabel,
+  type QuebecRemittanceItemRow,
 } from "@/lib/remittance/aggregate";
 import {
   getRemittanceSubmissions,
@@ -40,7 +42,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
 
   const runs = await prisma.payRun.findMany({
     where: { companyId, status: "FINALIZED" },
-    include: { payGroup: { select: { name: true } }, items: { include: { employee: { select: { firstName: true, lastName: true } } } } },
+    include: { payGroup: { select: { name: true, defaultProvince: true } }, items: { include: { employee: { select: { firstName: true, lastName: true, provinceOfEmployment: true } } } } },
     orderBy: { payDate: "desc" },
   });
 
@@ -94,6 +96,24 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
     empMap.set(i.employeeId, e);
   }
   const employees = Array.from(empMap.values());
+
+  // W4-D3 — Revenu Québec section: the current period's Quebec items,
+  // aggregated from the split columns (the CRA figures above fold QPP
+  // into CPP and QPIP into EI because they are built from run totals;
+  // this section separates the amounts owed to Revenu Québec instead).
+  const qcItems: QuebecRemittanceItemRow[] = [];
+  for (const r of periodRuns) {
+    for (const i of r.items) {
+      const province = i.employee.provinceOfEmployment ?? r.payGroup.defaultProvince;
+      if (province !== "QC") continue;
+      qcItems.push({
+        qpp: i.qpp, qpp2: i.qpp2, qpip: i.qpip, ei: i.ei,
+        employerCpp: i.employerCpp, employerCpp2: i.employerCpp2, employerEi: i.employerEi,
+        quebecTax: i.provincialTax,
+      });
+    }
+  }
+  const rq = aggregateQuebecRemittances(qcItems);
 
   // Due date — from the shared remitter-aware helper (PR #14 FLAG B: the
   // old inline code shifted Saturday BACK to the Friday 14th; CRA's rule
@@ -273,6 +293,46 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
               </tr></tfoot>
             </table>
           </div>
+          {/* W4-D3 — Revenu Québec: QPP/QPP2/QPIP/Québec tax are remitted
+              to Revenu Québec, not the CRA. These amounts are currently
+              ALSO inside the CRA totals above (which are built from run
+              totals) — this section separates them for the RQ payment. */}
+          {rq.items > 0 && (
+            <>
+              <p className="text-[13px] font-bold text-[#78716C] uppercase tracking-[0.06em] pt-2">Revenu Québec — {periodLabel(currentPeriod)}</p>
+              <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+                <table className="w-full">
+                  <thead><tr className="bg-[#FAFAF9] text-[11px] font-bold text-[#78716C] uppercase tracking-[0.04em] border-b border-[#E7E5E4]">
+                    {["Component","Employee","Employer","Total"].map(h=><th key={h} className={`px-4 py-[11px] ${h==="Component"?"text-left":"text-right"}`}>{h}</th>)}
+                  </tr></thead>
+                  <tbody>
+                    {[
+                      ["QPP contributions", rq.qppEmployee, rq.qppEmployer],
+                      ["QPP2 contributions", rq.qpp2Employee, rq.qpp2Employer],
+                      ["QPIP premiums", rq.qpipEmployee, rq.qpipEmployer],
+                      ["Québec income tax withheld", rq.quebecTax, 0],
+                    ].map(([label, ee, er]) => (
+                      <tr key={label as string} className="border-b border-[#F0EFED] text-[13px]">
+                        <td className="px-4 py-[11px] font-semibold">{label as string}</td>
+                        <td className="text-right px-4 py-[11px] font-mono tabular-nums">{(ee as number) > 0 ? fmtCAD(ee as number) : "—"}</td>
+                        <td className="text-right px-4 py-[11px] font-mono tabular-nums">{(er as number) > 0 ? fmtCAD(er as number) : "—"}</td>
+                        <td className="text-right px-4 py-[11px] font-mono tabular-nums font-semibold">{fmtCAD((ee as number) + (er as number))}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot><tr className="bg-[#1C1917] text-white font-bold text-[13px]">
+                    <td className="px-4 py-3">Total remittance to Revenu Québec — {currentPeriod}</td>
+                    <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(rq.qppEmployee + rq.qpp2Employee + rq.qpipEmployee + rq.quebecTax)}</td>
+                    <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(rq.qppEmployer + rq.qpp2Employer + rq.qpipEmployer)}</td>
+                    <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(rq.totalRq)}</td>
+                  </tr></tfoot>
+                </table>
+              </div>
+              <p className="text-[12.5px] text-[#78716C] leading-relaxed">
+                Remit these amounts to Revenu Québec (RL-1 / RQ remittance), not to the CRA. They are shown separately here because the CRA totals above are built from run totals, where QPP rides in the CPP figures and QPIP in the EI figures.
+              </p>
+            </>
+          )}
           <div className="flex gap-[11px] bg-[#EFF6FF] border border-[#BFDBFE] rounded-[10px] px-4 py-3.5 text-[12.5px] text-[#1E40AF] leading-relaxed">
             💡 CPP employer matches employee 1:1. EI employer = 1.4× employee. Income tax = federal + provincial withheld. All remitted together to CRA. {remitterType === "ACCELERATED1"
               ? "Accelerated Threshold 1 has TWO deadlines each month: amounts for the 1st–15th are due by the 25th of the same month, and amounts for the 16th–month-end by the 10th of the following month (the period-closing deadline shown here)."

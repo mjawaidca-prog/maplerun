@@ -13,6 +13,8 @@
  * can only differ when the *scope* (period set) differs, never the math.
  */
 
+import { employerQpipAmount } from "@/lib/payroll-display";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 /** Remitter frequency. Only monthly/quarterly schedules exist today;
@@ -411,4 +413,80 @@ export function aggregateRemittances(
   for (const k of MONEY_KEYS) totals[k] = round2(totals[k]);
 
   return { periods, totals };
+}
+
+// ─── Revenu Québec aggregation (Wave 4, W4-D3) ───────────────────────────────
+
+/**
+ * One Quebec pay-run item reduced to the fields the Revenu Québec
+ * remittance section needs. Callers resolve "is Quebec" per item
+ * (employee.provinceOfEmployment ?? payGroup.defaultProvince === "QC")
+ * and pass ONLY Quebec items — this function does no filtering.
+ *
+ * The employer QPIP share is NOT stored separately: the engine folds
+ * it into employerEi, and lib/payroll-display.ts recovers it
+ * (employerEi − round2(ei × 1.4)). The employee QPIP and the QPP/QPP2
+ * amounts come from the item's split columns (qpp/qpp2/qpip) — the
+ * same columns the RL-1 ties from.
+ */
+export type QuebecRemittanceItemRow = {
+  qpp: number;
+  qpp2: number;
+  qpip: number;
+  ei: number;
+  employerCpp: number;
+  employerCpp2: number;
+  employerEi: number;
+  /** Québec income tax withheld (the item's provincialTax for QC items). */
+  quebecTax: number;
+};
+
+export type QuebecRemittanceTotals = {
+  items: number;
+  qppEmployee: number;
+  qppEmployer: number;
+  qpp2Employee: number;
+  qpp2Employer: number;
+  qpipEmployee: number;
+  qpipEmployer: number;
+  quebecTax: number;
+  /** Everything owed to Revenu Québec for these items. */
+  totalRq: number;
+};
+
+export function aggregateQuebecRemittances(
+  items: readonly QuebecRemittanceItemRow[],
+): QuebecRemittanceTotals {
+  const t: QuebecRemittanceTotals = {
+    items: items.length,
+    qppEmployee: 0,
+    qppEmployer: 0,
+    qpp2Employee: 0,
+    qpp2Employer: 0,
+    qpipEmployee: 0,
+    qpipEmployer: 0,
+    quebecTax: 0,
+    totalRq: 0,
+  };
+  for (const i of items) {
+    t.qppEmployee += i.qpp;
+    t.qppEmployer += i.employerCpp;
+    t.qpp2Employee += i.qpp2;
+    t.qpp2Employer += i.employerCpp2;
+    t.qpipEmployee += i.qpip;
+    t.qpipEmployer += employerQpipAmount(i);
+    t.quebecTax += i.quebecTax;
+  }
+  t.qppEmployee = round2(t.qppEmployee);
+  t.qppEmployer = round2(t.qppEmployer);
+  t.qpp2Employee = round2(t.qpp2Employee);
+  t.qpp2Employer = round2(t.qpp2Employer);
+  t.qpipEmployee = round2(t.qpipEmployee);
+  t.qpipEmployer = round2(t.qpipEmployer);
+  t.quebecTax = round2(t.quebecTax);
+  t.totalRq = round2(
+    t.qppEmployee + t.qppEmployer + t.qpp2Employee + t.qpp2Employer +
+    t.qpipEmployee + t.qpipEmployer + t.quebecTax,
+  );
+  return t;
 }

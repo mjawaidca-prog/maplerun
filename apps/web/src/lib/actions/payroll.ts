@@ -92,6 +92,13 @@ export type PayRunPreview = {
     cpp: number;
     cpp2: number;
     ei: number;
+    /** Wave 4 (W4-D3) — Quebec subtotals for DISPLAY only: the QPP/QPP2
+     *  parts of cpp/cpp2 (Quebec items) and total employee QPIP. The
+     *  cpp/cpp2/ei totals keep their established meaning (finalize maps
+     *  them onto the PayRun totals unchanged). */
+    qpp: number;
+    qpp2: number;
+    qpip: number;
     federalTax: number;
     provincialTax: number;
     deductions: number;
@@ -267,6 +274,9 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     cpp: 0,
     cpp2: 0,
     ei: 0,
+    qpp: 0,
+    qpp2: 0,
+    qpip: 0,
     federalTax: 0,
     provincialTax: 0,
     deductions: 0,
@@ -432,6 +442,12 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     totals.cpp += result.cpp;
     totals.cpp2 += result.cpp2;
     totals.ei += result.ei;
+    // W4-D3 — Quebec display subtotals (see PayRunPreview.totals).
+    totals.qpip += result.qpip;
+    if (empProvince === "QC") {
+      totals.qpp += result.cpp;
+      totals.qpp2 += result.cpp2;
+    }
     totals.federalTax += result.federalTax;
     totals.provincialTax += result.provincialTax;
     totals.deductions += itemTotalDeductions;
