@@ -69,6 +69,9 @@ export async function createEmployee(formData: FormData) {
       // Wave 1: persist the pay-group assignment (previously validated
       // above and then discarded — the run loader now scopes by it).
       payGroupId: payGroupId || null,
+      // Wave 3 B6: per-employee province of employment (null = the pay
+      // group's default province applies at run time).
+      provinceOfEmployment: ((formData.get("provinceOfEmployment") as string) || "").trim() || null,
       // Wave 1 PR E: employment facts + vacation policy (schema PR A).
       startDate: (formData.get("startDate") as string)
         ? new Date(formData.get("startDate") as string)
@@ -186,6 +189,10 @@ export async function updateEmployee(formData: FormData) {
   }
   if (formData.has("payGroupId")) {
     updateData.payGroupId = (formData.get("payGroupId") as string) || null;
+  }
+  // Wave 3 B6: province of employment override (blank = pay-group default).
+  if (formData.has("provinceOfEmployment")) {
+    updateData.provinceOfEmployment = ((formData.get("provinceOfEmployment") as string) || "").trim() || null;
   }
   const bankTransit = (formData.get("bankTransit") as string) || "";
   const bankInstitution = (formData.get("bankInstitution") as string) || "";

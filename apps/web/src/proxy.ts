@@ -7,7 +7,15 @@
  * Svix signature). Unauthenticated requests to protected paths redirect to
  * /sign-in?callbackUrl=<path>, mirroring the legacy behaviour.
  *
- * The matcher is shared by both modes.
+ * "/portal/*" is the employee portal (Wave 3): employees are not Auth.js
+ * users — they authenticate with Clerk. The portal is public at the proxy
+ * in BOTH modes; its own route-group layout resolves the Clerk identity
+ * and fails closed without one, so the proxy never gates it.
+ *
+ * The matcher is shared by both modes. It keeps the production exclusions
+ * for the app-generated metadata routes (robots.txt, sitemap.xml,
+ * opengraph-image — src/app/robots.ts, sitemap.ts) so crawlers are never
+ * redirected to /sign-in.
  */
 
 import { auth } from "@/lib/auth";
@@ -26,7 +34,9 @@ function isPublicPath(pathname: string): boolean {
     pathname.startsWith("/features") ||
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/verify-request") ||
-    pathname.startsWith("/api/auth")
+    pathname.startsWith("/api/auth") ||
+    pathname === "/portal" ||
+    pathname.startsWith("/portal/")
   );
 }
 
@@ -62,6 +72,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/verify-request(.*)",
   "/api/auth(.*)",
+  "/portal(.*)",
 ]);
 
 const clerkProxy = clerkMiddleware(async (clerkAuth, req) => {
@@ -92,8 +103,9 @@ export default function proxy(req: NextRequest, evt: NextFetchEvent) {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and static files
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    // Skip Next.js internals and static files; also skip the app-generated
+    // metadata routes (production matcher parity — see header note)
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|opengraph-image|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
     // Always run for API routes
     "/(api|trpc)(.*)",
   ],

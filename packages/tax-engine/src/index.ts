@@ -21,6 +21,7 @@ export {
 } from './calc/quebec-tax';
 export type { QpipTable } from './calc/quebec-tax';
 export { calculatePay } from './calc/pay-run';
+export { resolveDeductions, type ResolvedDeductions } from './calc/deductions';
 export {
   calcStatHolidayPay,
   albertaAverageDailyWage,
@@ -29,6 +30,19 @@ export {
   type StatHolidayResult,
 } from './calc/stat-holiday';
 export { calculateBonus, type BonusInput, type BonusResult } from './calc/bonus';
+export {
+  estimateWcbPremium,
+  type WcbEstimateInput,
+  type WcbEstimateResult,
+} from './calc/wcb-estimate';
+export {
+  calcOntarioEht,
+  ontarioEhtRate,
+  ONTARIO_EHT_EXEMPTION_LIMIT,
+  ONTARIO_EHT_EXEMPTION_PAYROLL_CEILING,
+  type OntarioEhtInput,
+  type OntarioEhtResult,
+} from './calc/ontario-eht';
 export { calcCpp, maxCppContribution, maxCpp2Contribution } from './calc/cpp';
 export { calcEi, eiRateFor, maxEiPremium } from './calc/ei';
 export {

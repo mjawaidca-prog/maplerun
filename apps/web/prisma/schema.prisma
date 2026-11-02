@@ -105,6 +105,11 @@ model Company {
   eftInstitution    String?
   eftTransit        String?
   eftAccount        String?
+  /// Wave 3 B5 — when true, finalize emails each employee a pay-stub
+  /// notice pointing at the employee portal sign-in. Default OFF: the
+  /// portal (Clerk track) is the delivery surface, and email stays
+  /// opt-in per company until that lands.
+  stubEmailOnFinalize Boolean @default(false)
   freePayRunsUsed Int @default(0)
   maxFreePayRuns  Int @default(2)
   trialEndsAt     DateTime?
@@ -115,6 +120,7 @@ model Company {
   employees   Employee[]
   payGroups   PayGroup[]
   payRuns     PayRun[]
+  employeePendingUpdates EmployeePendingUpdate[]
   ledgerProConnection LedgerProConnection?
   ledgerProSyncRecords LedgerProSyncRecord[]
 }
@@ -138,6 +144,14 @@ model Membership {
 model Employee {
   id            String    @id @default(cuid())
   companyId     String
+  /// Employee portal link (Wave 3, Clerk): the Clerk user id once the
+  /// employee has signed in and been linked (resolution: clerkUserId first,
+  /// else verified-email first-link against portalInvitedAt — see
+  /// lib/employee-portal-session.ts). Null = not linked.
+  clerkUserId     String?   @unique
+  /// When the employer invited this employee to the portal (Wave 3).
+  /// Null = never invited. Cleared together with clerkUserId on revoke.
+  portalInvitedAt DateTime?
   firstName     String
   lastName      String
   /// AES-256-GCM encrypted SIN — never log, never expose in API responses without explicit permission
@@ -169,6 +183,11 @@ model Employee {
   vacationRatePct    Float?
   /// Accrued vacation balance owed, in cents (ACCRUE mode)
   vacationBalanceCents Int @default(0)
+  /// Wave 3 B6 — province of employment for THIS employee when it
+  /// differs from the pay group's default (e.g. a remote worker in
+  /// another province). Null = use PayGroup.defaultProvince. Preview
+  /// and finalize resolve per employee: this field ?? group default.
+  provinceOfEmployment String?
   /// The pay group this employee belongs to (null = unassigned; unassigned
   /// employees are included in every pay-group run until assigned — Wave 1).
   payGroupId    String?
@@ -181,6 +200,7 @@ model Employee {
   td1Profiles  TD1Profile[]
   ytdLedgers   YtdLedger[]
   payRunItems  PayRunItem[]
+  pendingUpdates EmployeePendingUpdate[]
 
   @@index([companyId])
   @@index([payGroupId])
@@ -216,6 +236,11 @@ model YtdLedger {
   employeeId          String
   year                Int
   pensionableEarnings Float    @default(0)
+  /// Wave 3 B5 — YTD gross pay and income tax (federal + provincial),
+  /// incremented at finalize by each item's gross and tax; reversal
+  /// decrements by exactly the same per-item amounts.
+  grossPay            Float    @default(0)
+  incomeTax           Float    @default(0)
   cpp                 Float    @default(0)
   cpp2                Float    @default(0)
   insurableEarnings   Float    @default(0)
@@ -251,6 +276,10 @@ model PayRun {
   payGroupId      String
   /// ISO date of the pay period end (selects tax-table edition)
   payDate         String     /// Period end date (last day of pay period)
+  /// Wave 3 B5 — ISO date of the pay period start, derived at finalize
+  /// from the pay group's frequency + payDate. Nullable: runs finalized
+  /// before B5 have no stored start and stubs tolerate the null.
+  periodStart     String?
   actualPayDate   String?    /// Actual deposit/payment date (can be later)
   status          String    @default("DRAFT") /// DRAFT | FINALIZED | REVERSED
   totalGross      Float     @default(0)
@@ -323,6 +352,31 @@ model PayRunItem {
   vacationPayRate Float    @default(0)
   /// Bonus or non-periodic payment included in this pay run
   bonus           Float    @default(0)
+  /// Wave 3 B5 — itemized earnings split of `gross`. Gross stays the
+  /// authoritative total; finalize asserts regular + overtime + stat +
+  /// vacation (+ bonus while it is lumped into gross) sums to gross
+  /// within $0.01. `regularPay` is the residual component.
+  regularPay      Float    @default(0)
+  overtimePay     Float    @default(0)
+  statPay         Float    @default(0)
+  overtimeHours   Float    @default(0)
+  statHours       Float    @default(0)
+  /// Wave 3 B5 — snapshot of the employee's ACCRUE vacation balance
+  /// (cents) immediately after this run posted; null for non-ACCRUE
+  /// employees and pre-B5 runs. A snapshot, so later runs never rewrite
+  /// what this stub showed.
+  vacationBalanceAfterCents Int?
+  /// Wave 3 B6 — the named custom deductions applied to this item:
+  /// [{ name, amount, reducesPensionable, reducesInsurable,
+  /// reducesTaxable }]. Persisted so the stub, reversal and reports
+  /// can reproduce exactly what was withheld and why.
+  customDeductions Json?
+  /// Wave 3 B6 — non-taxable reimbursement paid with this item:
+  /// excluded from gross and every deduction base; added to net pay.
+  reimbursement   Float    @default(0)
+  /// Wave 3 B6 — non-cash taxable benefits included in the CPP/EI/tax
+  /// bases for this item (never in gross, never in net pay).
+  taxableBenefits Float    @default(0)
 
   payRun   PayRun   @relation(fields: [payRunId], references: [id], onDelete: Cascade)
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
@@ -378,4 +432,31 @@ model LedgerProSyncRecord {
 
   @@index([companyId])
   @@index([status])
+}
+
+/// Employee-portal self-service change request (Wave 3). An employee submits
+/// proposed profile / TD1 / banking changes; they take effect ONLY when an
+/// employer approves (applied in one transaction by the review action).
+/// Banking travels inside `payload` already AES-256-GCM encrypted
+/// (payload.bankEncrypted) — never plaintext at rest.
+model EmployeePendingUpdate {
+  id               String    @id @default(cuid())
+  employeeId       String
+  companyId        String
+  /// PENDING | APPROVED | REJECTED | SUPERSEDED (a newer submission
+  /// supersedes the employee's previous PENDING row)
+  status           String    @default("PENDING")
+  /// Validated payload: { profile?, td1?, bankEncrypted? } —
+  /// see lib/employee-portal-core.ts (sanitizePendingPayload).
+  payload          Json
+  submittedAt      DateTime  @default(now())
+  reviewedAt       DateTime?
+  reviewedByUserId String?
+  reviewNote       String?
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, status])
+  @@index([companyId, status])
 }
