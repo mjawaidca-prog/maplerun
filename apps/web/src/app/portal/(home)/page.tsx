@@ -22,7 +22,7 @@ export default async function PortalHomePage() {
     prisma.payRunItem.findMany({
       where: { employeeId: active.employeeId, payRun: { status: "FINALIZED" } },
       include: {
-        payRun: { select: { payDate: true, periodStart: true, periodEnd: true } },
+        payRun: { select: { payDate: true, actualPayDate: true } },
       },
       orderBy: { payRun: { payDate: "desc" } },
       take: 50,
@@ -66,8 +66,11 @@ export default async function PortalHomePage() {
                     Pay date {item.payRun.payDate}
                   </p>
                   <p className="text-xs text-[#A8A29E]">
-                    Period {item.payRun.periodStart} – {item.payRun.periodEnd} ·
-                    Gross {fmt(item.gross)} · Deductions {fmt(item.totalDeductions)}
+                    Period end {item.payRun.payDate}
+                    {item.payRun.actualPayDate && item.payRun.actualPayDate !== item.payRun.payDate
+                      ? ` · Paid ${item.payRun.actualPayDate}`
+                      : ""}{" "}
+                    · Gross {fmt(item.gross)} · Deductions {fmt(item.totalDeductions)}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
