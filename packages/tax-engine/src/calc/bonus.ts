@@ -80,7 +80,11 @@ export function calculateBonus(input: BonusInput): BonusResult {
   const insurableBase = Math.max(0, gross + taxableBenefits - deductions.insurable);
 
   // Regular-period CPP/EI establish the baseline (exemption + remaining caps).
-  const regularCpp = calcCpp(pensionableBase, P, ytd, cppT, input.cppExempt ?? false);
+  // W4-D2(a): the regular baseline's CPP uses the same vacation-pay
+  // composition as calculatePay (PDOC prices the vacation component
+  // separately, without exemption).
+  const vacationPensionable = Math.min(Math.max(0, input.vacationPay ?? 0), pensionableBase);
+  const regularCpp = calcCpp(pensionableBase, P, ytd, cppT, input.cppExempt ?? false, vacationPensionable);
   const regularEi = calcEi(insurableBase, input.province, ytd, eiT, input.eiExempt ?? false);
 
   // CPP on the bonus: no per-period exemption, capped by remaining annual room.

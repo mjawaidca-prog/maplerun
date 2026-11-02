@@ -200,6 +200,16 @@ export interface PayInput {
   /** Gross taxable income for the period (earnings + taxable benefits). */
   grossPeriodIncome: number;
   /**
+   * Wave 4 (W4-D2) — the vacation-pay component of grossPeriodIncome
+   * (dollars; already included in grossPeriodIncome). PDOC prices
+   * CPP/QPP on vacation pay as a separate component with no basic
+   * exemption, each component rounded to cents (see calcCpp); EI is
+   * NOT split (PDOC's EI on the same fixtures matches the lumped
+   * calculation). calculatePay forwards the component to calcCpp.
+   * Defaults to 0 — the whole period's pay is regular pay.
+   */
+  vacationPay?: number;
+  /**
    * Per-period tax-deductible amounts (RPP, RRSP, union dues) — F in T4127.
    * Either a bare total (legacy form: reduces the taxable base only,
    * exactly as before) or a list of NamedDeduction (Wave 3 B6), whose
