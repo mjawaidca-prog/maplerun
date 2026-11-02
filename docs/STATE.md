@@ -29,6 +29,14 @@
 
 - **Public SEO guides (Oct 31, 2026): DONE** — /guides hub + 6 guides mirroring the LedgerPro PR #68 pattern (province of employment flagship, Quebec payroll, TD1 claim codes, CPP/CPP2/EI 2026, remittance due dates, LedgerPro sync story). Data layer `apps/web/src/lib/guides.ts` + `guides-content.ts`; sitemap carries hub + all 6; nav/footer/landing/feature pages cross-link; proxy opens only /guides (app routes stay gated). All figures verified against CRA T4127 121st ed. / canada.ca and Revenu Québec for 2026. Accuracy follow-up (Oct 31): TD1 claim-code chart corrected to T4032 Chart 3 as published ($2,833 bands, code 10 tops at $41,949), and the CPP/EI guide now notes the published 2027 EI amounts (1.64%, MIE $70,800) while 2027 CPP/CPP2 amounts remain unpublished.
 
+- **Wave 1 — versatility trust foundation (Nov 2, 2026): BUILT, AWAITING PROD MIGRATION + MERGE.** Five stacked PRs on `redesign`, all Vercel-preview green, web tests 79/79 (61 pre-Wave-1), tax-engine 137/137:
+  - PR A #8 `wave1/schema-foundation` — additive schema (Employee startDate/terminationDate/jobTitle/department/vacationMode/vacationRatePct/vacationBalanceCents + payGroupId relation persisted by createEmployee; PayRunItem qpp/qpp2/qpip dual-write + vacationAccruedCents; PayRun.reversedAt; Company remitterType + EFT originator profile). Engine: PayResult.qpip surfaced, no formula changes.
+  - PR B #9 `wave1/pay-group-scoping` — preview/finalize load the run's pay group; unassigned (NULL) employees stay in scope for every group until assigned.
+  - PR C #10 `wave1/finalize-recompute` — finalize recomputes server-side from run INPUTS via the shared compute path; client totals are never read (tamper-proof, vitest-proven).
+  - PR D #11 `wave1/payrun-reversal` — REVERSED status + reversePayRun (exact YTD rollback, LedgerPro void-first, vacation unwind); deletePayRun refuses FINALIZED runs.
+  - PR E #18 `wave1/vacation-and-employee-fields` — vacation accrual/payout-from-balance wiring; employee record completeness (updateEmployee fields); fixed edit-form silent deactivation bug (missing `active` field read as false).
+  - ⛔ **MERGE GATE:** migration `20261102090000_wave1_schema_foundation` (additive only, SHA-256 `1b08923339adc5416004215a400f78a0fdc7fb92daeca75cc8e0fa5170d924ca`) must be applied to production Neon BEFORE merging PR A — apply via `prisma migrate deploy` with prod DATABASE_URL, or Neon SQL Editor + manual `_prisma_migrations` row (full instructions in the comment on PR #8). Then merge A → B → C → D → E in order. Do NOT regenerate migrations against prod (known drift: businessNumber, trialEndsAt, actualPayDate, bonus columns).
+
 ## Live
 - **Production URL:** https://pay.nexvarlab.com (Cloudflare + Vercel, Next.js 16, Auth.js v5)
 - **Stack:** Vercel (pdx1) + Neon PostgreSQL + Cloudflare DNS + Stripe + Resend

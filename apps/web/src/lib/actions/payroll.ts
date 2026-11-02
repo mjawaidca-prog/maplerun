@@ -35,6 +35,15 @@ export type PayRunPreviewItem = {
   vacationPay: number;
   vacationRate: number;
   bonus: number;
+  /** Wave 1 PR E — ACCRUE employees only: vacationRatePct% of this
+   *  run's vacationable earnings (gross + bonus), in cents, that
+   *  finalize will add to the employee's vacation balance. */
+  vacationAccruedCents: number;
+  /** Wave 1 PR E — ACCRUE employees only: wizard vacation payout for
+   *  this run, in cents, drawn from the accrued balance at finalize.
+   *  (PAYOUT employees' wizard payout is ordinary pay — see
+   *  vacationPay — and never touches a balance.) */
+  vacationPayoutCents: number;
 };
 
 export type PayRunPreview = {
@@ -174,6 +183,20 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     const vacationAmount = empVacation?.amount ?? 0;
     const effectiveGross = gross + bonusAmount + vacationAmount;
 
+    // Wave 1 PR E — vacation accrual. ACCRUE employees build a balance:
+    // vacationRatePct% of the run's vacationable earnings (gross +
+    // bonus; a vacation payout itself does not accrue). Gross dollars
+    // × pct = cents. For ACCRUE employees the wizard vacation amount
+    // is a payout drawn from that balance at finalize; PAYOUT keeps
+    // today's behaviour (payout is ordinary pay, recorded on the
+    // item); NONE accrues nothing.
+    const vacationAccruedCents =
+      emp.vacationMode === "ACCRUE" && emp.vacationRatePct
+        ? Math.round((gross + bonusAmount) * emp.vacationRatePct)
+        : 0;
+    const vacationPayoutCents =
+      emp.vacationMode === "ACCRUE" ? Math.round(vacationAmount * 100) : 0;
+
     const result = calculatePay({
       payDate,
       province,
@@ -196,6 +219,8 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
       vacationPay: vacationAmount,
       vacationRate: empVacation?.rate ?? 0,
       bonus: bonusAmount,
+      vacationAccruedCents,
+      vacationPayoutCents,
     });
 
     totals.gross += result.gross;
@@ -295,6 +320,22 @@ export async function finalizePayRun(formData: FormData) {
     // Safety: ensure all values are defined numbers (JSON.parse may produce nulls)
     const n = (v: any, fallback = 0) => (typeof v === "number" ? v : fallback);
 
+    // Wave 1 PR E — vacation balance: the NET change this run applies
+    // (accrual minus any payout drawn from the balance, the payout
+    // clipped at the available balance so it never goes negative).
+    // The net is what gets recorded on the item, so reversal (PR D)
+    // unwinds exactly what was applied.
+    let vacationBalanceDeltaCents = 0;
+    if (item.vacationAccruedCents > 0 || item.vacationPayoutCents > 0) {
+      const empRow = await prisma.employee.findUnique({
+        where: { id: item.employeeId },
+        select: { vacationBalanceCents: true },
+      });
+      const available = (empRow?.vacationBalanceCents ?? 0) + item.vacationAccruedCents;
+      const appliedPayout = Math.min(available, item.vacationPayoutCents);
+      vacationBalanceDeltaCents = item.vacationAccruedCents - appliedPayout;
+    }
+
     await prisma.payRunItem.create({
       data: {
         payRunId: payRun.id,
@@ -326,9 +367,18 @@ export async function finalizePayRun(formData: FormData) {
         hours: n(item.hours, 0),
         vacationPay: n(item.vacationPay, 0),
         vacationPayRate: n(item.vacationRate, 0),
+        // Net vacation-balance change applied by this run (see above).
+        vacationAccruedCents: vacationBalanceDeltaCents,
         bonus: n(item.bonus, 0),
       },
     });
+
+    if (vacationBalanceDeltaCents !== 0) {
+      await prisma.employee.update({
+        where: { id: item.employeeId },
+        data: { vacationBalanceCents: { increment: vacationBalanceDeltaCents } },
+      });
+    }
 
     // Upsert YTD ledger
     await prisma.ytdLedger.upsert({
@@ -481,9 +531,11 @@ export async function reversePayRun(formData: FormData) {
       });
     }
 
-    // Unwind vacation accrued by this run (no-op until PR E lands —
-    // every item carries 0 before accrual wiring exists).
-    if (item.vacationAccruedCents > 0) {
+    // Unwind the vacation-balance change this run applied (PR E
+    // records the NET delta — accrual minus any balance-drawn payout —
+    // on the item, so decrementing by it restores the balance exactly,
+    // for negative deltas too).
+    if (item.vacationAccruedCents !== 0) {
       await prisma.employee.update({
         where: { id: item.employeeId },
         data: { vacationBalanceCents: { decrement: item.vacationAccruedCents } },

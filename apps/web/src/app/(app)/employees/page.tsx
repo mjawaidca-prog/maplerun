@@ -44,7 +44,7 @@ export default async function EmployeesPage() {
               <Link href={`/employees/${emp.id}`} className="contents no-underline text-inherit">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#B3261E] to-[#E56A5C] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{emp.firstName[0]}</div>
-                <div><p className="text-sm font-semibold">{emp.firstName} {emp.lastName}</p><p className="text-xs text-[#A8A29E]">SIN •••-•••-•••</p></div>
+                <div><p className="text-sm font-semibold">{emp.firstName} {emp.lastName}</p><p className="text-xs text-[#A8A29E]">SIN •••-•••-•••</p>{emp.vacationMode==="ACCRUE"&&(<p className="text-xs text-[#78716C]">Vacation accrued: ${(emp.vacationBalanceCents/100).toFixed(2)}</p>)}</div>
               </div>
               <div className="text-[13px] text-[#57534E]">{emp.province??"—"}</div>
               <div className="text-[13px] text-[#57534E] capitalize">{emp.payType??"—"}</div>
