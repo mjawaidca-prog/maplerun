@@ -5,6 +5,7 @@ import { getPayRun } from "@/lib/actions/payroll";
 import { requireCompany } from "@/lib/session";
 import { StubPrintButton } from "@/components/stub-actions";
 import { DeletePayRunButton } from "@/components/delete-payrun-button";
+import { ReversePayRunButton } from "@/components/reverse-payrun-button";
 import { LedgerProSyncBadge, type LedgerProSyncStatus } from "@/components/ledgerpro-sync-badge";
 import { LedgerProSyncActions } from "@/components/ledgerpro-sync-actions";
 import Link from "next/link";
@@ -32,7 +33,12 @@ export default async function PayRunDetailPage({ params }: Props) {
           <p className="text-sm text-muted-foreground mt-1">{run.payGroup.name} · {run.payGroup.frequency.toLowerCase()} · {run.items.length} employees</p>
         </div>
         <div className="flex gap-2.5 items-center">
-          <DeletePayRunButton id={run.id} date={run.payDate} ledgerSyncedAt={run.ledgerProSync?.status === "SYNCED" ? (run.ledgerProSync.syncedAt?.toISOString() ?? null) : null} />
+          {run.status === "FINALIZED" && (
+            <ReversePayRunButton id={run.id} date={run.payDate} ledgerSyncedAt={run.ledgerProSync?.status === "SYNCED" ? (run.ledgerProSync.syncedAt?.toISOString() ?? null) : null} />
+          )}
+          {run.status !== "FINALIZED" && (
+            <DeletePayRunButton id={run.id} date={run.payDate} ledgerSyncedAt={run.ledgerProSync?.status === "SYNCED" ? (run.ledgerProSync.syncedAt?.toISOString() ?? null) : null} />
+          )}
           <StubPrintButton />
         </div>
       </div>
