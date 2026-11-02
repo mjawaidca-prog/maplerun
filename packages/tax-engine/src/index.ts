@@ -7,7 +7,7 @@ export {
   calcVacationPay,
 } from './data/vacation-pay';
 export type { VacationPayTier, VacationPayStandard } from './data/vacation-pay';
-export { QPP_2026, QPIP_2026, QC_FEDERAL_ABATEMENT } from './data/2026/quebec';
+export { QPP_2026, QPIP_2026, QC_FEDERAL_ABATEMENT, QC_TAX_2026 } from './data/2026/quebec';
 export { CPP_2027, EI_2027 } from './data/2027/cpp-ei';
 export { QPP_2027, QPIP_2027 } from './data/2027/quebec';
 export {
@@ -18,6 +18,7 @@ export {
   maxQpipPremium,
   annualQuebecTax,
   applyFederalAbatement,
+  type QuebecTaxInput,
 } from './calc/quebec-tax';
 export type { QpipTable } from './calc/quebec-tax';
 export { calculatePay } from './calc/pay-run';

@@ -31,6 +31,16 @@ export interface TaxBracket {
   /** Upper bound of annual taxable income for this bracket; null = top bracket. */
   upTo: number | null;
   rate: number;
+  /**
+   * Published cumulative constant for this bracket (K in T4127 Table 8.1
+   * for federal, KP for provinces/territories; K in TP-1015.F for Quebec).
+   * When present, bracketFor uses it verbatim — CRA/RQ publish these
+   * rounded to whole dollars, and PDOC/WebRAS compute with the published
+   * values, not with the exact threshold derivation. Absent on tables
+   * whose constants have not been published yet (e.g. 2027), where
+   * bracketFor falls back to deriving from the thresholds.
+   */
+  k?: number;
 }
 
 /** Income-tested basic personal amount (federal and Yukon). */

@@ -38,3 +38,27 @@ export const QPIP_2026 = {
 
 /** Federal tax abatement for Quebec employees: T1 = T3 − 16.5% × T3. */
 export const QC_FEDERAL_ABATEMENT = 0.165;
+
+/**
+ * Quebec income-tax parameters for the TP-1015.F §2.1.1 regular-payments
+ * formula (Wave 4 Phase 0 fix, defect D2):
+ *   H (deduction for workers) = min(6% × D, $1,450 ÷ P) for 2026;
+ *   personal tax credits E convert at 14% in step 2 of the formula.
+ * Source: Revenu Québec TP-1015.F-V (2026-01), "Principal changes —
+ * Deduction for workers: The maximum deduction for workers is $1,450
+ * for 2026" and §2.1.1 steps 1–2.
+ */
+export const QC_TAX_2026 = {
+  year: 2026,
+  /** Deduction for workers: rate applied to gross salary/wages (D). */
+  workerDeductionRate: 0.06,
+  /** Deduction for workers: annual maximum (H is capped at max ÷ P per period). */
+  workerDeductionMax: 1_450,
+  /** Rate at which personal tax credits (E) convert in the Y formula. */
+  personalCreditRate: 0.14,
+  meta: {
+    verified: true,
+    source: 'Revenu Québec TP-1015.F-V (2026-01) §2.1.1 + Principal changes (deduction for workers max $1,450).',
+    lastReviewed: '2026-11-02',
+  } satisfies TableMeta,
+};

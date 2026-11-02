@@ -1,20 +1,26 @@
 /**
- * Quebec provincial income tax (TP-1015.3), QPIP premiums, and federal abatement.
+ * Quebec provincial income tax (TP-1015.F), QPIP premiums, and federal abatement.
  *
- * QC uses Revenu Québec formulas, not T4127 provincial formulas. Key differences:
- *   - QC provincial tax: T = V × A − KP − K1P − K2P − K3P
- *   - K3P: 20% credit on QPP and QPIP contributions (unique to Quebec)
- *   - Federal abatement: T1 = T3 − 16.5% × T3 for QC residents
- *   - QPP replaces CPP; QPIP is an additional payroll deduction
+ * QC uses Revenu Québec formulas, not T4127 provincial formulas.
+ * Quebec income tax follows TP-1015.F-V §2.1.1 verbatim (regular payments):
+ *   Step 1: I = P × (G − F − H − CSA) − J − J1        (annual taxable income)
+ *   Step 2: Y = T × I − K − K1 − 0.14 × E − 0.15 × P × Q − 0.15 × P × Q1
+ *   Step 3: per-period withholding = Y ÷ P (+ L, handled by the caller)
+ * There is NO QPP/QPIP non-refundable credit in the Quebec formula — an
+ * earlier implementation invented K2P/K3P credits and omitted the H
+ * deduction for workers, under-withholding ~$87/month at a $5,400 monthly
+ * salary (Wave 4 Phase 0 defect D2, proven against WebRAS).
+ * Federal abatement: T1 = T3 − 16.5% × T3 for QC residents.
+ * QPP replaces CPP; QPIP is an additional payroll deduction.
  *
- * Source: TP-1015.3 (2026-01), Revenu Québec. Verified constants in data/2026/quebec.ts.
+ * Source: Revenu Québec TP-1015.F-V (2026-01) §2.1.1. Verified constants
+ * in data/2026/quebec.ts and the QC table in data/2026/provinces.ts.
  */
 
 import { TaxEngineError, type CppTable, type ProvincialTable } from '../types';
 import { roundCent } from '../money';
 import { bracketFor } from './income-tax';
-import { eiRateFor, maxEiPremium as maxEiPremiumFn } from './ei';
-import type { EiTable } from '../types';
+import { QC_TAX_2026 } from '../data/2026/quebec';
 
 // ---------------------------------------------------------------------------
 // QPP (Quebec Pension Plan)
@@ -109,50 +115,83 @@ export function maxQpipPremium(qpipTable: QpipTable): number {
 }
 
 // ---------------------------------------------------------------------------
-// Quebec provincial income tax (TP-1015.3)
+// Quebec provincial income tax (TP-1015.F §2.1.1 — regular payments)
 // ---------------------------------------------------------------------------
 
+/** Inputs for the TP-1015.F §2.1.1 regular-payments formula. */
+export interface QuebecTaxInput {
+  /** G — gross remuneration subject to QC source deductions for the pay
+   *  period (earnings + taxable benefits, excl. lump sums). Also D, the
+   *  base of the deduction for workers. */
+  grossPeriodIncome: number;
+  /** F — per-period amounts that reduce QC taxable income (RPP/RRSP/VRSP/
+   *  FHSA contributions, union-dues-type deductions resolved by the caller). */
+  periodDeductions: number;
+  /** C — employee QPP contribution for the period (base + first additional). */
+  qpp: number;
+  /** C2 — second additional employee QPP contribution for the period. */
+  qpp2: number;
+  /** P — number of pay periods in the year. */
+  periodsPerYear: number;
+  /** J — annual deductions shown on line 19 of form TP-1015.3-V.
+   *  (J1, deductions authorized by Revenu Québec on form TP-1016-V, is
+   *  not modelled — the app carries a single annual-deductions amount.) */
+  annualDeductions?: number;
+  /** E — personal tax credits from form TP-1015.3-V (line 10 total).
+   *  Defaults to the Quebec basic personal amount. */
+  provincialClaim?: number;
+}
+
 /**
- * TP-1015.3 annual Quebec provincial tax.
- * Formula: T = V × A − KP − K1P − K2P − K3P, floored at zero.
+ * TP-1015.F-V §2.1.1 annual Quebec income tax Y (steps 1–2; the caller
+ * divides by P for the per-period withholding, step 3).
  *
- * K1P = V_lowest × TCP (QC BPA)
- * K2P = V_lowest × (QPP base credit + QPIP credit), capped
- * K3P = 20% × (QPP contributions + QPIP premiums)
+ * Step 1 — annual taxable income:
+ *   I = P × (G − F − H − CSA) − J − J1, floored at zero, where
+ *   H   = deduction for workers = min(6% × D, $1,450 ÷ P) for 2026;
+ *   CSA = deduction of additional QPP contributions = CS × (S3 − B2) ÷ S3
+ *         with CS = C × (0.01 ÷ 0.0630) + C2. For regular payments B2 = 0,
+ *         so CSA = CS; the rate share is (employeeRate − baseRate) ÷
+ *         employeeRate taken from the QPP table (1.00 ÷ 6.30 for 2026).
+ * Step 2 — income tax for the year:
+ *   Y = T × I − K − K1 − (0.14 × E) − (0.15 × P × Q) − (0.15 × P × Q1),
+ *   floored at zero. T and K are Revenu Québec's printed rate/constant for
+ *   the bracket of I (carried on the QC table's brackets). K1 (credits
+ *   authorized on form TP-1016-V) and Q/Q1 (labour-sponsored fund
+ *   withholdings — FTQ / Fondaction) are not modelled and enter as zero.
+ *
+ * Source: Revenu Québec, TP-1015.F-V (2026-01), §2.1.1.
  */
 export function annualQuebecTax(
-  A: number,
+  input: QuebecTaxInput,
   prov: ProvincialTable,
-  qppContrib: number,
-  qpipContrib: number,
-  periodsPerYear: number,
   qppTable: CppTable,
-  qpipTable: QpipTable,
-  provincialClaim?: number,
 ): number {
   if (prov.province !== 'QC') {
     throw new TaxEngineError('annualQuebecTax requires a QC provincial table');
   }
 
-  const { rate: V, k: KP } = bracketFor(prov.brackets, A);
-  const TCP = provincialClaim ?? (typeof prov.bpa === 'number' ? prov.bpa : 0);
+  const P = input.periodsPerYear;
 
-  // K1P: lowest-rate credit on QC BPA
-  const K1P = prov.lowestRate * TCP;
-
-  // K2P: lowest-rate credit on QPP base + QPIP (annualized, capped)
-  const baseQppFraction = qppTable.baseRate / qppTable.employeeRate;
-  const annualQppBase = Math.min(
-    periodsPerYear * qppContrib * baseQppFraction,
-    (qppTable.ympe - qppTable.basicExemption) * qppTable.baseRate,
+  // Step 1 — I (annual taxable income).
+  const H = Math.min(
+    QC_TAX_2026.workerDeductionRate * input.grossPeriodIncome,
+    QC_TAX_2026.workerDeductionMax / P,
   );
-  const annualQpipCredit = Math.min(periodsPerYear * qpipContrib, qpipTable.maxEmployeePremium);
-  const K2P = prov.lowestRate * (annualQppBase + annualQpipCredit);
+  const additionalShare =
+    (qppTable.employeeRate - qppTable.baseRate) / qppTable.employeeRate;
+  const CSA = input.qpp * additionalShare + input.qpp2;
+  const I = Math.max(
+    0,
+    P * (input.grossPeriodIncome - input.periodDeductions - H - CSA) -
+      (input.annualDeductions ?? 0),
+  );
 
-  // K3P: 20% credit on QPP + QPIP contributions (QC unique)
-  const K3P = 0.20 * roundCent(periodsPerYear * (qppContrib + qpipContrib));
-
-  return Math.max(0, V * A - KP - K1P - K2P - K3P);
+  // Step 2 — Y (income tax for the year). K1 = 0 and Q = Q1 = 0 (not modelled).
+  const { rate: T, k: K } = bracketFor(prov.brackets, I);
+  const E =
+    input.provincialClaim ?? (typeof prov.bpa === 'number' ? prov.bpa : 0);
+  return Math.max(0, T * I - K - QC_TAX_2026.personalCreditRate * E);
 }
 
 // ---------------------------------------------------------------------------
