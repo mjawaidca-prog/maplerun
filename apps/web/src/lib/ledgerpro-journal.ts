@@ -23,10 +23,15 @@
  * ⚠️ totalEmployerCost is employer contributions ONLY — total employer
  * cash cost is totalGross + totalEmployerCost.
  *
- * Quebec note: QPP reuses the cpp/cpp2 fields and QPIP is folded into the
- * EI fields by the tax engine, so QC runs use the same lines; the balance
- * identity (gross + employer cost = net + remittance) still holds because
- * the folded amounts stay inside the same totals.
+ * Quebec note: QPP reuses the cpp/cpp2 fields (employee AND employer).
+ * QPIP is where the asymmetry lives (Wave 4 defect W4-D1): the engine's
+ * EMPLOYER total folds QPIP into employerEi, but the employee QPIP
+ * premium is NOT in totalEi — it travels separately as totalQpip (the
+ * store sums PayRunItem.qpip). The journal therefore credits totalQpip
+ * into the EI payable line alongside EI: without it every Quebec run's
+ * journal is out of balance by exactly the employee QPIP (the Prairie
+ * Peak proof run failed its sync by exactly Sophie's $20.64), because
+ * net pay is already net of QPIP while no credit line carried it.
  *
  * Wave 3 B6 note: reimbursements and custom deductions break the naive
  * identity (they move net pay without moving gross or statutory
@@ -142,6 +147,13 @@ export interface PayRunTotals {
   totalEmployerCpp2: number;
   totalEmployerEi: number;
   totalEmployerCost: number;
+  /** Employee QPIP premiums for the run (Quebec only; W4-D1). NOT
+   *  included in totalEi — the engine keeps employee QPIP separate
+   *  (PayRunItem.qpip) while folding the EMPLOYER premium into
+   *  totalEmployerEi. Optional: absent/0 for non-QC runs and for fakes
+   *  built before the field existed. The journal credits this amount
+   *  into the EI payable line (2420) in both modes. */
+  totalQpip?: number;
   /** Wave 3 B6 — sum of item reimbursements in this run (optional:
    *  absent/0 for pre-B6 runs and fakes). The reimbursement is inside
    *  totalNetPay but NOT in totalGross, so the journal needs its own
@@ -196,6 +208,14 @@ export function buildJournalLines(
   // line — the reimbursement is never folded into the wages line.
   const reimbursement = run.totalReimbursement ?? 0;
   const customDeductions = run.totalCustomDeductions ?? 0;
+  // W4-D1 — employee QPIP (Quebec): net pay is already net of it, so the
+  // credit side must carry it or the journal cannot balance. It posts
+  // into the EI payable account (2420 in the default Mode 2 mapping —
+  // the same account the Mode 2 mapping intent assigns to QPIP), in
+  // both modes; the employer premium is already inside totalEmployerEi
+  // (and therefore inside the Dr employer-EI line and Mode 1's
+  // gross + employer-cost debit) — only the employee side was missing.
+  const qpip = run.totalQpip ?? 0;
   const raw: (JournalLine | null)[] =
     mode === "MODE1"
       ? [
@@ -204,7 +224,7 @@ export function buildJournalLines(
           line(
             mapping.mode1RemittancePayable,
             0,
-            run.totalCpp + run.totalCpp2 + run.totalEi +
+            run.totalCpp + run.totalCpp2 + run.totalEi + qpip +
               run.totalEmployerCpp + run.totalEmployerCpp2 + run.totalEmployerEi +
               run.totalFederalTax + run.totalProvincialTax,
             "Source deductions payable (CPP/EI/tax remittance)",
@@ -220,7 +240,7 @@ export function buildJournalLines(
           line(mapping.employerEiExpense, run.totalEmployerEi, 0, "Employer EI"),
           line(mapping.cppPayable, 0, run.totalCpp + run.totalEmployerCpp, "CPP payable"),
           line(mapping.cpp2Payable, 0, run.totalCpp2 + run.totalEmployerCpp2, "CPP2 payable"),
-          line(mapping.eiPayable, 0, run.totalEi + run.totalEmployerEi, "EI payable"),
+          line(mapping.eiPayable, 0, run.totalEi + run.totalEmployerEi + qpip, qpip > 0 ? "EI/QPIP payable" : "EI payable"),
           line(mapping.incomeTaxPayable, 0, run.totalFederalTax + run.totalProvincialTax, "Income tax payable"),
           line(mapping.customDeductionsPayable, 0, customDeductions, "Custom deductions payable (withheld from employees)"),
           line(mapping.wagesPayable, 0, run.totalNetPay, "Net pay payable"),
