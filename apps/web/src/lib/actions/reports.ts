@@ -13,15 +13,19 @@ import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import {
   aggregateRemittances,
-  type Pd7aPeriod,
+  type Pd7aPeriod as AggregatePd7aPeriod,
   type Pd7aTotals,
 } from "@/lib/remittance/aggregate";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-// Re-exported so existing imports from "@/lib/actions/reports" keep working;
-// the canonical definitions live in lib/remittance/aggregate.ts.
-export type { Pd7aPeriod };
+// Local type-alias declaration (NOT a bare `export type { … }` re-export):
+// Turbopack's server-actions transform treats a bare re-export in a
+// "use server" file as a runtime export and the build fails, because the
+// type is erased. The canonical definition lives in
+// lib/remittance/aggregate.ts; existing imports from "@/lib/actions/reports"
+// keep working through this alias.
+export type Pd7aPeriod = AggregatePd7aPeriod;
 
 export type Pd7aReport = {
   year: number;
