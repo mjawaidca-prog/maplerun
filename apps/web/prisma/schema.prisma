@@ -38,6 +38,9 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
+  /// Clerk user id (identity provider link). Nullable: legacy Auth.js users
+  /// link lazily on first Clerk sign-in by verified email. Unique when set.
+  clerkUserId   String?   @unique
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

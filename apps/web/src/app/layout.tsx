@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { getAuthMode } from "@/lib/auth-mode";
 import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
 import { PAY_URL } from "@/lib/seo";
@@ -68,7 +69,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
         <LanguageProvider>
-          <Providers>{children}</Providers>
+          <Providers mode={getAuthMode()}>{children}</Providers>
         </LanguageProvider>
       </body>
     </html>

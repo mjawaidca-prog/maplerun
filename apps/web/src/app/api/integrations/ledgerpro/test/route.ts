@@ -3,11 +3,11 @@
  * LedgerPro integration (M6). Calls GET /api/v1/accounts with the
  * submitted (or stored) key, then pre-flights the mapped payroll codes.
  *
- * Auth/membership pattern follows /api/pay-groups: session + membership
+ * Auth/membership pattern follows /api/pay-groups: getAuthUserId() + membership
  * check against the companyId in the body.
  */
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { decrypt } from "@/lib/encryption";
 import { createLedgerProClient } from "@/lib/ledgerpro";
@@ -15,8 +15,8 @@ import { normalizeMapping, type MappingMode } from "@/lib/ledgerpro-journal";
 import { testConnection } from "@/lib/ledgerpro-sync";
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
   }
 
   const membership = await prisma.membership.findFirst({
-    where: { userId: session.user.id, companyId },
+    where: { userId: userId, companyId },
   });
   if (!membership) {
     return NextResponse.json({ error: "You do not belong to this company" }, { status: 403 });

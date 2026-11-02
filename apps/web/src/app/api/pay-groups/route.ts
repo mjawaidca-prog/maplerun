@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   // Verify membership
   const membership = await prisma.membership.findFirst({
-    where: { userId: session.user.id, companyId },
+    where: { userId: userId, companyId },
   });
   if (!membership) {
     return NextResponse.json({ error: "You do not belong to this company" }, { status: 403 });
@@ -47,8 +47,8 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -68,7 +68,7 @@ export async function DELETE(request: Request) {
   }
 
   const membership = await prisma.membership.findFirst({
-    where: { userId: session.user.id, companyId: payGroup.companyId },
+    where: { userId: userId, companyId: payGroup.companyId },
   });
   if (!membership) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });

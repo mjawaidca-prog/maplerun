@@ -2,25 +2,24 @@
  * Protected app layout — plan-aware dark sidebar.
  */
 import { requireCompany } from "@/lib/session";
-import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SIDEBAR_NAV, can, PLAN_META, REQUIRES as REQ_MAP, type NavItem, type Plan } from "@/lib/plan";
 import { CompanySwitcher } from "@/components/company-switcher";
+import { SignOutControl } from "@/components/sign-out-control";
 import { TrialBanner } from "@/components/trial-banner";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireCompany();
-  const session = await auth();
-  const email = session?.user?.email ?? user.email;
+  const email = user.email;
   const initial = (user.name ?? email ?? "U")[0].toUpperCase();
 
   // Get company plan + all user companies for switcher
   const [company, allCompanies] = await Promise.all([
     prisma.company.findUnique({ where: { id: user.companyId }, select: { plan: true, trialEndsAt: true } }),
     prisma.company.findMany({
-      where: { memberships: { some: { userId: session?.user?.id } } },
+      where: { memberships: { some: { userId: user.id } } },
       select: { id: true, name: true },
       orderBy: { createdAt: "asc" },
     }),
@@ -101,16 +100,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <p className="text-[13px] font-semibold text-[#FAFAF9] truncate">
                 {user.name ?? email}
               </p>
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/" });
-                }}
-              >
-                <button type="submit" className="text-[11px] text-[#78716C] hover:text-[#A8A29E] cursor-pointer">
-                  Sign out
-                </button>
-              </form>
+              <SignOutControl />
             </div>
           </div>
         </div>
