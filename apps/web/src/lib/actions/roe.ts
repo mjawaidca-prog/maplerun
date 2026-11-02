@@ -455,6 +455,7 @@ export async function generateRoeBlkFile(
   }
 }
 
-// ROE reason codes moved to a separate non-server file (lib/roe-constants.ts)
-// because "use server" files can only export async functions.
-export { ROE_REASON_CODES } from "@/lib/roe-constants";
+// NOTE: ROE_REASON_CODES lives in lib/roe-constants.ts and must be imported
+// from there directly — re-exporting it from this "use server" file is a
+// build error (only async functions may be exported), which is why the old
+// re-export that sat here unused was removed when this module was wired in.
