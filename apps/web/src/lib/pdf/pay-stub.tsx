@@ -47,9 +47,21 @@ function LedgerRow({ label, value, alt, total }: { label: string; value: string;
 
 export interface PayStubPdfData {
   companyName: string; employeeName: string; payDate: string; payGroup: string;
+  /** Wave 3 B5 — pay-period start (PayRun.periodStart); null on pre-B5 runs. */
+  periodStart: string | null;
   gross: number; cpp: number; cpp2: number; ei: number; federalTax: number; provincialTax: number;
   totalDeductions: number; netPay: number;
+  /** Wave 3 B5 — itemized earnings lines (Regular/Overtime/Stat/Vacation/Bonus…). */
+  earnings: { label: string; detail: string | null; amount: number }[];
+  /** Wave 3 B6 — named custom deduction lines. */
+  customDeductions: { name: string; amount: number }[];
+  /** Wave 3 B6 — non-taxable reimbursement added to net pay. */
+  reimbursement: number;
   ytdPensionable: number; ytdCpp: number; ytdCpp2: number; ytdInsurable: number; ytdEi: number;
+  /** Wave 3 B5 — YTD gross pay + income tax (YtdLedger, post-B5 runs). */
+  ytdGrossPay: number; ytdIncomeTax: number;
+  /** Wave 3 B5 — ACCRUE vacation balance snapshot (cents) after this run. */
+  vacationBalanceAfterCents: number | null;
   employerCpp: number; employerCpp2: number; employerEi: number; employerTotal: number;
 }
 
@@ -68,7 +80,9 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.headerLabel}>PAY STUB</Text>
-            <Text style={styles.headerValue}>Pay Date · {data.payDate}</Text>
+            <Text style={styles.headerValue}>
+              {data.periodStart ? `Pay Period · ${data.periodStart} → ${data.payDate}` : `Pay Date · ${data.payDate}`}
+            </Text>
             <Text style={styles.headerValue}>{data.payGroup}</Text>
           </View>
         </View>
@@ -82,7 +96,9 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.empLabel}>Pay Period</Text>
-            <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 1 }}>{data.payDate}</Text>
+            <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 1 }}>
+              {data.periodStart ? `${data.periodStart} → ${data.payDate}` : data.payDate}
+            </Text>
           </View>
         </View>
 
@@ -90,9 +106,16 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
         <View style={styles.grid}>
           <View style={styles.col}>
             <Text style={styles.sectionTitle}>Earnings</Text>
-            <View style={styles.earningsCard}>
-              <Text style={styles.earningsLabel}>Gross Pay</Text>
-              <Text style={styles.earningsValue}>{fmtCAD(data.gross)}</Text>
+            <View style={styles.ledger}>
+              {data.earnings.map((line, i) => (
+                <LedgerRow
+                  key={line.label}
+                  label={line.detail ? `${line.label} · ${line.detail}` : line.label}
+                  value={fmtCAD(line.amount)}
+                  alt={i % 2 === 1}
+                />
+              ))}
+              <LedgerRow label="Gross Pay" value={fmtCAD(data.gross)} total />
             </View>
           </View>
           <View style={styles.col}>
@@ -103,8 +126,16 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
               <LedgerRow label="EI" value={fmtCAD(data.ei)} />
               <LedgerRow label="Federal Tax" value={fmtCAD(data.federalTax)} alt />
               <LedgerRow label="Provincial Tax" value={fmtCAD(data.provincialTax)} />
+              {data.customDeductions.map((d, i) => (
+                <LedgerRow key={d.name} label={d.name} value={fmtCAD(d.amount)} alt={i % 2 === 0} />
+              ))}
               <LedgerRow label="Total Deductions" value={fmtCAD(data.totalDeductions)} total />
             </View>
+            {data.reimbursement !== 0 && (
+              <View style={{ marginTop: 8 }}>
+                <LedgerRow label="Reimbursement (non-taxable, added to net)" value={fmtCAD(data.reimbursement)} />
+              </View>
+            )}
           </View>
         </View>
 
@@ -131,12 +162,22 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
           <View style={styles.col}>
             <Text style={styles.sectionTitle}>Year to Date · 2026</Text>
             <View style={styles.ledger}>
+              <LedgerRow label="Gross Pay" value={fmtCAD(data.ytdGrossPay)} />
+              <LedgerRow label="Income Tax" value={fmtCAD(data.ytdIncomeTax)} alt />
               <LedgerRow label="Pensionable" value={fmtCAD(data.ytdPensionable)} />
               <LedgerRow label="Insurable" value={fmtCAD(data.ytdInsurable)} alt />
               <LedgerRow label="CPP" value={fmtCAD(data.ytdCpp)} />
               <LedgerRow label="EI" value={fmtCAD(data.ytdEi)} alt />
               <LedgerRow label="CPP2" value={fmtCAD(data.ytdCpp2)} />
             </View>
+            {data.vacationBalanceAfterCents != null && (
+              <View style={{ marginTop: 8 }}>
+                <LedgerRow
+                  label="Vacation balance"
+                  value={`$${(data.vacationBalanceAfterCents / 100).toFixed(2)}`}
+                />
+              </View>
+            )}
           </View>
         </View>
 

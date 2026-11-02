@@ -61,7 +61,7 @@ export default async function EmployeeDetailPage({ params, searchParams }: Props
 
         <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="px-5 py-4 border-b border-[#F0EFED] flex justify-between items-center"><span className="text-[15px] font-bold">Pay settings</span></div>
-          {[["Province",emp.province??"—"],["Start date",emp.createdAt.toISOString().slice(0,10)],["Deposit","Direct"]].map(([k,v])=>(
+          {[["Province",emp.province??"—"],["Start date",emp.startDate?emp.startDate.toISOString().slice(0,10):emp.createdAt.toISOString().slice(0,10)],["Job title",emp.jobTitle??"—"],["Department",emp.department??"—"],["Vacation",emp.vacationMode==="ACCRUE"?`Accrues ${emp.vacationRatePct??0}% · balance $${(emp.vacationBalanceCents/100).toFixed(2)}`:emp.vacationMode==="NONE"?"None":`Paid out each run${emp.vacationRatePct?` at ${emp.vacationRatePct}%`:""}`],...(emp.terminationDate?[["Termination date",emp.terminationDate.toISOString().slice(0,10)]]:[]),["Deposit","Direct"]].map(([k,v])=>(
             <div key={k} className="flex justify-between px-5 py-[11px] text-[13px] border-b border-[#F7F6F4] last:border-b-0"><span className="text-[#78716C]">{k}</span><span className="font-medium">{v}</span></div>
           ))}
         </div>

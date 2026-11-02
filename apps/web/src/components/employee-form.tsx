@@ -176,6 +176,20 @@ export function EmployeeForm({ payGroups }: Props) {
                 )}
               </div>
             </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Start date</Label>
+                <Input id="startDate" name="startDate" type="date" disabled={submitting} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Job title</Label>
+                <Input id="jobTitle" name="jobTitle" disabled={submitting} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="department">Department</Label>
+                <Input id="department" name="department" disabled={submitting} />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -239,6 +253,31 @@ export function EmployeeForm({ payGroups }: Props) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="provinceOfEmployment">Province of employment (payroll)</Label>
+              <select id="provinceOfEmployment" name="provinceOfEmployment" defaultValue="" className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white" disabled={submitting}>
+                <option value="">Pay group default</option>
+                {["AB","BC","MB","NB","NL","NS","NT","NU","ON","PE","QC","SK","YT"].map((p) => <option key={p} value={p}>{p}</option>)}
+              </select>
+              <p className="text-[11px] text-[#A8A29E]">Only set this when the employee works in a different province than their pay group.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="vacationMode">Vacation pay</Label>
+                <select id="vacationMode" name="vacationMode" defaultValue="PAYOUT" className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white" disabled={submitting}>
+                  <option value="PAYOUT">Pay out each run</option>
+                  <option value="ACCRUE">Accrue to a balance</option>
+                  <option value="NONE">None</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="vacationRatePct">Vacation rate %</Label>
+                <Input id="vacationRatePct" name="vacationRatePct" type="number" min="0" step="0.1" placeholder="4" disabled={submitting} />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Pay out: the rate is applied in the pay-run wizard each run. Accrue: each finalized run adds the rate % of gross to the employee&apos;s vacation balance (shown on their profile); pay it out from the wizard when they take vacation.
+            </p>
           </CardContent>
         </Card>
 

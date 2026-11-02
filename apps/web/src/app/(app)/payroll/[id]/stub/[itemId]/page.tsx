@@ -5,6 +5,7 @@
 import { getPayRun } from "@/lib/actions/payroll";
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { buildEarningsLines, parseCustomDeductions, vacationBalanceLine } from "@/lib/pay-stub-data";
 import { StubBackLink, StubPdfLink, StubPrintButton } from "@/components/stub-actions";
 import { Logo } from "@/components/logo";
 import { notFound } from "next/navigation";
@@ -37,6 +38,33 @@ export default async function PayStubPage({ params }: Props) {
   const ytdFederalTax = (ytdTaxAgg._sum.federalTax ?? 0);
   const ytdProvincialTax = (ytdTaxAgg._sum.provincialTax ?? 0);
 
+  // Wave 3 B5 — YTD gross pay + total income tax from the YtdLedger
+  // (finalize increments them per item; reversal decrements exactly).
+  // Pre-B5 ledgers carry the 0 default, so fall back to an item
+  // aggregate when the ledger has no gross recorded yet.
+  const ytdLedger = await prisma.ytdLedger.findUnique({
+    where: { employeeId_year: { employeeId: item.employeeId, year: 2026 } },
+    select: { grossPay: true, incomeTax: true },
+  });
+  let ytdGrossPay = ytdLedger?.grossPay ?? 0;
+  let ytdIncomeTax = ytdLedger?.incomeTax ?? 0;
+  if (ytdGrossPay === 0) {
+    const ytdGrossAgg = await prisma.payRunItem.aggregate({
+      where: {
+        employeeId: item.employeeId,
+        payRun: { status: "FINALIZED", payDate: { startsWith: "2026" } },
+      },
+      _sum: { gross: true },
+    });
+    ytdGrossPay = ytdGrossAgg._sum.gross ?? 0;
+    ytdIncomeTax = ytdFederalTax + ytdProvincialTax;
+  }
+
+  const earningsLines = buildEarningsLines(item);
+  const customDeductionLines = parseCustomDeductions((item as { customDeductions?: unknown }).customDeductions);
+  const reimbursement = (item as { reimbursement?: number }).reimbursement ?? 0;
+  const vacBalance = vacationBalanceLine(item);
+
   return (
     <div className="space-y-6 max-w-[816px] print:max-w-full">
       {/* Actions */}
@@ -63,7 +91,11 @@ export default async function PayStubPage({ params }: Props) {
           </div>
           <div className="text-right">
             <p className="text-[13px] font-semibold tracking-[0.18em] opacity-85">PAY STUB</p>
-            <p className="text-[13px] opacity-90 mt-1">Period End · {payRun.payDate}</p>
+            {payRun.periodStart ? (
+              <p className="text-[13px] opacity-90 mt-1">Period · {payRun.periodStart} → {payRun.payDate}</p>
+            ) : (
+              <p className="text-[13px] opacity-90 mt-1">Period End · {payRun.payDate}</p>
+            )}
             {payRun.actualPayDate && payRun.actualPayDate !== payRun.payDate && (
               <p className="text-[13px] opacity-90 mt-1">Pay Date · {payRun.actualPayDate}</p>
             )}
@@ -90,31 +122,32 @@ export default async function PayStubPage({ params }: Props) {
           <div className="text-right">
             <p className="text-xs text-[#A8A29E] uppercase tracking-[0.08em] font-semibold">Pay Period</p>
             <p className="text-sm font-semibold text-[#1C1917] dark:text-[#FAFAF9] mt-0.5">
-              {payRun.payGroup.frequency.toLowerCase()} · {payRun.payDate}
+              {payRun.payGroup.frequency.toLowerCase()} · {payRun.periodStart ? `${payRun.periodStart} → ` : ""}{payRun.payDate}
             </p>
           </div>
         </div>
 
         {/* Earnings / Deductions grid */}
         <div className="px-10 py-6 grid grid-cols-2 gap-6">
-          {/* Earnings */}
+          {/* Earnings — itemized (Wave 3 B5) */}
           <div>
             <p className="text-xs font-bold text-[#78716C] dark:text-[#A8A29E] uppercase tracking-[0.08em] mb-2.5">Earnings</p>
-            <div className="bg-[#F0FDF4] dark:bg-[#0F2A17] border border-[#BBF7D0] dark:border-[#166534] rounded-xl p-4 flex justify-between items-center">
-              <div>
-                <span className="text-sm text-[#15803D] dark:text-[#4ADE80] font-medium">Gross Pay</span>
-                {item.hours > 0 && (
-                  <p className="text-[11px] text-[#15803D]/70 dark:text-[#4ADE80]/70 mt-0.5">
-                    {item.hours} hours · {fmtCAD(item.gross / item.hours)}/hr
-                  </p>
-                )}
-              {item.vacationPay > 0 && (
-                <p className="text-[11px] text-[#15803D]/70 dark:text-[#4ADE80]/70 mt-0.5">
-                  Incl. {fmtCAD(item.vacationPay)} vacation pay ({(item.vacationPayRate * 100).toFixed(1)}%)
-                </p>
-              )}
+            <div className="bg-[#F0FDF4] dark:bg-[#0F2A17] border border-[#BBF7D0] dark:border-[#166534] rounded-xl overflow-hidden">
+              {earningsLines.map((line) => (
+                <div key={line.label} className="flex justify-between items-center px-4 py-[9px] text-[13px]">
+                  <div>
+                    <span className="text-[#15803D] dark:text-[#4ADE80] font-medium">{line.label}</span>
+                    {line.detail && (
+                      <p className="text-[11px] text-[#15803D]/70 dark:text-[#4ADE80]/70 mt-0.5">{line.detail}</p>
+                    )}
+                  </div>
+                  <span className="font-mono tabular-nums text-[#15803D] dark:text-[#4ADE80]">{fmtCAD(line.amount)}</span>
+                </div>
+              ))}
+              <div className="flex justify-between items-center px-4 py-[11px] border-t border-[#BBF7D0] dark:border-[#166534]">
+                <span className="text-sm font-bold text-[#15803D] dark:text-[#4ADE80]">Gross Pay</span>
+                <span className="text-lg font-semibold text-[#15803D] dark:text-[#4ADE80] font-mono tabular-nums">{fmtCAD(item.gross)}</span>
               </div>
-              <span className="text-xl font-semibold text-[#15803D] dark:text-[#4ADE80] font-mono tabular-nums">{fmtCAD(item.gross)}</span>
             </div>
           </div>
 
@@ -125,6 +158,7 @@ export default async function PayStubPage({ params }: Props) {
               {[
                 ["CPP", fmtCAD(item.cpp)], ["CPP2", fmtCAD(item.cpp2)], ["EI", fmtCAD(item.ei)],
                 ["Federal Tax", fmtCAD(item.federalTax)], ["Provincial Tax", fmtCAD(item.provincialTax)],
+                ...customDeductionLines.map((d) => [d.name, fmtCAD(d.amount)] as [string, string]),
               ].map(([label, value], i) => (
                 <div key={label} className={`flex justify-between px-3.5 py-[9px] text-[13px] ${i % 2 === 1 ? "bg-[#FAFAF9] dark:bg-[#1C1917]" : ""}`}>
                   <span className="text-[#57534E] dark:text-[#A8A29E]">{label}</span>
@@ -136,6 +170,11 @@ export default async function PayStubPage({ params }: Props) {
                 <span className="font-mono tabular-nums text-[#B3261E] dark:text-[#E56A5C]">{fmtCAD(item.totalDeductions)}</span>
               </div>
             </div>
+            {reimbursement > 0 && (
+              <p className="text-[12px] text-[#78716C] dark:text-[#A8A29E] mt-2">
+                Includes {fmtCAD(reimbursement)} non-taxable reimbursement added to net pay.
+              </p>
+            )}
           </div>
         </div>
 
@@ -174,9 +213,11 @@ export default async function PayStubPage({ params }: Props) {
             <p className="text-xs font-bold text-[#78716C] dark:text-[#A8A29E] uppercase tracking-[0.08em] mb-2.5">Year to Date · 2026</p>
             <div className="border border-[#E7E5E4] dark:border-[#292524] rounded-xl overflow-hidden">
               {[
+                ["Gross Pay", fmtCAD(ytdGrossPay)], ["Income Tax", fmtCAD(ytdIncomeTax)],
                 ["Pensionable", fmtCAD(item.ytdPensionable)], ["Insurable", fmtCAD(item.ytdInsurable)],
                 ["CPP", fmtCAD(item.ytdCpp)], ["EI", fmtCAD(item.ytdEi)], ["CPP2", fmtCAD(item.ytdCpp2)],
                 ["Federal Tax", fmtCAD(ytdFederalTax)], ["Provincial Tax", fmtCAD(ytdProvincialTax)],
+                ...(vacBalance ? [["Vacation Balance", vacBalance] as [string, string]] : []),
               ].map(([label, value], i) => (
                 <div key={label} className={`flex justify-between px-3.5 py-[9px] text-[13px] ${i % 2 === 1 ? "bg-[#FAFAF9] dark:bg-[#1C1917]" : ""}`}>
                   <span className="text-[#57534E] dark:text-[#A8A29E]">{label}</span>

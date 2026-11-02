@@ -39,9 +39,30 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@maplerun/tax-engine", () => ({
-  calculatePay: () => {
-    throw new Error("not used in finalize/delete paths under test");
-  },
+  // Wave 1 PR C: finalize now recomputes through calculatePay, so the
+  // stub returns the deterministic figures the old posted-preview
+  // fixtures carried (gross 10000 → the totals asserted below).
+  calculatePay: (input: { grossPeriodIncome: number }) => ({
+    gross: input.grossPeriodIncome,
+    cpp: 500,
+    cpp2: 40,
+    ei: 163,
+    qpip: 0,
+    federalTax: 1200,
+    provincialTax: 600,
+    totalDeductions: 2503,
+    netPay: input.grossPeriodIncome - 2503,
+    annualTaxableIncome: 260000,
+    employer: { cpp: 500, cpp2: 40, ei: 228.2, total: 768.2 },
+    newYtd: {
+      pensionableEarnings: input.grossPeriodIncome,
+      cpp: 500,
+      cpp2: 40,
+      insurableEarnings: input.grossPeriodIncome,
+      ei: 163,
+    },
+    warnings: [],
+  }),
   ZERO_YTD: { pensionableEarnings: 0, cpp: 0, cpp2: 0, insurableEarnings: 0, ei: 0 },
 }));
 
@@ -62,10 +83,16 @@ vi.mock("@/lib/prisma", () => {
         db.runs.set("run_new1", run);
         return run;
       },
+      update: async ({ where, data }: { where: { id: string }; data: Record<string, unknown> }) => {
+        callOrder.push("payRun.update");
+        const run = db.runs.get(where.id);
+        if (run) db.runs.set(where.id, { ...run, ...data });
+        return run ?? {};
+      },
       findUnique: async ({ where }: { where: { id: string } }) => {
         const run = db.runs.get(where.id);
         if (!run) return null;
-        return { ...run, payGroup: { name: "Biweekly Staff", frequency: "BIWEEKLY", defaultProvince: "ON" } };
+        return { ...run, items: [], payGroup: { name: "Biweekly Staff", frequency: "BIWEEKLY", defaultProvince: "ON" } };
       },
       delete: async ({ where }: { where: { id: string } }) => {
         callOrder.push("payRun.delete");
@@ -76,6 +103,11 @@ vi.mock("@/lib/prisma", () => {
     },
     payRunItem: { create: async () => ({}) },
     ytdLedger: { upsert: async () => ({}) },
+    employee: {
+      findMany: async () => [
+        { id: "emp_1", firstName: "Test", lastName: "Employee", payGroupId: null, td1Profiles: [], ytdLedgers: [] },
+      ],
+    },
     ledgerProConnection: {
       findUnique: async () => db.connection,
     },
@@ -94,7 +126,7 @@ vi.mock("@/lib/prisma", () => {
 
 // ─── Imports under test (after mocks) ─────────────────────────────────────────
 
-import { finalizePayRun, deletePayRun } from "../src/lib/actions/payroll";
+import { finalizePayRun, deletePayRun, reversePayRun } from "../src/lib/actions/payroll";
 import { encrypt } from "../src/lib/encryption";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -127,24 +159,14 @@ function setConnection(syncEnabled: boolean) {
   };
 }
 
+// Wave 1 PR C: finalize takes the run INPUTS (the stub engine above
+// turns gross 10000 into the totals the sync assertions expect).
 function previewFormData(): FormData {
-  const totals = {
-    gross: 10000, cpp: 500, cpp2: 40, ei: 163, federalTax: 1200, provincialTax: 600,
-    deductions: 2503, netPay: 7497, employerCpp: 500, employerCpp2: 40, employerEi: 228.2, employerTotal: 768.2,
-  };
-  const preview = {
-    payGroupName: "Biweekly Staff",
-    payDate: "2026-11-13",
-    frequency: "biweekly",
-    province: "ON",
-    items: [],
-    totals,
-  };
   const fd = new FormData();
   fd.set("payGroupId", "pg_1");
   fd.set("payDate", "2026-11-13");
   fd.set("actualPayDate", "2026-11-15");
-  fd.set("preview", JSON.stringify(preview));
+  fd.set("grossAmounts", JSON.stringify({ emp_1: 10000 }));
   return fd;
 }
 
@@ -205,10 +227,10 @@ describe("finalizePayRun + LedgerPro sync (M4)", () => {
   });
 });
 
-// ─── M5: delete hook ──────────────────────────────────────────────────────────
+// ─── M5 + PR D: reverse/delete + LedgerPro void ─────────────────────────────
 
-describe("deletePayRun + LedgerPro void (M5)", () => {
-  it("voids the LedgerPro journal BEFORE deleting, then deletes", async () => {
+describe("reversePayRun/deletePayRun + LedgerPro void (M5, Wave 1 PR D)", () => {
+  it("voids the LedgerPro journal BEFORE reversing, then marks the run REVERSED", async () => {
     setConnection(true);
     seedSyncedRun();
     fetchBehaviour = async (url) => {
@@ -220,14 +242,15 @@ describe("deletePayRun + LedgerPro void (M5)", () => {
     };
     const fd = new FormData();
     fd.set("id", "run_synced");
-    await expect(deletePayRun(fd)).rejects.toThrow("REDIRECT:/payroll");
-    expect(h.callOrder).toEqual(["ledgerpro.void", "payRun.delete"]);
+    await reversePayRun(fd);
+    expect(h.callOrder).toEqual(["ledgerpro.void", "payRun.update"]);
+    expect(h.db.runs.get("run_synced")?.status).toBe("REVERSED");
     const voidCall = fetchCalls.find((c) => c.url.includes("/void"));
     expect(voidCall?.url).toContain("/api/v1/journal-entries/je_42/void");
     expect((voidCall!.init.headers as Record<string, string>)["Idempotency-Key"]).toBe("nexvarpay-payrun-run_synced-void");
   });
 
-  it("BLOCKS the delete when the void cannot complete — run and journal stay live", async () => {
+  it("BLOCKS the reversal when the void cannot complete — run stays FINALIZED", async () => {
     setConnection(true);
     seedSyncedRun();
     fetchBehaviour = async (url) => {
@@ -239,13 +262,22 @@ describe("deletePayRun + LedgerPro void (M5)", () => {
     };
     const fd = new FormData();
     fd.set("id", "run_synced");
-    await expect(deletePayRun(fd)).rejects.toThrow(/Delete blocked/);
-    expect(h.callOrder).toEqual(["ledgerpro.void"]); // delete never attempted
-    expect(h.db.runs.has("run_synced")).toBe(true);
+    await expect(reversePayRun(fd)).rejects.toThrow(/Reversal blocked/);
+    expect(h.callOrder).toEqual(["ledgerpro.void"]); // update never attempted
+    expect(h.db.runs.get("run_synced")?.status).toBe("FINALIZED");
   });
 
-  it("deletes an unsynced run without any LedgerPro call", async () => {
-    h.db.runs.set("run_plain", { id: "run_plain", companyId: "co_1", payGroupId: "pg_1", payDate: "2026-11-13", status: "FINALIZED" });
+  it("refuses to delete a FINALIZED run and directs the caller to reverse first", async () => {
+    h.db.runs.set("run_fin", { id: "run_fin", companyId: "co_1", payGroupId: "pg_1", payDate: "2026-11-13", status: "FINALIZED" });
+    const fd = new FormData();
+    fd.set("id", "run_fin");
+    await expect(deletePayRun(fd)).rejects.toThrow(/Reverse it first/);
+    expect(fetchCalls).toHaveLength(0);
+    expect(h.db.runs.has("run_fin")).toBe(true);
+  });
+
+  it("deletes an already-reversed run without any LedgerPro call", async () => {
+    h.db.runs.set("run_plain", { id: "run_plain", companyId: "co_1", payGroupId: "pg_1", payDate: "2026-11-13", status: "REVERSED" });
     const fd = new FormData();
     fd.set("id", "run_plain");
     await expect(deletePayRun(fd)).rejects.toThrow("REDIRECT:/payroll");

@@ -4,6 +4,12 @@
  */
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import {
+  aggregateRemittances,
+  periodKeyForDate,
+  periodLabel,
+  remittanceDueDate,
+} from "@/lib/remittance/aggregate";
 import { RemittanceActions } from "@/components/remittance-actions";
 import Link from "next/link";
 
@@ -24,30 +30,36 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
   });
 
   const now = new Date();
-  const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const currentPeriod = periodKeyForDate(now);
   const periodRuns = runs.filter((r) => r.payDate.startsWith(currentPeriod));
   const employeeSet = new Set<string>(); periodRuns.forEach((r) => r.items.forEach((i) => employeeSet.add(i.employeeId)));
 
-  // Totals
-  const t = { cppEe: 0, cppEr: 0, cpp2Ee: 0, cpp2Er: 0, eiEe: 0, eiEr: 0, fedTax: 0, provTax: 0, gross: 0 };
-  for (const r of periodRuns) {
-    t.cppEe += r.totalCpp; t.cppEr += r.totalEmployerCpp;
-    t.cpp2Ee += r.totalCpp2; t.cpp2Er += r.totalEmployerCpp2;
-    t.eiEe += r.totalEi; t.eiEr += r.totalEmployerEi;
-    t.fedTax += r.totalFederalTax; t.provTax += r.totalProvincialTax;
-    t.gross += r.totalGross;
-  }
-  const totalCRA = t.cppEe + t.cppEr + t.cpp2Ee + t.cpp2Er + t.eiEe + t.eiEr + t.fedTax + t.provTax;
+  // Totals — computed by the shared remittance aggregation (the same code
+  // path behind the Reports hub PD7A figure), never recomputed inline.
+  const remittanceAgg = aggregateRemittances(runs, "monthly");
+  const periodAgg = new Map(remittanceAgg.periods.map((p) => [p.period, p]));
+  const cur = periodAgg.get(currentPeriod);
+  const t = {
+    cppEe: cur?.employeeCpp ?? 0, cppEr: cur?.employerCpp ?? 0,
+    cpp2Ee: cur?.employeeCpp2 ?? 0, cpp2Er: cur?.employerCpp2 ?? 0,
+    eiEe: cur?.employeeEi ?? 0, eiEr: cur?.employerEi ?? 0,
+    fedTax: cur?.federalTax ?? 0, provTax: cur?.provincialTax ?? 0,
+    gross: periodRuns.reduce((s, r) => s + r.totalGross, 0),
+  };
+  const totalCRA = cur?.totalRemittance ?? 0;
   const cppTotal = t.cppEe + t.cppEr; const eiTotal = t.eiEe + t.eiEr;
   const taxTotal = t.fedTax + t.provTax;
   const employeeEeTotal = t.cppEe + t.cpp2Ee + t.eiEe + t.fedTax + t.provTax;
   const employerTotal = t.cppEr + t.cpp2Er + t.eiEr;
 
-  // Per-employee
-  const empMap = new Map<string, { name: string; gross: number; cppEe: number; eiEe: number; fedTax: number; provTax: number }>();
+  // Per-employee — employer portions come from the items' actual employer
+  // fields (previously fabricated as employer CPP = employee CPP and
+  // employer EI = 1.4 × employee EI, which need not match the run totals).
+  const empMap = new Map<string, { name: string; gross: number; cppEe: number; eiEe: number; fedTax: number; provTax: number; totalCra: number }>();
   for (const r of periodRuns) for (const i of r.items) {
-    const e = empMap.get(i.employeeId) || { name: `${i.employee.firstName} ${i.employee.lastName}`, gross: 0, cppEe: 0, eiEe: 0, fedTax: 0, provTax: 0 };
+    const e = empMap.get(i.employeeId) || { name: `${i.employee.firstName} ${i.employee.lastName}`, gross: 0, cppEe: 0, eiEe: 0, fedTax: 0, provTax: 0, totalCra: 0 };
     e.gross += i.gross; e.cppEe += i.cpp; e.eiEe += i.ei; e.fedTax += i.federalTax; e.provTax += i.provincialTax;
+    e.totalCra += i.cpp + i.cpp2 + i.ei + i.federalTax + i.provincialTax + i.employerCpp + i.employerCpp2 + i.employerEi;
     empMap.set(i.employeeId, e);
   }
   const employees = Array.from(empMap.values());
@@ -234,8 +246,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
               <tbody>
                 {employees.length===0?<tr><td colSpan={7} className="px-4 py-12 text-center text-[13px] text-muted-foreground">No pay runs finalized for this period.</td></tr>:
                 employees.slice(0,7).map((e,i)=>{
-                  const cppEr = e.cppEe; const eiEr = e.eiEe * 1.4;
-                  const total = e.cppEe + cppEr + e.eiEe + eiEr + e.fedTax + e.provTax;
+                  const total = e.totalCra;
                   const colors = ["#B3261E","#E56A5C","#1D4ED8","#60A5FA","#15803D","#4ADE80","#B45309","#FBBF24"];
                   return (
                     <tr key={e.name} className="border-b border-[#F0EFED] hover:bg-[#FAFAF9] text-[13px]">
@@ -282,30 +293,38 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
               <tbody>
                 {Array.from({length:6}).map((_,i)=>{
                   const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                  const period = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-                  const pr = runs.filter((r) => r.payDate.startsWith(period));
-                  const cpp = pr.reduce((s,r)=>s+r.totalCpp+r.totalEmployerCpp,0);
-                  const ei = pr.reduce((s,r)=>s+r.totalEi+r.totalEmployerEi,0);
-                  const tax = pr.reduce((s,r)=>s+r.totalFederalTax+r.totalProvincialTax,0);
-                  const tot = cpp+ei+tax;
-                  const due = new Date(d.getFullYear(), d.getMonth() + 1, 15);
+                  const period = periodKeyForDate(d);
+                  // Figures come from the shared aggregation — the old inline
+                  // sums here omitted CPP2, so history totals disagreed with
+                  // the breakdown tab and the Reports hub for the same period.
+                  const p = periodAgg.get(period);
+                  const cpp = p ? p.employeeCpp + p.employerCpp + p.employeeCpp2 + p.employerCpp2 : 0;
+                  const ei = p ? p.employeeEi + p.employerEi : 0;
+                  const tax = p?.incomeTax ?? 0;
+                  const tot = p?.totalRemittance ?? 0;
+                  const due = remittanceDueDate(period);
                   const isCurrent = i===0;
-                  const isLate = !isCurrent && tot===0;
+                  // No submission/remittance-payment records exist in the
+                  // system, so a submitted date or reference must NEVER be
+                  // invented: the old code printed the due date as the
+                  // "Submitted" date (even on No-activity rows) and built a
+                  // fake PD7A-… reference. Show "—" / "Not submitted" until
+                  // real submission tracking exists.
                   return (
                     <tr key={period} className="border-b border-[#F0EFED] hover:bg-[#FAFAF9] text-[13px]">
                       <td className="px-4 py-3 font-semibold">{period}</td>
-                      <td className="text-right px-4 py-3">{due.toISOString().slice(0,10)}</td>
-                      <td className="text-right px-4 py-3 text-[#A8A29E]">{isCurrent?"—":due.toISOString().slice(0,10)}</td>
+                      <td className="text-right px-4 py-3">{due}</td>
+                      <td className="text-right px-4 py-3 text-[#A8A29E]">—</td>
                       <td className="text-right px-4 py-3 font-mono tabular-nums">{cpp>0?fmtCAD(cpp):"—"}</td>
                       <td className="text-right px-4 py-3 font-mono tabular-nums">{ei>0?fmtCAD(ei):"—"}</td>
                       <td className="text-right px-4 py-3 font-mono tabular-nums">{tax>0?fmtCAD(tax):"—"}</td>
                       <td className="text-right px-4 py-3 font-mono tabular-nums font-semibold">{tot>0?fmtCAD(tot):"—"}</td>
                       <td className="text-right px-4 py-3">
-                        <span className={`inline-flex items-center gap-[5px] text-[11px] font-bold tracking-[0.04em] rounded-full px-2.5 py-[3px] ${isCurrent&&tot>0?"bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]":tot>0?"bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]":"bg-[#F5F5F4] text-[#78716C]"}`}>
-                          {isCurrent&&tot>0?"Pending":tot>0?"Submitted":"No activity"}
+                        <span className={`inline-flex items-center gap-[5px] text-[11px] font-bold tracking-[0.04em] rounded-full px-2.5 py-[3px] ${isCurrent&&tot>0?"bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]":tot>0?"bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]":"bg-[#F5F5F4] text-[#78716C]"}`}>
+                          {isCurrent&&tot>0?"Pending":tot>0?"Not submitted":"No activity"}
                         </span>
                       </td>
-                      <td className="text-right px-4 py-3 font-mono text-xs text-[#A8A29E]">{tot>0?`PD7A-${period}-${companyId.slice(-6).toUpperCase()}`:"—"}</td>
+                      <td className="text-right px-4 py-3 font-mono text-xs text-[#A8A29E]">—</td>
                     </tr>
                   );
                 })}
@@ -322,11 +341,14 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
           <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="px-[18px] py-4 border-b border-[#F0EFED]"><span className="text-[15px] font-bold">Upcoming schedule</span></div>
             {Array.from({length:5}).map((_,i)=>{
+              // d is the DUE date (15th of next month); the remittance period
+              // is the month BEFORE it. The period key/label come from the
+              // shared helpers — the old inline `String(d.getMonth())`
+              // (no +1) produced "2027-00" for January due dates.
               const d = new Date(now.getFullYear(), now.getMonth() + i + 1, 15);
-              const period = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,"0")}`;
-              const pr = runs.filter((r) => r.payDate.startsWith(period));
-              const tot = pr.reduce((s,r)=>s+r.totalCpp+r.totalEmployerCpp+r.totalEi+r.totalEmployerEi+r.totalFederalTax+r.totalProvincialTax,0);
-              const isNext = i===0; const isPast = i<0;
+              const period = periodKeyForDate(new Date(now.getFullYear(), now.getMonth() + i, 1));
+              const tot = periodAgg.get(period)?.totalRemittance ?? 0;
+              const isNext = i===0;
               return (
                 <div key={d.toISOString()} className="flex gap-3.5 px-[18px] py-3.5 border-b border-[#F0EFED] last:border-b-0 hover:bg-[#FAFAF9] items-center">
                   <div className={`w-[46px] h-[46px] rounded-[10px] border flex flex-col items-center justify-center flex-shrink-0 ${isNext&&tot>0?"bg-[#FEF2F2] border-[#FECACA] text-[#B3261E]":"bg-[#F5F5F4] border-[#E7E5E4]"}`}>
@@ -334,7 +356,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
                     <span className="text-lg font-extrabold tracking-[-0.02em]">{d.getDate()}</span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold">{period} remittance</p>
+                    <p className="text-sm font-semibold">{periodLabel(period)} remittance</p>
                     <p className="text-xs text-[#A8A29E]">CRA · Regular remitter{isNext&&tot>0?` · ${daysLeft} days remaining`:""}</p>
                   </div>
                   <span className={`text-sm font-bold font-mono tabular-nums ${isNext&&tot>0?"text-[#B3261E]":"text-[#A8A29E"}`}>{tot>0?fmtCAD(tot):isNext?"~$0":"~$0"}</span>

@@ -11,6 +11,7 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { PayStubPdf } from "@/lib/pdf/pay-stub";
 import { prisma } from "@/lib/prisma";
+import { buildEarningsLines, parseCustomDeductions } from "@/lib/pay-stub-data";
 import { getActivePortalEmployee } from "@/lib/employee-portal-session";
 
 export async function GET(
@@ -39,10 +40,19 @@ export async function GET(
     select: { name: true },
   });
 
+  // Wave 3 B5 — YTD gross pay + income tax live on the YtdLedger, same as
+  // the employer stub route reads them.
+  const year = Number(item.payRun.payDate.slice(0, 4)) || 2026;
+  const ytdLedger = await prisma.ytdLedger.findUnique({
+    where: { employeeId_year: { employeeId: session.active.employeeId, year } },
+    select: { grossPay: true, incomeTax: true },
+  });
+
   const pdfData = {
     companyName: company?.name ?? "Nexvar Pay",
     employeeName: `${item.employee.firstName} ${item.employee.lastName}`,
     payDate: item.payRun.payDate,
+    periodStart: item.payRun.periodStart ?? null,
     payGroup: `${item.payRun.payGroup.name} · ${item.payRun.payGroup.frequency.toLowerCase()}`,
     gross: item.gross,
     cpp: item.cpp,
@@ -52,11 +62,17 @@ export async function GET(
     provincialTax: item.provincialTax,
     totalDeductions: item.totalDeductions,
     netPay: item.netPay,
+    earnings: buildEarningsLines(item),
+    customDeductions: parseCustomDeductions((item as { customDeductions?: unknown }).customDeductions),
+    reimbursement: (item as { reimbursement?: number }).reimbursement ?? 0,
     ytdPensionable: item.ytdPensionable,
     ytdCpp: item.ytdCpp,
     ytdCpp2: item.ytdCpp2,
     ytdInsurable: item.ytdInsurable,
     ytdEi: item.ytdEi,
+    ytdGrossPay: ytdLedger?.grossPay ?? 0,
+    ytdIncomeTax: ytdLedger?.incomeTax ?? 0,
+    vacationBalanceAfterCents: item.vacationBalanceAfterCents ?? null,
     employerCpp: item.employerCpp,
     employerCpp2: item.employerCpp2,
     employerEi: item.employerEi,
