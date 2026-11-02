@@ -113,6 +113,69 @@ export default async function EditEmployeePage({ params }: Props) {
         </Card>
 
         <Card className="border-border/60">
+          <CardHeader><CardTitle className="text-lg">Employment & pay</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Start date</Label>
+                <Input id="startDate" name="startDate" type="date" defaultValue={employee.startDate ? employee.startDate.toISOString().slice(0, 10) : ""} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Job title</Label>
+                <Input id="jobTitle" name="jobTitle" defaultValue={employee.jobTitle ?? ""} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="department">Department</Label>
+                <Input id="department" name="department" defaultValue={employee.department ?? ""} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="dateOfBirth">Date of birth</Label>
+                <Input id="dateOfBirth" name="dateOfBirth" type="date" defaultValue={employee.dateOfBirth ? employee.dateOfBirth.toISOString().slice(0, 10) : ""} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="payGroupId">Pay group</Label>
+                <select id="payGroupId" name="payGroupId" className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white" defaultValue={employee.payGroupId ?? ""}>
+                  <option value="">Unassigned (in every run)</option>
+                  {payGroups.map((pg) => <option key={pg.id} value={pg.id}>{pg.name}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="payType">Pay type</Label>
+                <select id="payType" name="payType" className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white" defaultValue={employee.payType ?? "salary"}>
+                  <option value="salary">Salary</option>
+                  <option value="hourly">Hourly</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="payRate">Pay rate (per period)</Label>
+                <Input id="payRate" name="payRate" type="number" min="0" step="0.01" defaultValue={employee.payRate ?? ""} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="vacationMode">Vacation pay</Label>
+                <select id="vacationMode" name="vacationMode" className="w-full border border-[#D6D3D1] rounded-lg px-3 py-2.5 text-sm bg-white" defaultValue={employee.vacationMode}>
+                  <option value="PAYOUT">Pay out each run</option>
+                  <option value="ACCRUE">Accrue to a balance</option>
+                  <option value="NONE">None</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="vacationRatePct">Vacation rate %</Label>
+                <Input id="vacationRatePct" name="vacationRatePct" type="number" min="0" step="0.1" defaultValue={employee.vacationRatePct ?? ""} />
+              </div>
+            </div>
+            {employee.vacationMode === "ACCRUE" && (
+              <p className="text-xs text-muted-foreground">Accrued vacation balance: ${(employee.vacationBalanceCents / 100).toFixed(2)} — grows with each finalized run; reversing a run unwinds its accrual.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60">
           <CardHeader><CardTitle className="text-lg">Bank details (Direct Deposit)</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
