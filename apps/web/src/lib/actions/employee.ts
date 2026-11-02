@@ -66,6 +66,9 @@ export async function createEmployee(formData: FormData) {
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       payType: payType || null,
       payRate: payRate ? parseFloat(payRate) : null,
+      // Wave 1: persist the pay-group assignment (previously validated
+      // above and then discarded — the run loader now scopes by it).
+      payGroupId: payGroupId || null,
       bankEncrypted: (bankTransit || bankInstitution || bankAccount)
         ? encrypt(JSON.stringify({ transit: bankTransit, institution: bankInstitution, account: bankAccount }))
         : null,

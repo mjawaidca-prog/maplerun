@@ -273,6 +273,12 @@ export async function finalizePayRun(formData: FormData) {
         cpp: n(item.result.cpp),
         cpp2: n(item.result.cpp2),
         ei: n(item.result.ei),
+        // Wave 1 Quebec split (dual-write): for QC runs the engine's
+        // cpp/cpp2 ARE the QPP/QPP2 amounts; qpip is surfaced separately.
+        // Legacy cpp/cpp2/ei keep holding the combined totals.
+        qpp: preview.province === "QC" ? n(item.result.cpp) : 0,
+        qpp2: preview.province === "QC" ? n(item.result.cpp2) : 0,
+        qpip: n((item.result as any).qpip),
         federalTax: n(item.result.federalTax),
         provincialTax: n(item.result.provincialTax),
         totalDeductions: n(item.result.totalDeductions),

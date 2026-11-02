@@ -144,6 +144,7 @@ export function calculatePay(input: PayInput): PayResult {
     cpp: cppRes.cpp,
     cpp2: cppRes.cpp2,
     ei: eiRes.ei,
+    qpip: qpipRes.qpip,
     federalTax,
     provincialTax,
     totalDeductions,
