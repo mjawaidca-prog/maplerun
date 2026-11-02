@@ -1,16 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { markRemittanceSubmitted } from "@/lib/actions/remittance";
+import { remittanceDueDateFor } from "@/lib/remittance/aggregate";
 
 type Props = {
   totalCRA: number;
   period: string;
   businessNumber?: string;
+  /** Adjusted due date (ISO) from the page's shared-helper computation. */
+  dueDate?: string;
+  /** Human remitter-type label from the page (e.g. "Regular remitter"). */
+  remitterLabel?: string;
+  /** True when a persisted RemittanceSubmission already exists for the period. */
+  alreadySubmitted?: boolean;
 };
 
-export function RemittanceActions({ totalCRA, period, businessNumber }: Props) {
+export function RemittanceActions({ totalCRA, period, businessNumber, dueDate: dueDateProp, remitterLabel, alreadySubmitted }: Props) {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(!!alreadySubmitted);
   const [showCRA, setShowCRA] = useState(false);
 
   function handlePrint() { window.print(); }
@@ -40,18 +50,23 @@ export function RemittanceActions({ totalCRA, period, businessNumber }: Props) {
     if (!confirm(`Mark remittance as submitted for ${period}?\n\nAmount: $${totalCRA.toFixed(2)}\n\nThis records the filing in Nexvar Pay. You must remit the actual payment through your CRA business account.`)) return;
     setSubmitting(true);
     try {
-      await fetch("/api/remittance/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ period }) });
+      // Real persisted record via the server action (which snapshots the
+      // aggregation total server-side). The old code POSTed to a
+      // non-existent /api/remittance/submit route and faked success.
+      await markRemittanceSubmitted(period);
       setSubmitted(true);
-    } catch { /* */ }
+      router.refresh();
+    } catch { /* leave unsubmitted on failure */ }
     setSubmitting(false);
   }
 
-  const pd7aRef = `PD7A-${period}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-  const dueDate = new Date();
-  dueDate.setMonth(dueDate.getMonth() + 1);
-  dueDate.setDate(15);
-  if (dueDate.getDay()===0) dueDate.setDate(16);
-  if (dueDate.getDay()===6) dueDate.setDate(14);
+  // No reference exists until CRA issues one — never fabricate a PD7A-… ref.
+  const pd7aRef = "— (issued by CRA when you remit)";
+  // Due date from the shared remitter-aware helper (the page passes its
+  // computed value; the fallback is the Regular-remitter rule). The old
+  // inline code shifted Saturday BACK to the 14th — CRA's rule is the
+  // next business day, and it lives in lib/remittance/aggregate.ts.
+  const dueDateISO = dueDateProp ?? remittanceDueDateFor(period, null);
 
   if (submitted) {
     return (
@@ -113,12 +128,12 @@ export function RemittanceActions({ totalCRA, period, businessNumber }: Props) {
           <div className="grid grid-cols-2 gap-4 bg-[#FAFAF9] border border-[#E7E5E4] rounded-[10px] p-5">
             {[
               ["Remittance period", period],
-              ["Payment due date", dueDate.toISOString().slice(0, 10)],
+              ["Payment due date", dueDateISO],
               ["Total amount to remit", `$${totalCRA.toFixed(2)}`],
               ["Business number", businessNumber || "Enter your BN"],
-              ["Remitter type", "Regular — due 15th of month"],
+              ["Remitter type", remitterLabel ?? "Regular remitter"],
               ["PD7A reference", pd7aRef],
-              ["Tax year", "2026"],
+              ["Tax year", period.slice(0, 4)],
               ["Where to pay", "CRA My Business → Payroll Remittance → PD7A"],
             ].map(([label, value]) => (
               <div key={label as string} className="flex justify-between items-center border-b border-[#F0EFED] pb-2 last:border-b-0 last:pb-0">

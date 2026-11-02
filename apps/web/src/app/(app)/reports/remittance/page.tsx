@@ -1,16 +1,31 @@
 /**
  * Remittance Report — pixel-matched to MapleRun Remittance Report design spec.
- * Regular remitter: due 15th of following month.
+ * Due dates come from the shared remitter-aware helper
+ * (remittanceDueDateFor): CRA's next-business-day rule lives there, never
+ * inline. The lead figure is the CURRENT PERIOD's scope (labelled as such);
+ * year-to-date figures are labelled "Year to date" wherever they appear —
+ * the Reports hub PD7A figure is the YTD one (PR #14 FLAG A).
  */
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import {
   aggregateRemittances,
+  groupingForRemitterType,
   periodKeyForDate,
+  periodKeyForPayDate,
   periodLabel,
-  remittanceDueDate,
+  remittanceDueDateFor,
+  remitterTypeLabel,
 } from "@/lib/remittance/aggregate";
+import {
+  getRemittanceSubmissions,
+  getRemitterType,
+} from "@/lib/actions/remittance";
 import { RemittanceActions } from "@/components/remittance-actions";
+import {
+  MarkSubmittedControl,
+  RemitterTypeSelector,
+} from "@/components/remittance-submission-controls";
 import Link from "next/link";
 
 function fmtCAD(n: number): string { return `$${n.toFixed(2)}`; }
@@ -29,16 +44,32 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
     orderBy: { payDate: "desc" },
   });
 
+  // Remitter type drives grouping (QUARTERLY → quarters, else monthly) and
+  // due dates. Submissions are the persisted RemittanceSubmission records.
+  const remitterType = await getRemitterType();
+  const grouping = groupingForRemitterType(remitterType);
+  const submissions = await getRemittanceSubmissions();
+  const remitterLabel = remitterTypeLabel(remitterType);
+
   const now = new Date();
-  const currentPeriod = periodKeyForDate(now);
-  const periodRuns = runs.filter((r) => r.payDate.startsWith(currentPeriod));
+  const currentPeriod = periodKeyForDate(now, grouping);
+  // Runs belonging to the current period, via the shared period-key helper
+  // (monthly behaviour identical to the old payDate-prefix filter).
+  const periodRuns = runs.filter(
+    (r) => periodKeyForPayDate(r.payDate, grouping) === currentPeriod,
+  );
   const employeeSet = new Set<string>(); periodRuns.forEach((r) => r.items.forEach((i) => employeeSet.add(i.employeeId)));
 
   // Totals — computed by the shared remittance aggregation (the same code
   // path behind the Reports hub PD7A figure), never recomputed inline.
-  const remittanceAgg = aggregateRemittances(runs, "monthly");
+  // Grouping follows the company's remitter type.
+  const remittanceAgg = aggregateRemittances(runs, grouping);
   const periodAgg = new Map(remittanceAgg.periods.map((p) => [p.period, p]));
   const cur = periodAgg.get(currentPeriod);
+  // Year-to-date scope (FLAG A): the totals over every period in the
+  // aggregation — the same scope the Reports hub PD7A card shows. Labelled
+  // "Year to date" wherever displayed; the lead cards are current-period.
+  const ytdTotal = remittanceAgg.totals.totalRemittance;
   const t = {
     cppEe: cur?.employeeCpp ?? 0, cppEr: cur?.employerCpp ?? 0,
     cpp2Ee: cur?.employeeCpp2 ?? 0, cpp2Er: cur?.employerCpp2 ?? 0,
@@ -64,11 +95,15 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
   }
   const employees = Array.from(empMap.values());
 
-  // Due date
-  const dueDate = new Date(now.getFullYear(), now.getMonth() + 1, 15);
-  if (dueDate.getDay() === 0) dueDate.setDate(16); if (dueDate.getDay() === 6) dueDate.setDate(14);
+  // Due date — from the shared remitter-aware helper (PR #14 FLAG B: the
+  // old inline code shifted Saturday BACK to the Friday 14th; CRA's rule
+  // is the NEXT business day, and that rule now lives in
+  // lib/remittance/aggregate.ts alongside every other remittance rule).
+  const dueDateStr = remittanceDueDateFor(currentPeriod, remitterType);
+  const dueDate = new Date(`${dueDateStr}T12:00:00`);
   const daysLeft = Math.ceil((dueDate.getTime() - now.getTime()) / 86400000);
   const isUrgent = daysLeft <= 14 && daysLeft > 0 && totalCRA > 0;
+  const currentSubmission = submissions[currentPeriod];
 
   return (
     <div className="space-y-5 print:space-y-3">
@@ -78,7 +113,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
       {/* Print-only header */}
       <div className="hidden print:block text-center border-b-2 border-black pb-4 mb-4">
         <h1 className="text-xl font-bold">Nexvar Pay — Remittance Report</h1>
-        <p className="text-sm">{currentPeriod} · Regular Remitter · Due {dueDate.toISOString().slice(0,10)}</p>
+        <p className="text-sm">Current period — {periodLabel(currentPeriod)} ({currentPeriod}) · {remitterLabel} · Due {dueDateStr}</p>
         <p className="text-sm font-bold mt-1">Total Owing to CRA: {fmtCAD(totalCRA)}</p>
       </div>
 
@@ -86,9 +121,9 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
       <div className="flex justify-between items-start print:hidden">
         <div>
           <h1 className="text-[26px] font-extrabold tracking-[-0.02em] text-[#1C1917]">Remittance Report</h1>
-          <p className="text-sm text-[#78716C] mt-1">Source deductions owing to the CRA — {currentPeriod} · {employeeSet.size} employees</p>
+          <p className="text-sm text-[#78716C] mt-1">Source deductions owing to the CRA — Current period — {periodLabel(currentPeriod)} · {employeeSet.size} employees</p>
         </div>
-        <RemittanceActions totalCRA={totalCRA} period={currentPeriod} />
+        <RemittanceActions totalCRA={totalCRA} period={currentPeriod} dueDate={dueDateStr} remitterLabel={remitterLabel} alreadySubmitted={!!currentSubmission} />
       </div>
 
       {/* Alert Banner */}
@@ -96,8 +131,8 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
         <div className="flex gap-3 bg-[#FEF2F2] border border-[#FECACA] rounded-[11px] px-[18px] py-3.5 items-center">
           <span className="text-lg flex-shrink-0">⚠️</span>
           <div className="flex-1">
-            <p className="text-[13.5px] font-bold text-[#991B1B]">Remittance due in {daysLeft} days — {dueDate.toISOString().slice(0, 10)}</p>
-            <p className="text-[12.5px] text-[#B91C1C] leading-relaxed mt-0.5">{fmtCAD(totalCRA)} due to CRA · Business No. — · Regular remitter</p>
+            <p className="text-[13.5px] font-bold text-[#991B1B]">Remittance due in {daysLeft} days — {dueDateStr}</p>
+            <p className="text-[12.5px] text-[#B91C1C] leading-relaxed mt-0.5">{fmtCAD(totalCRA)} due to CRA · Business No. — · {remitterLabel}</p>
           </div>
           <button className="rounded-[9px] bg-[#B3261E] hover:bg-[#9B1C18] text-white text-xs font-semibold px-3.5 py-[7px] flex-shrink-0">Review &amp; Submit</button>
         </div>
@@ -121,6 +156,9 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
           <span className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em]">Pay group</span>
           <select className="border border-[#D6D3D1] rounded-lg px-3 py-2 text-[13px] bg-white"><option>All staff</option></select>
         </div>
+        {/* Remitter type — Wave 1's Company.remitterType, settable here.
+            Changing it regroups periods (QUARTERLY) and re-derives due dates. */}
+        <RemitterTypeSelector current={remitterType} />
         <button className="rounded-[9px] border border-[#D6D3D1] bg-white text-[#1C1917] text-[13px] font-semibold px-4 py-2">Apply</button>
       </div>
 
@@ -129,8 +167,15 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
         <div className="bg-[#1C1917] border border-[#1C1917] rounded-[14px] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">Total owing to CRA</p>
           <p className="text-[28px] font-extrabold tracking-[-0.02em] text-white font-mono tabular-nums mt-2">{fmtCAD(totalCRA)}</p>
-          <p className="text-xs text-[#78716C] mt-1">{currentPeriod} · {employeeSet.size} employees</p>
-          {totalCRA > 0 && <span className="inline-flex mt-2 text-[11px] font-bold tracking-[0.04em] bg-[#3F1413] text-[#E56A5C] rounded-full px-2.5 py-1">Due {dueDate.toISOString().slice(0,10)} · {daysLeft > 0 ? `${daysLeft} days` : "Overdue"}</span>}
+          {/* FLAG A scope label: this lead figure is the CURRENT PERIOD only —
+              the Reports hub PD7A figure is the year-to-date scope. */}
+          <p className="text-xs text-[#78716C] mt-1">Current period — {periodLabel(currentPeriod)} · {employeeSet.size} employees</p>
+          <p className="text-xs text-[#78716C] mt-0.5">Year to date: {fmtCAD(ytdTotal)}</p>
+          {currentSubmission ? (
+            <span className="inline-flex mt-2 text-[11px] font-bold tracking-[0.04em] bg-[#14532D] text-[#4ADE80] rounded-full px-2.5 py-1">✓ Submitted {currentSubmission.submittedAt.toISOString().slice(0, 10)}{currentSubmission.reference ? ` · ${currentSubmission.reference}` : ""}</span>
+          ) : totalCRA > 0 ? (
+            <span className="inline-flex mt-2 text-[11px] font-bold tracking-[0.04em] bg-[#3F1413] text-[#E56A5C] rounded-full px-2.5 py-1">Due {dueDateStr} · {daysLeft > 0 ? `${daysLeft} days` : "Overdue"}</span>
+          ) : null}
         </div>
         <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">CPP contributions</p>
@@ -153,10 +198,10 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
       <div className="bg-white border border-[#E7E5E4] rounded-xl overflow-hidden flex">
         {[
           ["Business number","—"],
-          ["Remitter type","Regular remitter"],
+          ["Remitter type",remitterLabel],
           ["Pay period",currentPeriod],
           ["Pay runs",`${periodRuns.length} finalized`],
-          ["Filing status",totalCRA>0?"Pending review":"No activity"],
+          ["Filing status",currentSubmission?"Submitted":totalCRA>0?"Pending review":"No activity"],
           ["Prior month","—"],
         ].map(([label,value],i)=>(
           <div key={label} className={`flex-1 px-5 py-3.5 ${i<5?"border-r border-[#F0EFED]":""}`}>
@@ -229,7 +274,13 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
             </table>
           </div>
           <div className="flex gap-[11px] bg-[#EFF6FF] border border-[#BFDBFE] rounded-[10px] px-4 py-3.5 text-[12.5px] text-[#1E40AF] leading-relaxed">
-            💡 CPP employer matches employee 1:1. EI employer = 1.4× employee. Income tax = federal + provincial withheld. All remitted together to CRA by the 15th of the following month for regular remitters.
+            💡 CPP employer matches employee 1:1. EI employer = 1.4× employee. Income tax = federal + provincial withheld. All remitted together to CRA. {remitterType === "ACCELERATED1"
+              ? "Accelerated Threshold 1 has TWO deadlines each month: amounts for the 1st–15th are due by the 25th of the same month, and amounts for the 16th–month-end by the 10th of the following month (the period-closing deadline shown here)."
+              : remitterType === "ACCELERATED2"
+                ? "Accelerated Threshold 2: each period's amount is due 3 business days after the period ends."
+                : remitterType === "QUARTERLY"
+                  ? "Quarterly remitters: due by the 15th of the month after the quarter ends."
+                  : "Regular remitters: due by the 15th of the following month."} When a due date falls on a weekend, CRA's deadline moves to the next business day.
           </div>
         </div>
       )}
@@ -288,12 +339,13 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
           <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <table className="w-full">
               <thead><tr className="bg-[#FAFAF9] text-[11px] font-bold text-[#78716C] uppercase tracking-[0.04em] border-b border-[#E7E5E4]">
-                {["Period","Due date","Submitted","CPP total","EI total","Tax withheld","Total remitted","Status","Reference"].map(h=><th key={h} className={`px-4 py-[11px] ${h==="Period"?"text-left":"text-right"}`}>{h}</th>)}
+                {["Period","Due date","Submitted","CPP total","EI total","Tax withheld","Total remitted","Status","Reference","Action"].map(h=><th key={h} className={`px-4 py-[11px] ${h==="Period"?"text-left":"text-right"}`}>{h}</th>)}
               </tr></thead>
               <tbody>
                 {Array.from({length:6}).map((_,i)=>{
-                  const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                  const period = periodKeyForDate(d);
+                  const stepMonths = grouping === "quarterly" ? i * 3 : i;
+                  const d = new Date(now.getFullYear(), now.getMonth() - stepMonths, 1);
+                  const period = periodKeyForDate(d, grouping);
                   // Figures come from the shared aggregation — the old inline
                   // sums here omitted CPP2, so history totals disagreed with
                   // the breakdown tab and the Reports hub for the same period.
@@ -302,29 +354,30 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
                   const ei = p ? p.employeeEi + p.employerEi : 0;
                   const tax = p?.incomeTax ?? 0;
                   const tot = p?.totalRemittance ?? 0;
-                  const due = remittanceDueDate(period);
+                  // Due date from the shared remitter-aware helper (FLAG B).
+                  const due = remittanceDueDateFor(period, remitterType);
                   const isCurrent = i===0;
-                  // No submission/remittance-payment records exist in the
-                  // system, so a submitted date or reference must NEVER be
-                  // invented: the old code printed the due date as the
-                  // "Submitted" date (even on No-activity rows) and built a
-                  // fake PD7A-… reference. Show "—" / "Not submitted" until
-                  // real submission tracking exists.
+                  // Submission state comes from the persisted
+                  // RemittanceSubmission records — a date/reference is shown
+                  // ONLY when a real record exists (PR #14 removed the
+                  // fabricated ones; this restores them on real data).
+                  const sub = submissions[period];
                   return (
                     <tr key={period} className="border-b border-[#F0EFED] hover:bg-[#FAFAF9] text-[13px]">
                       <td className="px-4 py-3 font-semibold">{period}</td>
                       <td className="text-right px-4 py-3">{due}</td>
-                      <td className="text-right px-4 py-3 text-[#A8A29E]">—</td>
+                      <td className="text-right px-4 py-3">{sub ? sub.submittedAt.toISOString().slice(0, 10) : <span className="text-[#A8A29E]">—</span>}</td>
                       <td className="text-right px-4 py-3 font-mono tabular-nums">{cpp>0?fmtCAD(cpp):"—"}</td>
                       <td className="text-right px-4 py-3 font-mono tabular-nums">{ei>0?fmtCAD(ei):"—"}</td>
                       <td className="text-right px-4 py-3 font-mono tabular-nums">{tax>0?fmtCAD(tax):"—"}</td>
-                      <td className="text-right px-4 py-3 font-mono tabular-nums font-semibold">{tot>0?fmtCAD(tot):"—"}</td>
+                      <td className="text-right px-4 py-3 font-mono tabular-nums font-semibold">{sub?fmtCAD(sub.totalRemittance):tot>0?fmtCAD(tot):"—"}</td>
                       <td className="text-right px-4 py-3">
-                        <span className={`inline-flex items-center gap-[5px] text-[11px] font-bold tracking-[0.04em] rounded-full px-2.5 py-[3px] ${isCurrent&&tot>0?"bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]":tot>0?"bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]":"bg-[#F5F5F4] text-[#78716C]"}`}>
-                          {isCurrent&&tot>0?"Pending":tot>0?"Not submitted":"No activity"}
+                        <span className={`inline-flex items-center gap-[5px] text-[11px] font-bold tracking-[0.04em] rounded-full px-2.5 py-[3px] ${sub?"bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]":tot>0?"bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]":"bg-[#F5F5F4] text-[#78716C]"}`}>
+                          {sub?"Submitted":isCurrent&&tot>0?"Pending":tot>0?"Not submitted":"No activity"}
                         </span>
                       </td>
-                      <td className="text-right px-4 py-3 font-mono text-xs text-[#A8A29E]">—</td>
+                      <td className="text-right px-4 py-3 font-mono text-xs">{sub?.reference ?? <span className="text-[#A8A29E]">—</span>}</td>
+                      <td className="text-right px-4 py-3">{!sub && tot>0 ? <MarkSubmittedControl periodKey={period} /> : null}</td>
                     </tr>
                   );
                 })}
@@ -341,28 +394,35 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
           <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="px-[18px] py-4 border-b border-[#F0EFED]"><span className="text-[15px] font-bold">Upcoming schedule</span></div>
             {Array.from({length:5}).map((_,i)=>{
-              // d is the DUE date (15th of next month); the remittance period
-              // is the month BEFORE it. The period key/label come from the
-              // shared helpers — the old inline `String(d.getMonth())`
-              // (no +1) produced "2027-00" for January due dates.
-              const d = new Date(now.getFullYear(), now.getMonth() + i + 1, 15);
-              const period = periodKeyForDate(new Date(now.getFullYear(), now.getMonth() + i, 1));
+              // The period steps forward from the current period (monthly,
+              // or quarterly for QUARTERLY remitters); its due date comes
+              // from the shared remitter-aware helper — never an inline
+              // 15th-of-next-month construction (the old one also produced
+              // "2027-00" period keys for January due dates).
+              const stepMonths = grouping === "quarterly" ? i * 3 : i;
+              const period = periodKeyForDate(new Date(now.getFullYear(), now.getMonth() + stepMonths, 1), grouping);
+              const rowDueStr = remittanceDueDateFor(period, remitterType);
+              const d = new Date(`${rowDueStr}T12:00:00`);
+              const rowDaysLeft = Math.ceil((d.getTime() - now.getTime()) / 86400000);
               const tot = periodAgg.get(period)?.totalRemittance ?? 0;
               const isNext = i===0;
               return (
-                <div key={d.toISOString()} className="flex gap-3.5 px-[18px] py-3.5 border-b border-[#F0EFED] last:border-b-0 hover:bg-[#FAFAF9] items-center">
+                <div key={period} className="flex gap-3.5 px-[18px] py-3.5 border-b border-[#F0EFED] last:border-b-0 hover:bg-[#FAFAF9] items-center">
                   <div className={`w-[46px] h-[46px] rounded-[10px] border flex flex-col items-center justify-center flex-shrink-0 ${isNext&&tot>0?"bg-[#FEF2F2] border-[#FECACA] text-[#B3261E]":"bg-[#F5F5F4] border-[#E7E5E4]"}`}>
                     <span className="text-[9px] font-bold uppercase text-[#A8A29E]">{d.toLocaleString('default',{month:'short'})}</span>
                     <span className="text-lg font-extrabold tracking-[-0.02em]">{d.getDate()}</span>
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold">{periodLabel(period)} remittance</p>
-                    <p className="text-xs text-[#A8A29E]">CRA · Regular remitter{isNext&&tot>0?` · ${daysLeft} days remaining`:""}</p>
+                    <p className="text-xs text-[#A8A29E]">CRA · {remitterLabel} · Due {rowDueStr}{isNext&&tot>0?` · ${rowDaysLeft} days remaining`:""}</p>
                   </div>
                   <span className={`text-sm font-bold font-mono tabular-nums ${isNext&&tot>0?"text-[#B3261E]":"text-[#A8A29E"}`}>{tot>0?fmtCAD(tot):isNext?"~$0":"~$0"}</span>
                 </div>
               );
             })}
+            {remitterType === "ACCELERATED1" && (
+              <p className="px-[18px] py-3 text-xs text-[#78716C] leading-relaxed">Threshold 1 also has a mid-period deadline: amounts for the 1st–15th of a month are due by the 25th of that month. The dates above are the period-closing deadlines (10th of the following month).</p>
+            )}
           </div>
 
           {/* Statutory rates */}
@@ -373,7 +433,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
               ["🧮", "#FEF2F2", "CPP2 additional", "Earnings $74,600–$85,000. Higher earners only.", "4.00%"],
               ["🔹", "#EFF6FF", "EI employee premium", "Insurable up to max annual $68,900.", "1.63%"],
               ["🔹", "#EFF6FF", "EI employer multiplier", "1.4× employee premium.", "×1.4"],
-              ["📅", "#F0FDF4", "Remitter type threshold", "Regular: avg monthly $1,000–$24,999. Due 15th.", "15th"],
+              ["📅", "#F0FDF4", "Remitter type", `This company: ${remitterLabel}. Regular: avg monthly $1,000–$24,999, due 15th.`, remitterType === "ACCELERATED1" ? "10th" : remitterType === "ACCELERATED2" ? "+3 days" : "15th"],
             ].map(([icon,iconBg,name,desc,value],i)=>(
               <div key={name} className={`flex gap-3 py-2.5 ${i<4?"border-b border-[#F0EFED]":""} items-center`}>
                 <div className="w-9 h-9 rounded-[9px] flex items-center justify-center text-lg flex-shrink-0" style={{background:iconBg}}>{icon}</div>
