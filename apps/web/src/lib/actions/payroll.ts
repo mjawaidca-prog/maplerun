@@ -395,6 +395,111 @@ export async function getPayRuns() {
 /**
  * Get a single pay run with all items.
  */
+/**
+ * Reverse a finalized pay run (Wave 1 PR D) — the supported correction
+ * path, replacing delete-and-lose-the-trail:
+ *  - the run row is KEPT, marked REVERSED with reversedAt set, so the
+ *    audit trail survives; every report (they all filter FINALIZED)
+ *    stops counting it immediately;
+ *  - each employee's YTD ledger is decremented by exactly the
+ *    increments this run added — its items' stored YTD-after minus the
+ *    YTD-after of the employee's previous finalized item (finalization
+ *    order). Reversing in LIFO order restores the ledger exactly;
+ *    reversing an earlier run while a later one stands removes exactly
+ *    this run's own contribution (the later run's stored snapshots stay
+ *    as historical record);
+ *  - vacation accrued by this run (PayRunItem.vacationAccruedCents,
+ *    Wave 1 PR E) is subtracted back from the employee's balance;
+ *  - a SYNCED LedgerPro journal is voided FIRST (the M5 rule): if the
+ *    void fails, the reversal is blocked and nothing changes;
+ *  - EFT: files are generated on demand from FINALIZED runs only, so
+ *    the status flip voids this run for direct deposit —
+ *    generateEftFile refuses a REVERSED run. (There is no batch table.)
+ * The trial free-run counter is NOT refunded — a finalize consumed it.
+ */
+export async function reversePayRun(formData: FormData) {
+  "use server";
+  const { companyId } = await requireCompany();
+  const id = formData.get("id") as string;
+  if (!id) throw new Error("Pay run ID required.");
+  const run = await prisma.payRun.findUnique({ where: { id }, include: { items: true } });
+  if (!run || run.companyId !== companyId) throw new Error("Pay run not found.");
+  if (run.status !== "FINALIZED") {
+    throw new Error("Only a finalized pay run can be reversed.");
+  }
+
+  // LedgerPro void-then-reverse (M5 rule): if this run was posted to
+  // LedgerPro, reverse that journal FIRST and only proceed once the
+  // void confirms. If the void cannot complete, BLOCK the reversal —
+  // never leave a live LedgerPro journal pointing at a reversed run.
+  const syncRecord = await prisma.ledgerProSyncRecord.findUnique({ where: { payRunId: id } });
+  if (syncRecord?.status === "SYNCED" && syncRecord.ledgerEntryId) {
+    const voidResult = await voidPayRunSync(ledgerProSyncDeps, id);
+    if (voidResult.outcome === "failed") {
+      throw new Error(
+        `This pay run was posted to LedgerPro on ${syncRecord.syncedAt ? syncRecord.syncedAt.toISOString().slice(0, 10) : "an earlier date"}, and that journal could not be reversed (${voidResult.error}). Reversal blocked — fix the LedgerPro connection or period, then try again.`,
+      );
+    }
+  }
+
+  const year = Number(run.payDate.slice(0, 4)) || 2026;
+
+  // Roll back YTD by exactly this run's own increments, per employee.
+  for (const item of run.items) {
+    // Baseline: the YTD snapshot of the employee's previous finalized
+    // item (finalization order: finalizedAt, then createdAt).
+    const prev = await prisma.payRunItem.findFirst({
+      where: {
+        employeeId: item.employeeId,
+        payRunId: { not: id },
+        payRun: {
+          status: "FINALIZED",
+          companyId,
+          OR: [
+            { finalizedAt: { lt: run.finalizedAt! } },
+            { finalizedAt: run.finalizedAt!, createdAt: { lt: run.createdAt } },
+          ],
+        },
+      },
+      orderBy: [{ payRun: { finalizedAt: "desc" } }, { payRun: { createdAt: "desc" } }],
+      select: { ytdPensionable: true, ytdCpp: true, ytdCpp2: true, ytdInsurable: true, ytdEi: true },
+    });
+
+    const ledger = await prisma.ytdLedger.findUnique({
+      where: { employeeId_year: { employeeId: item.employeeId, year } },
+    });
+    if (ledger) {
+      await prisma.ytdLedger.update({
+        where: { employeeId_year: { employeeId: item.employeeId, year } },
+        data: {
+          pensionableEarnings: ledger.pensionableEarnings - (item.ytdPensionable - (prev?.ytdPensionable ?? 0)),
+          cpp: ledger.cpp - (item.ytdCpp - (prev?.ytdCpp ?? 0)),
+          cpp2: ledger.cpp2 - (item.ytdCpp2 - (prev?.ytdCpp2 ?? 0)),
+          insurableEarnings: ledger.insurableEarnings - (item.ytdInsurable - (prev?.ytdInsurable ?? 0)),
+          ei: ledger.ei - (item.ytdEi - (prev?.ytdEi ?? 0)),
+        },
+      });
+    }
+
+    // Unwind vacation accrued by this run (no-op until PR E lands —
+    // every item carries 0 before accrual wiring exists).
+    if (item.vacationAccruedCents > 0) {
+      await prisma.employee.update({
+        where: { id: item.employeeId },
+        data: { vacationBalanceCents: { decrement: item.vacationAccruedCents } },
+      });
+    }
+  }
+
+  await prisma.payRun.update({
+    where: { id },
+    data: { status: "REVERSED", reversedAt: new Date() },
+  });
+
+  revalidatePath("/payroll");
+  revalidatePath(`/payroll/${id}`);
+}
+
 export async function deletePayRun(formData: FormData) {
   "use server";
   const { companyId } = await requireCompany();
@@ -402,6 +507,16 @@ export async function deletePayRun(formData: FormData) {
   if (!id) throw new Error("Pay run ID required.");
   const run = await prisma.payRun.findUnique({ where: { id } });
   if (!run || run.companyId !== companyId) throw new Error("Pay run not found.");
+
+  // Wave 1 PR D: a FINALIZED run can no longer be hard-deleted — that
+  // path silently orphaned YTD increments. Reverse it first (the
+  // reversal unwinds YTD, vacation and the LedgerPro journal exactly);
+  // drafts and already-reversed runs may still be deleted.
+  if (run.status === "FINALIZED") {
+    throw new Error(
+      "This pay run is finalized and can't be deleted directly. Reverse it first — reversal keeps the audit trail and unwinds its YTD totals and LedgerPro journal exactly. You can delete the run afterwards if you still need to.",
+    );
+  }
 
   // LedgerPro void-then-delete (M5): if this run was posted to LedgerPro,
   // reverse that journal FIRST and only delete once the void confirms.
