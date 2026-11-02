@@ -89,9 +89,20 @@ export async function previewPayRun(formData: FormData): Promise<PayRunPreview> 
   const vacationData: Record<string, { enabled: boolean; rate: number; amount: number }> = vacationStr ? JSON.parse(vacationStr) : {};
   const bonusData: Record<string, number> = bonusStr ? JSON.parse(bonusStr) : {};
 
-  // Load active employees with YTD and TD1
+  // Load active employees with YTD and TD1.
+  // Wave 1 pay-group scoping rule: an employee assigned to THIS pay group
+  // is in scope; an employee assigned to a DIFFERENT group is excluded;
+  // an unassigned employee (payGroupId NULL — every employee created
+  // before Wave 1, and any not yet assigned) stays in scope for every
+  // group's runs until they are assigned. This keeps all pre-Wave-1
+  // companies behaving exactly as before (their employees are unassigned)
+  // while making assignment meaningful the moment it is used.
   const employees = await prisma.employee.findMany({
-    where: { companyId, active: true },
+    where: {
+      companyId,
+      active: true,
+      OR: [{ payGroupId }, { payGroupId: null }],
+    },
     include: {
       td1Profiles: { where: { year: 2026 }, take: 1 },
       ytdLedgers: { where: { year: 2026 }, take: 1 },
