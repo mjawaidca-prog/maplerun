@@ -75,6 +75,22 @@ export async function updateCompany(formData: FormData) {
   revalidatePath("/app/company");
 }
 
+/**
+ * Wave 3 B5 — payroll settings: the pay-stub email opt-in. When on,
+ * finalize emails each employee (who has an address on file) a notice
+ * pointing at the portal sign-in. Default off.
+ */
+export async function updatePayrollSettings(formData: FormData) {
+  const { companyId } = await requireCompany();
+
+  await prisma.company.update({
+    where: { id: companyId },
+    data: { stubEmailOnFinalize: formData.get("stubEmailOnFinalize") === "on" },
+  });
+
+  revalidatePath("/company");
+}
+
 export async function getCompany() {
   const { companyId } = await requireCompany();
 

@@ -124,6 +124,16 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
       return saved?.hours ?? Object.fromEntries(employees.map((e) => [e.id, defaultHours(freq)]));
     })()
   );
+  // Wave 3 B5 — the expander's bonus / stat / overtime inputs were
+  // decorative (uncontrolled) until now; they are wired through to
+  // preview + finalize. Bonus and vacation are added to gross by the
+  // server; overtime/stat amounts are "of-which" components of the
+  // gross entered above (with their hours, for the stub's hrs × rate).
+  const [bonusAmounts, setBonusAmounts] = useState<Record<string, string>>({});
+  const [statAmounts, setStatAmounts] = useState<Record<string, string>>({});
+  const [statHours, setStatHours] = useState<Record<string, string>>({});
+  const [overtimeAmounts, setOvertimeAmounts] = useState<Record<string, string>>({});
+  const [overtimeHours, setOvertimeHours] = useState<Record<string, string>>({});
   const [vacationEnabled, setVacationEnabled] = useState<Record<string, boolean>>(
     Object.fromEntries(employees.map((e) => [e.id, false]))
   );
@@ -203,6 +213,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
     }
     formData.set("hours", JSON.stringify(hoursData));
     formData.set("vacation", JSON.stringify(vacationData));
+    appendExtendedInputs(formData);
 
     persistState();
     startTransition(async () => {
@@ -247,7 +258,29 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
     }
     formData.set("hours", JSON.stringify(hoursData));
     formData.set("vacation", JSON.stringify(vacationData));
+    appendExtendedInputs(formData);
     return formData;
+  }
+
+  // Wave 3 B5 — bonus / overtime / stat inputs shared by preview and
+  // finalize so both server paths see identical run inputs.
+  function appendExtendedInputs(formData: FormData) {
+    const bonusData: Record<string, number> = {};
+    const overtimeData: Record<string, { hours: number; amount: number }> = {};
+    const statData: Record<string, { hours: number; amount: number }> = {};
+    for (const emp of employees) {
+      const bonus = parseFloat(bonusAmounts[emp.id] ?? "") || 0;
+      if (bonus > 0) bonusData[emp.id] = bonus;
+      const otAmount = parseFloat(overtimeAmounts[emp.id] ?? "") || 0;
+      const otHours = parseFloat(overtimeHours[emp.id] ?? "") || 0;
+      if (otAmount > 0 || otHours > 0) overtimeData[emp.id] = { hours: otHours, amount: otAmount };
+      const stAmount = parseFloat(statAmounts[emp.id] ?? "") || 0;
+      const stHours = parseFloat(statHours[emp.id] ?? "") || 0;
+      if (stAmount > 0 || stHours > 0) statData[emp.id] = { hours: stHours, amount: stAmount };
+    }
+    if (Object.keys(bonusData).length > 0) formData.set("bonus", JSON.stringify(bonusData));
+    if (Object.keys(overtimeData).length > 0) formData.set("overtime", JSON.stringify(overtimeData));
+    if (Object.keys(statData).length > 0) formData.set("stat", JSON.stringify(statData));
   }
 
   async function handleFinalize() {
@@ -425,14 +458,25 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                               <Label className="text-[11px] text-[#A8A29E]">Bonus</Label>
                               <div className="relative mt-1">
                                 <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8"
+                                  value={bonusAmounts[emp.id] ?? ""}
+                                  onChange={(e) => setBonusAmounts((prev) => ({ ...prev, [emp.id]: e.target.value }))} />
                               </div>
                             </div>
                             <div>
-                              <Label className="text-[11px] text-[#A8A29E]">Stat holiday pay</Label>
+                              <Label className="text-[11px] text-[#A8A29E]">Stat holiday pay (part of gross)</Label>
                               <div className="relative mt-1">
                                 <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                                <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8"
+                                  value={statAmounts[emp.id] ?? ""}
+                                  onChange={(e) => setStatAmounts((prev) => ({ ...prev, [emp.id]: e.target.value }))} />
+                              </div>
+                              <div className="flex items-center gap-1.5 mt-1.5">
+                                <input type="number" min="0" step="0.5" placeholder="hrs"
+                                  value={statHours[emp.id] ?? ""}
+                                  onChange={(e) => setStatHours((prev) => ({ ...prev, [emp.id]: e.target.value }))}
+                                  className="w-16 border border-[#D6D3D1] rounded-md px-2 py-1 text-xs text-right" />
+                                <span className="text-[11px] text-[#A8A29E]">stat hours</span>
                               </div>
                             </div>
                             <div>
@@ -445,10 +489,19 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                             {showFullPayGrid && (
                               <>
                                 <div>
-                                  <Label className="text-[11px] text-[#A8A29E]">Overtime (1.5×)</Label>
+                                  <Label className="text-[11px] text-[#A8A29E]">Overtime (part of gross)</Label>
                                   <div className="relative mt-1">
                                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                                    <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8" />
+                                    <Input type="number" min="0" step="0.01" placeholder="0.00" className="pl-6 text-xs h-8"
+                                      value={overtimeAmounts[emp.id] ?? ""}
+                                      onChange={(e) => setOvertimeAmounts((prev) => ({ ...prev, [emp.id]: e.target.value }))} />
+                                  </div>
+                                  <div className="flex items-center gap-1.5 mt-1.5">
+                                    <input type="number" min="0" step="0.5" placeholder="hrs"
+                                      value={overtimeHours[emp.id] ?? ""}
+                                      onChange={(e) => setOvertimeHours((prev) => ({ ...prev, [emp.id]: e.target.value }))}
+                                      className="w-16 border border-[#D6D3D1] rounded-md px-2 py-1 text-xs text-right" />
+                                    <span className="text-[11px] text-[#A8A29E]">overtime hours</span>
                                   </div>
                                 </div>
                                 <div>
