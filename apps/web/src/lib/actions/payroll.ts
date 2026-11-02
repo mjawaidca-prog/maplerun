@@ -31,6 +31,10 @@ export type PayRunPreviewItem = {
   gross: number;
   result: PayResult;
   ytdBefore: EmployeeYtd;
+  hours: number;
+  vacationPay: number;
+  vacationRate: number;
+  bonus: number;
 };
 
 export type PayRunPreview = {
@@ -63,6 +67,17 @@ export type PayRunPreview = {
  */
 export async function previewPayRun(formData: FormData): Promise<PayRunPreview> {
   const { companyId } = await requireCompany();
+  return computePayRun(companyId, formData);
+}
+
+/**
+ * The single calculation path for a pay run, shared by preview AND
+ * finalize (Wave 1 PR C). Takes the run INPUTS (pay group, pay date,
+ * per-employee gross/hours/bonus/vacation) and computes every figure on
+ * the server through the tax engine. Finalize persists ONLY what this
+ * function computed — client-posted totals are never read.
+ */
+async function computePayRun(companyId: string, formData: FormData): Promise<PayRunPreview> {
 
   const payGroupId = formData.get("payGroupId") as string;
   const payDate = formData.get("payDate") as string;
@@ -181,7 +196,7 @@ export async function previewPayRun(formData: FormData): Promise<PayRunPreview> 
       vacationPay: vacationAmount,
       vacationRate: empVacation?.rate ?? 0,
       bonus: bonusAmount,
-    } as any);
+    });
 
     totals.gross += result.gross;
     totals.cpp += result.cpp;
@@ -210,6 +225,12 @@ export async function previewPayRun(formData: FormData): Promise<PayRunPreview> 
 /**
  * Finalize a pay run — create immutable PayRun + PayRunItem records
  * and update each employee's YTD ledger.
+ *
+ * Wave 1 PR C (the trust fix): finalize accepts the run INPUTS — the
+ * same fields previewPayRun takes — and recomputes every figure on the
+ * server via computePayRun. Any client-posted totals or "preview" JSON
+ * are ignored entirely; what persists is exactly what the tax engine
+ * computed here, from the inputs, against current YTD/TD1 state.
  */
 export async function finalizePayRun(formData: FormData) {
   const { companyId } = await requireCompany();
@@ -217,18 +238,16 @@ export async function finalizePayRun(formData: FormData) {
   const payGroupId = formData.get("payGroupId") as string;
   const payDate = formData.get("payDate") as string;
   const actualPayDate = (formData.get("actualPayDate") as string) || payDate;
-  const previewJson = formData.get("preview") as string;
 
-  if (!payGroupId || !payDate || !previewJson) {
+  if (!payGroupId || !payDate) {
     throw new Error("Missing required fields.");
   }
 
-  const preview: PayRunPreview = JSON.parse(previewJson);
-
-  // Verify ownership
-  const payGroup = await prisma.payGroup.findUnique({ where: { id: payGroupId } });
-  if (!payGroup || payGroup.companyId !== companyId) {
-    throw new Error("Invalid pay group.");
+  // Server-side recompute from inputs (also verifies pay-group
+  // ownership). Nothing in the request body is trusted for figures.
+  const preview = await computePayRun(companyId, formData);
+  if (preview.items.length === 0) {
+    throw new Error("Nothing to finalize — no employees with gross pay in this run.");
   }
 
   // Free trial gate — trialEndsAt (14-day period) + pay-run cap, via the
@@ -304,10 +323,10 @@ export async function finalizePayRun(formData: FormData) {
         ytdInsurable: n(newYtd?.insurableEarnings),
         ytdEi: n(newYtd?.ei),
         warnings: Array.isArray(item.result.warnings) ? item.result.warnings.join("; ") : "",
-        hours: n((item as any).hours, 0),
-        vacationPay: n((item as any).vacationPay, 0),
-        vacationPayRate: n((item as any).vacationRate, 0),
-        bonus: n((item as any).bonus, 0),
+        hours: n(item.hours, 0),
+        vacationPay: n(item.vacationPay, 0),
+        vacationPayRate: n(item.vacationRate, 0),
+        bonus: n(item.bonus, 0),
       },
     });
 

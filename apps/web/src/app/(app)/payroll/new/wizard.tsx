@@ -218,6 +218,38 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
 
   // ── Step 2 → Step 3 ──────────────────────────────────────────────────────
 
+  // Build the run INPUTS form data — mirrors handlePreview's construction
+  // exactly. Wave 1 PR C: finalize sends these inputs and the server
+  // recomputes every figure from them; the preview JSON is never posted.
+  function buildInputsFormData(): FormData | null {
+    const amounts: Record<string, number> = {};
+    for (const emp of employees) {
+      const val = parseFloat(grossAmounts[emp.id] ?? "");
+      if (!isNaN(val) && val > 0) {
+        amounts[emp.id] = val;
+      }
+    }
+    if (Object.keys(amounts).length === 0) return null;
+
+    const formData = new FormData();
+    formData.set("payGroupId", payGroupId);
+    formData.set("payDate", payDate);
+    formData.set("grossAmounts", JSON.stringify(amounts));
+    const hoursData: Record<string, number> = {};
+    const vacationData: Record<string, { enabled: boolean; rate: number; amount: number }> = {};
+    for (const emp of employees) {
+      hoursData[emp.id] = parseFloat(hours[emp.id] ?? "0") || 0;
+      if (vacationEnabled[emp.id]) {
+        const val = parseFloat(grossAmounts[emp.id] ?? "0") || 0;
+        const rate = parseFloat(vacationRate[emp.id] ?? "4") || 4;
+        vacationData[emp.id] = { enabled: true, rate: rate / 100, amount: val * rate / 100 };
+      }
+    }
+    formData.set("hours", JSON.stringify(hoursData));
+    formData.set("vacation", JSON.stringify(vacationData));
+    return formData;
+  }
+
   async function handleFinalize() {
     if (!preview) return;
 
@@ -226,11 +258,12 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
       return;
     }
 
-    const formData = new FormData();
-    formData.set("payGroupId", payGroupId);
-    formData.set("payDate", payDate);
+    const formData = buildInputsFormData();
+    if (!formData) {
+      setError("Enter gross pay for at least one employee.");
+      return;
+    }
     formData.set("actualPayDate", actualPayDate || payDate);
-    formData.set("preview", JSON.stringify(preview));
 
     startTransition(async () => {
       try {

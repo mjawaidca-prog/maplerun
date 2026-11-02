@@ -39,9 +39,30 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@maplerun/tax-engine", () => ({
-  calculatePay: () => {
-    throw new Error("not used in finalize/delete paths under test");
-  },
+  // Wave 1 PR C: finalize now recomputes through calculatePay, so the
+  // stub returns the deterministic figures the old posted-preview
+  // fixtures carried (gross 10000 → the totals asserted below).
+  calculatePay: (input: { grossPeriodIncome: number }) => ({
+    gross: input.grossPeriodIncome,
+    cpp: 500,
+    cpp2: 40,
+    ei: 163,
+    qpip: 0,
+    federalTax: 1200,
+    provincialTax: 600,
+    totalDeductions: 2503,
+    netPay: input.grossPeriodIncome - 2503,
+    annualTaxableIncome: 260000,
+    employer: { cpp: 500, cpp2: 40, ei: 228.2, total: 768.2 },
+    newYtd: {
+      pensionableEarnings: input.grossPeriodIncome,
+      cpp: 500,
+      cpp2: 40,
+      insurableEarnings: input.grossPeriodIncome,
+      ei: 163,
+    },
+    warnings: [],
+  }),
   ZERO_YTD: { pensionableEarnings: 0, cpp: 0, cpp2: 0, insurableEarnings: 0, ei: 0 },
 }));
 
@@ -76,6 +97,11 @@ vi.mock("@/lib/prisma", () => {
     },
     payRunItem: { create: async () => ({}) },
     ytdLedger: { upsert: async () => ({}) },
+    employee: {
+      findMany: async () => [
+        { id: "emp_1", firstName: "Test", lastName: "Employee", payGroupId: null, td1Profiles: [], ytdLedgers: [] },
+      ],
+    },
     ledgerProConnection: {
       findUnique: async () => db.connection,
     },
@@ -127,24 +153,14 @@ function setConnection(syncEnabled: boolean) {
   };
 }
 
+// Wave 1 PR C: finalize takes the run INPUTS (the stub engine above
+// turns gross 10000 into the totals the sync assertions expect).
 function previewFormData(): FormData {
-  const totals = {
-    gross: 10000, cpp: 500, cpp2: 40, ei: 163, federalTax: 1200, provincialTax: 600,
-    deductions: 2503, netPay: 7497, employerCpp: 500, employerCpp2: 40, employerEi: 228.2, employerTotal: 768.2,
-  };
-  const preview = {
-    payGroupName: "Biweekly Staff",
-    payDate: "2026-11-13",
-    frequency: "biweekly",
-    province: "ON",
-    items: [],
-    totals,
-  };
   const fd = new FormData();
   fd.set("payGroupId", "pg_1");
   fd.set("payDate", "2026-11-13");
   fd.set("actualPayDate", "2026-11-15");
-  fd.set("preview", JSON.stringify(preview));
+  fd.set("grossAmounts", JSON.stringify({ emp_1: 10000 }));
   return fd;
 }
 
