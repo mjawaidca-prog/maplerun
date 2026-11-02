@@ -33,7 +33,12 @@ export function calcCpp(
     return { cpp: 0, cpp2: 0, pensionableEarnings: Math.max(0, pensionable) };
   }
 
-  const periodExemption = roundCent(t.basicExemption / periodsPerYear);
+  // The per-period exemption is carried EXACTLY (basicExemption / P) and
+  // only the contribution outputs are rounded. Rounding the exemption to
+  // cents first (roundCent(3500/12) = 291.67 instead of 291.6667) cost a
+  // cent on monthly QPP against Revenu Québec/PDOC — Wave 4 Phase 0
+  // defect D5 (S3: $321.82 vs the oracle's $321.83).
+  const periodExemption = t.basicExemption / periodsPerYear;
   let cpp = roundCent(t.employeeRate * Math.max(0, pensionable - periodExemption));
   cpp = Math.min(cpp, Math.max(0, roundCent(maxCppContribution(t) - ytd.cpp)));
 

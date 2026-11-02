@@ -186,8 +186,18 @@ describe('calculateBonus — T4127 bonus method', () => {
     near(r.bonusCpp, 297.5); // 5.95% with no period exemption
     expect(r.bonusCpp2).toBe(0);
     near(r.bonusEi, 81.5);
-    near(r.bonusFederalTax, 1_014.75); // 20.5% × (5,000 − F5 50.00)
-    near(r.bonusProvincialTax, 452.93); // 9.15% × 4,950, no surtax/premium change
+    // Corrected-method derivation (Wave 4 Phase 0, defect D4 — see
+    // ~/workspace/nexvar-pay-versatility/evidence/phase0-pdoc-crosscheck.md):
+    // the marginal-rate difference alone is 20.5% × (5,000 − F5 50.00) = 1,014.75,
+    // but that freezes the K2 credit at the regular-pay level. T4127's method
+    // re-evaluates the credits at A2, where the bonus's own CPP/EI enlarge the
+    // credit bases: ΔK2 = 75.42 → 1,014.75 − 75.42 = 939.33 by hand; the engine
+    // reports 939.32 (its established intermediate cent-rounding). The old
+    // 1,014.75 expectation pinned the frozen-credit defect.
+    near(r.bonusFederalTax, 939.32);
+    // Same correction provincially: 9.15% × 4,950 = 452.93 frozen-credit, less
+    // ΔK2P = 27.21 from credits re-evaluated at A2 → 425.72. No surtax/premium change.
+    near(r.bonusProvincialTax, 425.72);
     near(r.netBonus, 5_000 - r.totalDeductions, 0.011);
   });
 

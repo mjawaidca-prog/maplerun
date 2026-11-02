@@ -84,31 +84,56 @@ export function calculatePay(input: PayInput): PayResult {
   let annualTaxableIncome: number;
 
   if (isQC) {
-    // Quebec provincial tax via TP-1015.3, NOT T4127 provincial formulas.
+    // Quebec provincial tax via TP-1015.F §2.1.1, NOT T4127 formulas.
+    // The federal calculation still uses the T4127 annual taxable income
+    // A (which deducts the additional-QPP amount via F5 and has no
+    // worker deduction H — H is Quebec-only).
     const f5 = cppDeductionF5(cppRes.cpp, cppRes.cpp2, cppTable);
     const A = Math.max(0, P * (taxableGross - periodDeductions - f5) - annualDeductions);
 
-    // K2 credit bases: QPP base fraction + EI (QC-reduced rate)
+    // Federal K2 credit bases for a Quebec employee: the base-rate
+    // portion of QPP contributions, EI premiums (QC-reduced rate) and
+    // QPIP premiums — PDOC includes QPIP in the federal K2 base
+    // (Wave 4 Phase 0 defect D3). The QPP base is YTD-aware (defect D1):
+    // the greater of the annualized current period and (YTD + current),
+    // capped. EI/QPIP credits stay on the current-period annualization:
+    // the engine's YTD ledger blends QPIP into the EI accumulation, so
+    // no clean YTD split exists in the PayInput contract.
     const baseQppFraction = cppTable.baseRate / cppTable.employeeRate;
     const maxBaseQpp = (cppTable.ympe - cppTable.basicExemption) * cppTable.baseRate;
-    const annualCppCredit = Math.min(P * cppRes.cpp * baseQppFraction, maxBaseQpp);
+    const annualCppCredit = Math.min(
+      Math.max(P * cppRes.cpp, ytd.cpp + cppRes.cpp) * baseQppFraction,
+      maxBaseQpp,
+    );
     const annualEiCredit = Math.min(
       P * eiRes.ei,
       tables.ei.maxInsurableEarnings * tables.ei.employeeRateQuebec,
     );
+    const annualQpipCredit = Math.min(P * qpipRes.qpip, QPIP_2026.maxEmployeePremium);
 
     // Federal tax T3 on A (pre-abatement)
     const fedRaw = computeFederalTax(
-      A, tables.federal, annualDeductions, annualCppCredit, annualEiCredit, input.federalClaim,
+      A, tables.federal, annualDeductions,
+      annualCppCredit + annualEiCredit + annualQpipCredit, input.federalClaim,
     );
 
     // Apply 16.5% federal abatement for QC residents
     federalTax = roundCent(applyFederalAbatement(fedRaw) / P);
 
-    // QC provincial tax via TP-1015.3
+    // QC provincial tax via TP-1015.F §2.1.1 (steps 1–2 annual, step 3 ÷P)
     provincialTax = roundCent(
       annualQuebecTax(
-        A, prov, cppRes.cpp, qpipRes.qpip, P, cppTable, QPIP_2026, input.provincialClaim,
+        {
+          grossPeriodIncome: taxableGross,
+          periodDeductions,
+          qpp: cppRes.cpp,
+          qpp2: cppRes.cpp2,
+          periodsPerYear: P,
+          annualDeductions,
+          provincialClaim: input.provincialClaim,
+        },
+        prov,
+        cppTable,
       ) / P,
     );
     annualTaxableIncome = roundCent(A);
@@ -125,6 +150,10 @@ export function calculatePay(input: PayInput): PayResult {
         ei: eiRes.ei,
         federalClaim: input.federalClaim,
         provincialClaim: input.provincialClaim,
+        // Defect D1: YTD CPP/EI feed the K2 credit bases so employees
+        // at/near the annual caps are credited with their actual
+        // year-to-date contributions, as PDOC does.
+        ytd: { cpp: ytd.cpp, ei: ytd.ei },
       },
       tables.federal,
       prov,
@@ -193,20 +222,21 @@ export function calculatePay(input: PayInput): PayResult {
   };
 }
 
-/** Compute annual federal tax T3 inline (avoids circular imports). */
+/** Compute annual federal tax T3 inline (avoids circular imports).
+ *  annualK2CreditBase is the TOTAL K2 credit base (CPP/QPP base portion
+ *  + EI [+ QPIP for Quebec] credit bases, each already capped). */
 function computeFederalTax(
   A: number,
   fed: FederalTable,
   annualDeductions: number,
-  annualCppCredit: number,
-  annualEiCredit: number,
+  annualK2CreditBase: number,
   federalClaim?: number,
 ): number {
   const { rate: R, k: K } = bracketFor(fed.brackets, A);
   const NI = A + annualDeductions;
   const TC = federalClaim ?? dynamicBpa(fed.bpa, NI);
   const K1 = fed.lowestRate * TC;
-  const K2 = fed.lowestRate * (annualCppCredit + annualEiCredit);
+  const K2 = fed.lowestRate * annualK2CreditBase;
   const K4 = fed.lowestRate * Math.min(A, fed.cea);
   return Math.max(0, R * A - K - K1 - K2 - K4);
 }

@@ -14,8 +14,15 @@ import { eiRateFor } from './ei';
 
 /**
  * Rate R and cumulative constant K for an annual income within a bracket set.
- * K_i = K_{i-1} + (rate_i − rate_{i-1}) × lowerThreshold_i, computed exactly from
- * thresholds. Verified: matches every CRA-published 2026 K/KP constant within $0.50.
+ *
+ * When the bracket carries CRA's published constant (T4127 Table 8.1 K/KP;
+ * TP-1015.F K for Quebec), it is used verbatim: CRA publishes the constants
+ * rounded to whole dollars and PDOC computes with those values. Deriving
+ * K from the thresholds instead (K_i = K_{i-1} + (rate_i − rate_{i-1}) ×
+ * lowerThreshold_i) drifts up to ~$0.50/yr from the published figure, which
+ * surfaced as 1–2¢ per-period residuals against PDOC in the Wave 4 Phase 0
+ * cross-check (defect D6). Brackets without a published constant (the
+ * unpublished 2027 tables) still derive from thresholds.
  */
 export function bracketFor(brackets: TaxBracket[], annualIncome: number): { rate: number; k: number } {
   if (brackets.length === 0) throw new TaxEngineError('Empty bracket table');
@@ -23,10 +30,12 @@ export function bracketFor(brackets: TaxBracket[], annualIncome: number): { rate
   let prev: TaxBracket = brackets[0]!;
   for (const b of brackets) {
     k += (b.rate - prev.rate) * (prev.upTo ?? 0);
-    if (b.upTo === null || annualIncome <= b.upTo) return { rate: b.rate, k };
+    if (b.upTo === null || annualIncome <= b.upTo) {
+      return { rate: b.rate, k: b.k ?? k };
+    }
     prev = b;
   }
-  return { rate: prev.rate, k };
+  return { rate: prev.rate, k: prev.k ?? k };
 }
 
 /** Income-tested BPA (BPAF/BPAMB/BPAYT): max below phase-out, linear to min across it. Takes NI = A + HD. */
@@ -134,7 +143,23 @@ export function cppDeductionF5(cpp: number, cpp2: number, cppT: CppTable): numbe
   return roundCent(cpp * enhancementFraction + cpp2);
 }
 
-/** Annualized, capped K2 credit bases from this period's CPP/EI deductions. */
+/**
+ * Annualized, capped K2 credit bases (base-rate CPP portion + EI premiums).
+ *
+ * YTD-aware (Wave 4 Phase 0 defect D1): T4127 option 1 annualizes the
+ * current period's contributions (P × C), but once an employee's actual
+ * year-to-date contributions exceed that annualized figure — the normal
+ * case after the CPP/EI caps are reached, when the current period's
+ * contribution is small or zero — PDOC credits the ACTUAL annual amounts.
+ * The credit base is therefore the greater of the annualized current
+ * period and (YTD + current period), capped at the statutory maximum
+ * credit base. This is T4127's own Step 2 direction: "use the greater
+ * of i) (P × C × (base rate/total contribution rate)) or (P × EI) and
+ * ii) D or D1 for all pay periods", replacing the annualized amount by
+ * the maximum annual contribution once a cap is reached. Proven against
+ * PDOC to the cent in Phase 0 scenarios S5 (YTD at both caps) and S7
+ * (EI at the cap, partial current period).
+ */
 export function creditBases(
   cpp: number,
   ei: number,
@@ -142,13 +167,16 @@ export function creditBases(
   province: ProvinceCode,
   cppT: CppTable,
   eiT: EiTable,
+  ytd?: { cpp: number; ei: number },
 ): { annualCppCredit: number; annualEiCredit: number } {
   const baseFraction = cppT.baseRate / cppT.employeeRate;
   const maxBaseCpp = (cppT.ympe - cppT.basicExemption) * cppT.baseRate;
   const maxEi = eiT.maxInsurableEarnings * eiRateFor(province, eiT);
+  const annualCpp = Math.max(periodsPerYear * cpp, (ytd?.cpp ?? 0) + cpp);
+  const annualEi = Math.max(periodsPerYear * ei, (ytd?.ei ?? 0) + ei);
   return {
-    annualCppCredit: Math.min(periodsPerYear * cpp * baseFraction, maxBaseCpp),
-    annualEiCredit: Math.min(periodsPerYear * ei, maxEi),
+    annualCppCredit: Math.min(annualCpp * baseFraction, maxBaseCpp),
+    annualEiCredit: Math.min(annualEi, maxEi),
   };
 }
 
@@ -162,6 +190,12 @@ export interface IncomeTaxInput {
   ei: number;
   federalClaim?: number;
   provincialClaim?: number;
+  /**
+   * Year-to-date CPP (first tier) and EI deducted BEFORE this period.
+   * Feeds the YTD-aware K2 credit bases (defect D1); omit for a
+   * first-period employee (equivalent to zeros).
+   */
+  ytd?: { cpp: number; ei: number };
 }
 
 export interface IncomeTaxResult {
@@ -188,7 +222,7 @@ export function calcIncomeTax(
   const ctx: AnnualTaxContext = {
     fed,
     prov,
-    ...creditBases(input.cpp, input.ei, P, prov.province, cppT, eiT),
+    ...creditBases(input.cpp, input.ei, P, prov.province, cppT, eiT, input.ytd),
     annualDeductions: input.annualDeductions,
     federalClaim: input.federalClaim,
     provincialClaim: input.provincialClaim,

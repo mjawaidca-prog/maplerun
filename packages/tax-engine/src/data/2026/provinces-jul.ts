@@ -43,14 +43,17 @@ export const PROVINCES_2026_JULY: Record<ProvinceCode, ProvincialTable> = {
     province: 'BC',
     year: 2026,
     lowestRate: 0.0614, // prorated; annual effective rate is 5.60%
+    // KP constants are the July 1, 2026 Table 8.1 published values
+    // (docs/sources/t4127-jul-2026.html) — BC's differ from January
+    // because the prorated first-bracket rate changed (defect D6).
     brackets: [
-      { upTo: 50_363, rate: 0.0614 },
-      { upTo: 100_728, rate: 0.077 },
-      { upTo: 115_648, rate: 0.105 },
-      { upTo: 140_430, rate: 0.1229 },
-      { upTo: 190_405, rate: 0.147 },
-      { upTo: 265_545, rate: 0.168 },
-      { upTo: null, rate: 0.205 },
+      { upTo: 50_363, rate: 0.0614, k: 0 },
+      { upTo: 100_728, rate: 0.077, k: 786 },
+      { upTo: 115_648, rate: 0.105, k: 3_606 },
+      { upTo: 140_430, rate: 0.1229, k: 5_676 },
+      { upTo: 190_405, rate: 0.147, k: 9_061 },
+      { upTo: 265_545, rate: 0.168, k: 13_059 },
+      { upTo: null, rate: 0.205, k: 22_884 },
     ],
     bpa: 13_216, // unchanged
     lowIncomeReduction: {
@@ -67,15 +70,16 @@ export const PROVINCES_2026_JULY: Record<ProvinceCode, ProvincialTable> = {
     province: 'NL',
     year: 2026,
     lowestRate: 0.087,
+    // KP constants unchanged from January (July Table 8.1).
     brackets: [
-      { upTo: 44_678, rate: 0.087 },
-      { upTo: 89_354, rate: 0.145 },
-      { upTo: 159_528, rate: 0.158 },
-      { upTo: 223_340, rate: 0.178 },
-      { upTo: 285_319, rate: 0.198 },
-      { upTo: 570_638, rate: 0.208 },
-      { upTo: 1_141_275, rate: 0.213 },
-      { upTo: null, rate: 0.218 },
+      { upTo: 44_678, rate: 0.087, k: 0 },
+      { upTo: 89_354, rate: 0.145, k: 2_591 },
+      { upTo: 159_528, rate: 0.158, k: 3_753 },
+      { upTo: 223_340, rate: 0.178, k: 6_943 },
+      { upTo: 285_319, rate: 0.198, k: 11_410 },
+      { upTo: 570_638, rate: 0.208, k: 14_263 },
+      { upTo: 1_141_275, rate: 0.213, k: 17_117 },
+      { upTo: null, rate: 0.218, k: 22_823 },
     ],
     bpa: 15_000, // prorated; annual effective amount is $13,094
     meta: VERIFIED_JULY,
@@ -86,13 +90,15 @@ export const PROVINCES_2026_JULY: Record<ProvinceCode, ProvincialTable> = {
     province: 'PE',
     year: 2026,
     lowestRate: 0.095,
+    // KP constants from the July 1, 2026 Table 8.1, including the new
+    // sixth bracket's 10,464.
     brackets: [
-      { upTo: 33_928, rate: 0.095 },
-      { upTo: 65_820, rate: 0.1347 },
-      { upTo: 106_890, rate: 0.166 },
-      { upTo: 142_520, rate: 0.1762 },
-      { upTo: 200_000, rate: 0.19 },
-      { upTo: null, rate: 0.21 }, // prorated; annual effective rate is 20%
+      { upTo: 33_928, rate: 0.095, k: 0 },
+      { upTo: 65_820, rate: 0.1347, k: 1_347 },
+      { upTo: 106_890, rate: 0.166, k: 3_407 },
+      { upTo: 142_520, rate: 0.1762, k: 4_497 },
+      { upTo: 200_000, rate: 0.19, k: 6_464 },
+      { upTo: null, rate: 0.21, k: 10_464 }, // prorated; annual effective rate is 20%
     ],
     bpa: 15_000,
     meta: VERIFIED_JULY,

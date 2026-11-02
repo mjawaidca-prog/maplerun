@@ -124,21 +124,44 @@ export function calculateBonus(input: BonusInput): BonusResult {
   );
   const A2 = A1 + Math.max(0, B - f5Bonus);
 
-  // Credits held identical on both sides of the difference (they cancel).
-  const ctx: AnnualTaxContext = {
+  // Non-refundable credits are evaluated on BOTH sides of the difference,
+  // each at its own annualized income (Wave 4 Phase 0 defect D4): the
+  // bonus's own CPP/EI earn additional K2 credit base, limited by the
+  // annual caps and by the YTD already deducted (defect D1). Freezing the
+  // regular-pay credits across the difference — the previous behaviour —
+  // over-withheld every bonus (Phase 0 S4: +$12.46 federal / +$7.12
+  // Alberta on a $10,000 bonus). PDOC's bonus calculation reflects the
+  // capped, re-evaluated credits exactly.
+  const ctxA1: AnnualTaxContext = {
     fed: tables.federal,
     prov,
-    ...creditBases(regularCpp.cpp, regularEi.ei, P, input.province, cppT, eiT),
+    ...creditBases(regularCpp.cpp, regularEi.ei, P, input.province, cppT, eiT, ytd),
+    annualDeductions,
+    federalClaim: input.federalClaim,
+    provincialClaim: input.provincialClaim,
+  };
+  const ctxA2: AnnualTaxContext = {
+    fed: tables.federal,
+    prov,
+    ...creditBases(
+      regularCpp.cpp + bonusCpp,
+      regularEi.ei + bonusEi,
+      P,
+      input.province,
+      cppT,
+      eiT,
+      ytd,
+    ),
     annualDeductions,
     federalClaim: input.federalClaim,
     provincialClaim: input.provincialClaim,
   };
 
   const bonusFederalTax = roundCent(
-    Math.max(0, annualFederalTax(A2, ctx) - annualFederalTax(A1, ctx)),
+    Math.max(0, annualFederalTax(A2, ctxA2) - annualFederalTax(A1, ctxA1)),
   );
   const bonusProvincialTax = roundCent(
-    Math.max(0, annualProvincialTax(A2, ctx) - annualProvincialTax(A1, ctx)),
+    Math.max(0, annualProvincialTax(A2, ctxA2) - annualProvincialTax(A1, ctxA1)),
   );
 
   if (!tables.federal.meta.verified || !prov.meta.verified) {
