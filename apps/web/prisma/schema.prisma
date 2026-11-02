@@ -102,6 +102,10 @@ model Company {
   eftInstitution    String?
   eftTransit        String?
   eftAccount        String?
+  /// Bank-assigned processing/data centre (5 digits) for the CPA-005
+  /// header — Wave 2 EFT wiring. Without it no valid file can be built,
+  /// and fabricating one is forbidden, hence this column.
+  eftDataCentre     String?
   freePayRunsUsed Int @default(0)
   maxFreePayRuns  Int @default(2)
   trialEndsAt     DateTime?
