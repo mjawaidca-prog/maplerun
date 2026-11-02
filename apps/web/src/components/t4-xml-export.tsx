@@ -36,12 +36,20 @@ export function T4XmlExport({ year }: Props) {
     }
     setBusy(true);
     try {
-      const { filename, content } = await exportT4Xml(year, {
+      // W4-D7 — the action returns a discriminated result: expected
+      // failures arrive as { ok: false, error } with the REAL reason
+      // (a thrown action error is masked by Next.js in production).
+      const result = await exportT4Xml(year, {
         contactName: contactName.trim(),
         areaCode: areaCode.trim(),
         phone: phone.trim(),
         email: email.trim(),
       });
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      const { filename, content } = result;
       const blob = new Blob([content], { type: "text/xml" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -118,6 +126,9 @@ export function T4XmlExport({ year }: Props) {
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="555-1234"
                   />
+                  <p className="text-xs text-[#A8A29E] mt-1">
+                    7-digit local number — or paste the full 10-digit number and it will be split.
+                  </p>
                 </div>
               </div>
               <div>

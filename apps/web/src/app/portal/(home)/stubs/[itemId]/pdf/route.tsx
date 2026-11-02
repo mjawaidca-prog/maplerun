@@ -12,6 +12,8 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { PayStubPdf } from "@/lib/pdf/pay-stub";
 import { prisma } from "@/lib/prisma";
 import { buildEarningsLines, parseCustomDeductions } from "@/lib/pay-stub-data";
+import { employerEiPure, employerQpipAmount } from "@/lib/payroll-display";
+import { getQuebecYtdSplit } from "@/lib/pay-stub-ytd";
 import { getActivePortalEmployee } from "@/lib/employee-portal-session";
 
 export async function GET(
@@ -25,15 +27,20 @@ export async function GET(
   const item = await prisma.payRunItem.findFirst({
     where: { id: itemId, employeeId: session.active.employeeId },
     include: {
-      employee: { select: { firstName: true, lastName: true } },
+      employee: { select: { firstName: true, lastName: true, provinceOfEmployment: true } },
       payRun: {
-        include: { payGroup: { select: { name: true, frequency: true } } },
+        include: { payGroup: { select: { name: true, frequency: true, defaultProvince: true } } },
       },
     },
   });
   if (!item || item.payRun.status !== "FINALIZED") {
     return new NextResponse("Not found", { status: 404 });
   }
+
+  // W4-D3 — Quebec resolution + YTD split, same as the employer route.
+  const isQuebec =
+    (item.employee.provinceOfEmployment ?? item.payRun.payGroup.defaultProvince) === "QC";
+  const ytdSplit = isQuebec ? await getQuebecYtdSplit(item) : null;
 
   const company = await prisma.company.findUnique({
     where: { id: session.active.companyId },
@@ -53,6 +60,7 @@ export async function GET(
     employeeName: `${item.employee.firstName} ${item.employee.lastName}`,
     payDate: item.payRun.payDate,
     periodStart: item.payRun.periodStart ?? null,
+    actualPayDate: item.payRun.actualPayDate ?? null,
     payGroup: `${item.payRun.payGroup.name} · ${item.payRun.payGroup.frequency.toLowerCase()}`,
     gross: item.gross,
     cpp: item.cpp,
@@ -65,11 +73,17 @@ export async function GET(
     earnings: buildEarningsLines(item),
     customDeductions: parseCustomDeductions((item as { customDeductions?: unknown }).customDeductions),
     reimbursement: (item as { reimbursement?: number }).reimbursement ?? 0,
+    isQuebec,
+    qpip: item.qpip,
+    employerEiPure: employerEiPure(item),
+    employerQpip: employerQpipAmount(item),
+    ytdQpip: ytdSplit?.ytdQpip ?? 0,
+    ytdQpipInsurable: ytdSplit?.ytdQpipInsurable ?? 0,
     ytdPensionable: item.ytdPensionable,
     ytdCpp: item.ytdCpp,
     ytdCpp2: item.ytdCpp2,
-    ytdInsurable: item.ytdInsurable,
-    ytdEi: item.ytdEi,
+    ytdInsurable: ytdSplit ? ytdSplit.ytdEiInsurable : item.ytdInsurable,
+    ytdEi: ytdSplit ? ytdSplit.ytdEiPure : item.ytdEi,
     ytdGrossPay: ytdLedger?.grossPay ?? 0,
     ytdIncomeTax: ytdLedger?.incomeTax ?? 0,
     vacationBalanceAfterCents: item.vacationBalanceAfterCents ?? null,

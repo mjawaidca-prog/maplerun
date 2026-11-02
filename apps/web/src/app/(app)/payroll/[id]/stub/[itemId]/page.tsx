@@ -5,7 +5,9 @@
 import { getPayRun } from "@/lib/actions/payroll";
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { buildEarningsLines, parseCustomDeductions, vacationBalanceLine } from "@/lib/pay-stub-data";
+import { buildEarningsLines, buildDeductionLines, buildEmployerLines, parseCustomDeductions, vacationBalanceLine } from "@/lib/pay-stub-data";
+import { getQuebecYtdSplit } from "@/lib/pay-stub-ytd";
+import { parseBankDetails, bankAccountLast4 } from "@/lib/banking";
 import { StubBackLink, StubPdfLink, StubPrintButton } from "@/components/stub-actions";
 import { Logo } from "@/components/logo";
 import { notFound } from "next/navigation";
@@ -19,13 +21,35 @@ export default async function PayStubPage({ params }: Props) {
   const { companyId } = await requireCompany();
   const payRun = await getPayRun(payRunId).catch(() => null);
   if (!payRun || payRun.companyId !== companyId) notFound();
+  // W4-D6 — stubs are served for FINALIZED runs only, matching the
+  // portal PDF route and the EFT side (generateEftFile refuses
+  // non-FINALIZED runs). A reversed run's item snapshots are
+  // pre-reversal history; serving them showed stale vacation/CPP/EI
+  // YTD that no longer exists in the ledger.
+  if (payRun.status !== "FINALIZED") notFound();
   const item = payRun.items.find((i) => i.id === itemId);
   if (!item) notFound();
   const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true, businessNumber: true } });
   const employee = await prisma.employee.findUnique({
     where: { id: item.employeeId },
-    select: { firstName: true, lastName: true, addressLine1: true, city: true, province: true, postalCode: true },
+    select: { firstName: true, lastName: true, addressLine1: true, city: true, province: true, postalCode: true, provinceOfEmployment: true, bankEncrypted: true },
   });
+
+  // W4-D3 — Quebec resolution + split of the blended YTD snapshots.
+  const isQuebec = (employee?.provinceOfEmployment ?? payRun.payGroup.defaultProvince) === "QC";
+  const ytdSplit = isQuebec ? await getQuebecYtdSplit(item) : null;
+  const stubItem = { ...item, isQuebec };
+  const deductionLines = buildDeductionLines(stubItem, isQuebec ? "Quebec Tax" : "Provincial Tax");
+  const employerLines = buildEmployerLines(stubItem);
+
+  // W4-D5 — the payment-method line follows the ONE banking
+  // completeness rule (lib/banking.ts): all of institution + transit +
+  // account present and well-formed, else the pay was by cheque.
+  const bank = parseBankDetails(employee?.bankEncrypted);
+  const bankLast4 = bankAccountLast4(bank);
+  const paymentMethodLine = bankLast4
+    ? `Deposited to account •••• ${bankLast4}`
+    : "Paid by cheque — no direct-deposit details on file";
 
   // Sum YTD income tax from all finalized pay run items for this employee in 2026
   const ytdTaxAgg = await prisma.payRunItem.aggregate({
@@ -96,9 +120,9 @@ export default async function PayStubPage({ params }: Props) {
             ) : (
               <p className="text-[13px] opacity-90 mt-1">Period End · {payRun.payDate}</p>
             )}
-            {payRun.actualPayDate && payRun.actualPayDate !== payRun.payDate && (
-              <p className="text-[13px] opacity-90 mt-1">Pay Date · {payRun.actualPayDate}</p>
-            )}
+            {/* W4-D4 — the pay date always renders, not only when it
+                differs from the period end. */}
+            <p className="text-[13px] opacity-90 mt-1">Pay Date · {payRun.actualPayDate ?? payRun.payDate}</p>
             <p className="text-[13px] opacity-90 mt-1">{payRun.payGroup.frequency.toLowerCase()}</p>
           </div>
         </div>
@@ -120,9 +144,12 @@ export default async function PayStubPage({ params }: Props) {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-[#A8A29E] uppercase tracking-[0.08em] font-semibold">Pay Period</p>
+            <p className="text-xs text-[#A8A29E] uppercase tracking-[0.08em] font-semibold">Pay Date</p>
             <p className="text-sm font-semibold text-[#1C1917] dark:text-[#FAFAF9] mt-0.5">
-              {payRun.payGroup.frequency.toLowerCase()} · {payRun.periodStart ? `${payRun.periodStart} → ` : ""}{payRun.payDate}
+              {payRun.actualPayDate ?? payRun.payDate}
+            </p>
+            <p className="text-[13px] text-[#78716C] dark:text-[#A8A29E] mt-0.5">
+              {payRun.payGroup.frequency.toLowerCase()} · {payRun.periodStart ? `${payRun.periodStart} → ` : "period end "}{payRun.payDate}
             </p>
           </div>
         </div>
@@ -156,8 +183,7 @@ export default async function PayStubPage({ params }: Props) {
             <p className="text-xs font-bold text-[#78716C] dark:text-[#A8A29E] uppercase tracking-[0.08em] mb-2.5">Deductions</p>
             <div className="border border-[#E7E5E4] dark:border-[#292524] rounded-xl overflow-hidden">
               {[
-                ["CPP", fmtCAD(item.cpp)], ["CPP2", fmtCAD(item.cpp2)], ["EI", fmtCAD(item.ei)],
-                ["Federal Tax", fmtCAD(item.federalTax)], ["Provincial Tax", fmtCAD(item.provincialTax)],
+                ...deductionLines.map((l) => [l.label, fmtCAD(l.amount)] as [string, string]),
                 ...customDeductionLines.map((d) => [d.name, fmtCAD(d.amount)] as [string, string]),
               ].map(([label, value], i) => (
                 <div key={label} className={`flex justify-between px-3.5 py-[9px] text-[13px] ${i % 2 === 1 ? "bg-[#FAFAF9] dark:bg-[#1C1917]" : ""}`}>
@@ -182,7 +208,7 @@ export default async function PayStubPage({ params }: Props) {
         <div className="mx-10 my-1 mb-6 bg-gradient-to-br from-[#FEF2F2] to-[#FEE2E2] dark:from-[#2A1110] dark:to-[#3F1413] border border-[#FECACA] dark:border-[#7F211B] rounded-[14px] px-7 py-5 flex justify-between items-center">
           <div>
             <p className="text-xs font-bold text-[#991B1B] dark:text-[#FCA5A5] uppercase tracking-[0.08em]">Net Pay</p>
-            <p className="text-xs text-[#B91C1C]/80 dark:text-[#F87171]/80 mt-0.5">Deposited to account •••• XXXX</p>
+            <p className="text-xs text-[#B91C1C]/80 dark:text-[#F87171]/80 mt-0.5">{paymentMethodLine}</p>
           </div>
           <span className="text-[38px] font-bold text-[#B3261E] dark:text-[#E56A5C] font-mono tabular-nums tracking-[-0.02em]">
             {fmtCAD(item.netPay)}
@@ -194,10 +220,7 @@ export default async function PayStubPage({ params }: Props) {
           <div>
             <p className="text-xs font-bold text-[#78716C] dark:text-[#A8A29E] uppercase tracking-[0.08em] mb-2.5">Employer Costs</p>
             <div className="border border-[#E7E5E4] dark:border-[#292524] rounded-xl overflow-hidden">
-              {[
-                ["CPP Match", fmtCAD(item.employerCpp)], ["CPP2 Match", fmtCAD(item.employerCpp2)],
-                ["EI (1.4×)", fmtCAD(item.employerEi)],
-              ].map(([label, value], i) => (
+              {employerLines.map((l) => [l.label, fmtCAD(l.amount)] as [string, string]).map(([label, value], i) => (
                 <div key={label} className={`flex justify-between px-3.5 py-[9px] text-[13px] ${i % 2 === 1 ? "bg-[#FAFAF9] dark:bg-[#1C1917]" : ""}`}>
                   <span className="text-[#57534E] dark:text-[#A8A29E]">{label}</span>
                   <span className="font-mono tabular-nums dark:text-[#E7E5E4]">{value}</span>
@@ -214,9 +237,16 @@ export default async function PayStubPage({ params }: Props) {
             <div className="border border-[#E7E5E4] dark:border-[#292524] rounded-xl overflow-hidden">
               {[
                 ["Gross Pay", fmtCAD(ytdGrossPay)], ["Income Tax", fmtCAD(ytdIncomeTax)],
-                ["Pensionable", fmtCAD(item.ytdPensionable)], ["Insurable", fmtCAD(item.ytdInsurable)],
-                ["CPP", fmtCAD(item.ytdCpp)], ["EI", fmtCAD(item.ytdEi)], ["CPP2", fmtCAD(item.ytdCpp2)],
-                ["Federal Tax", fmtCAD(ytdFederalTax)], ["Provincial Tax", fmtCAD(ytdProvincialTax)],
+                ["Pensionable", fmtCAD(item.ytdPensionable)],
+                // W4-D3 — for Quebec stubs the blended insurable/EI
+                // snapshots are split: EI-only here, QPIP separate.
+                [isQuebec ? "Insurable (EI)" : "Insurable", fmtCAD(ytdSplit ? ytdSplit.ytdEiInsurable : item.ytdInsurable)],
+                ...(isQuebec ? [["Insurable (QPIP)", fmtCAD(ytdSplit?.ytdQpipInsurable ?? 0)] as [string, string]] : []),
+                [isQuebec ? "QPP" : "CPP", fmtCAD(item.ytdCpp)],
+                ["EI", fmtCAD(ytdSplit ? ytdSplit.ytdEiPure : item.ytdEi)],
+                ...(isQuebec ? [["QPIP", fmtCAD(ytdSplit?.ytdQpip ?? 0)] as [string, string]] : []),
+                [isQuebec ? "QPP2" : "CPP2", fmtCAD(item.ytdCpp2)],
+                ["Federal Tax", fmtCAD(ytdFederalTax)], [isQuebec ? "Quebec Tax" : "Provincial Tax", fmtCAD(ytdProvincialTax)],
                 ...(vacBalance ? [["Vacation Balance", vacBalance] as [string, string]] : []),
               ].map(([label, value], i) => (
                 <div key={label} className={`flex justify-between px-3.5 py-[9px] text-[13px] ${i % 2 === 1 ? "bg-[#FAFAF9] dark:bg-[#1C1917]" : ""}`}>

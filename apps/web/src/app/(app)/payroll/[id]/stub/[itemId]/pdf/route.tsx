@@ -10,6 +10,8 @@ import { getPayRun } from "@/lib/actions/payroll";
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { buildEarningsLines, parseCustomDeductions } from "@/lib/pay-stub-data";
+import { employerEiPure, employerQpipAmount } from "@/lib/payroll-display";
+import { getQuebecYtdSplit } from "@/lib/pay-stub-ytd";
 
 export async function GET(
   _request: Request,
@@ -23,6 +25,14 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 });
   }
 
+  // W4-D6 — stubs are served for FINALIZED runs only, matching the
+  // employee-portal route and the EFT side (generateEftFile refuses
+  // non-FINALIZED runs). A reversed run's item snapshots are
+  // pre-reversal history; serving them showed stale YTD figures.
+  if (payRun.status !== "FINALIZED") {
+    return new NextResponse("Not found", { status: 404 });
+  }
+
   const item = payRun.items.find((i) => i.id === itemId);
   if (!item) {
     return new NextResponse("Not found", { status: 404 });
@@ -32,6 +42,16 @@ export async function GET(
     where: { id: companyId },
     select: { name: true },
   });
+
+  // W4-D3 — Quebec resolution + YTD split (blended snapshots are
+  // split back into EI / QPIP shares for display).
+  const employeeRow = await prisma.employee.findUnique({
+    where: { id: item.employeeId },
+    select: { provinceOfEmployment: true },
+  });
+  const isQuebec =
+    (employeeRow?.provinceOfEmployment ?? payRun.payGroup.defaultProvince) === "QC";
+  const ytdSplit = isQuebec ? await getQuebecYtdSplit(item) : null;
 
   // Wave 3 B5 — YTD gross pay + income tax live on the YtdLedger (they
   // are current-state totals, like the ledger's other fields the stub
@@ -47,6 +67,7 @@ export async function GET(
     employeeName: `${item.employee.firstName} ${item.employee.lastName}`,
     payDate: payRun.payDate,
     periodStart: payRun.periodStart ?? null,
+    actualPayDate: payRun.actualPayDate ?? null,
     payGroup: `${payRun.payGroup.name} · ${payRun.payGroup.frequency.toLowerCase()}`,
     gross: item.gross,
     cpp: item.cpp,
@@ -59,11 +80,17 @@ export async function GET(
     earnings: buildEarningsLines(item),
     customDeductions: parseCustomDeductions((item as { customDeductions?: unknown }).customDeductions),
     reimbursement: (item as { reimbursement?: number }).reimbursement ?? 0,
+    isQuebec,
+    qpip: item.qpip,
+    employerEiPure: employerEiPure(item),
+    employerQpip: employerQpipAmount(item),
+    ytdQpip: ytdSplit?.ytdQpip ?? 0,
+    ytdQpipInsurable: ytdSplit?.ytdQpipInsurable ?? 0,
     ytdPensionable: item.ytdPensionable,
     ytdCpp: item.ytdCpp,
     ytdCpp2: item.ytdCpp2,
-    ytdInsurable: item.ytdInsurable,
-    ytdEi: item.ytdEi,
+    ytdInsurable: ytdSplit ? ytdSplit.ytdEiInsurable : item.ytdInsurable,
+    ytdEi: ytdSplit ? ytdSplit.ytdEiPure : item.ytdEi,
     ytdGrossPay: ytdLedger?.grossPay ?? 0,
     ytdIncomeTax: ytdLedger?.incomeTax ?? 0,
     vacationBalanceAfterCents: item.vacationBalanceAfterCents ?? null,

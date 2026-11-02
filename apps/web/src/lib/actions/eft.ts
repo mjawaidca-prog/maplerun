@@ -22,6 +22,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { decrypt, encrypt } from "@/lib/encryption";
+import { parseBankDetails } from "@/lib/banking";
 import { revalidatePath } from "next/cache";
 import {
   buildCpa005File,
@@ -287,28 +288,17 @@ async function loadEftContext(payRunId: string): Promise<{
     }
     payableRefs.add(employeeRef);
 
-    // Banking: decrypted Employee.bankEncrypted JSON {institution, transit,
-    // account}. When it is missing or undecryptable the payment goes to
-    // the builder with EMPTY banking fields on purpose — the builder
-    // excludes it and its reasons are reported to the user. Banking is
-    // never defaulted or fabricated here.
-    let institution = "";
-    let transit = "";
-    let account = "";
-    if (item.employee.bankEncrypted) {
-      try {
-        const bank = JSON.parse(decrypt(item.employee.bankEncrypted)) as {
-          institution?: string;
-          transit?: string;
-          account?: string;
-        };
-        institution = bank.institution ?? "";
-        transit = bank.transit ?? "";
-        account = bank.account ?? "";
-      } catch {
-        /* leave empty — the builder excludes this payment with reasons */
-      }
-    }
+    // Banking: the shared parser (lib/banking.ts) reads the encrypted
+    // Employee.bankEncrypted JSON {institution, transit, account}. When
+    // it is missing or undecryptable the payment goes to the builder
+    // with EMPTY banking fields on purpose — the builder excludes it
+    // and its reasons are reported to the user (the builder's payee
+    // validation IS the completeness rule lib/banking.ts mirrors).
+    // Banking is never defaulted or fabricated here.
+    const bank = parseBankDetails(item.employee.bankEncrypted);
+    const institution = bank?.institution ?? "";
+    const transit = bank?.transit ?? "";
+    const account = bank?.account ?? "";
 
     payments.push({
       employeeRef,

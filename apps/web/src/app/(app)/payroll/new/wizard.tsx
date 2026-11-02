@@ -36,6 +36,10 @@ type EmployeeOption = {
   id: string;
   name: string;
   payRate?: number | null;
+  /** Wave 4 (W4-D8) — the employee's pay group; null = unassigned. The
+   *  input list filters to the selected group using the server's own
+   *  scoping rule (assigned to the group OR unassigned). */
+  payGroupId?: string | null;
 };
 
 type Props = {
@@ -337,6 +341,15 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
 
   // ── Render ────────────────────────────────────────────────────────────────
 
+  // W4-D8 — the input list shows only the selected pay group's members
+  // (plus unassigned employees, mirroring the server's scoping rule in
+  // computePayRun). Before a group is chosen, everyone is listed. The
+  // Prairie Peak proof listed all 6 employees — including the Quebec
+  // group's employee — in a Core Crew run.
+  const visibleEmployees = payGroupId
+    ? employees.filter((e) => e.payGroupId == null || e.payGroupId === payGroupId)
+    : employees;
+
   return (
     <div className="space-y-6">
       {/* Stepper */}
@@ -407,16 +420,22 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {employees.length === 0 ? (
+              {visibleEmployees.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4 text-center">
-                  No active employees.{" "}
-                  <a href="/employees/new" className="text-primary underline">
-                    Add one first.
-                  </a>
+                  {employees.length === 0 ? (
+                    <>
+                      No active employees.{" "}
+                      <a href="/employees/new" className="text-primary underline">
+                        Add one first.
+                      </a>
+                    </>
+                  ) : (
+                    "No employees in this pay group yet. Assign employees to the group, or pick another group."
+                  )}
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {employees.map((emp) => (
+                  {visibleEmployees.map((emp) => (
                     <div key={emp.id}>
                       <div className="flex items-center gap-4">
                         <Label className="w-40 text-sm truncate" htmlFor={`gross-${emp.id}`}>
@@ -641,9 +660,15 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
                 <Stat label="Gross pay" value={fmtCAD(preview.totals.gross)} />
-                <Stat label="CPP" value={fmtCAD(preview.totals.cpp)} />
-                <Stat label="CPP2" value={fmtCAD(preview.totals.cpp2)} />
+                {/* W4-D3 — Quebec amounts are labelled as what they are:
+                    the CPP figure excludes the QPP subtotal, and QPIP
+                    gets its own stat instead of hiding inside EI. */}
+                <Stat label="CPP" value={fmtCAD(preview.totals.cpp - preview.totals.qpp)} />
+                <Stat label="CPP2" value={fmtCAD(preview.totals.cpp2 - preview.totals.qpp2)} />
+                {preview.totals.qpp > 0 && <Stat label="QPP" value={fmtCAD(preview.totals.qpp)} />}
+                {preview.totals.qpp2 > 0 && <Stat label="QPP2" value={fmtCAD(preview.totals.qpp2)} />}
                 <Stat label="EI" value={fmtCAD(preview.totals.ei)} />
+                {preview.totals.qpip > 0 && <Stat label="QPIP" value={fmtCAD(preview.totals.qpip)} />}
                 <Stat label="Federal tax" value={fmtCAD(preview.totals.federalTax)} />
                 <Stat label="Provincial tax" value={fmtCAD(preview.totals.provincialTax)} />
                 <Separator className="col-span-full" />
@@ -688,7 +713,7 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                       <p className="tabular-nums">{fmtCAD(item.gross)}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">CPP</span>
+                      <span className="text-muted-foreground">{item.province === "QC" ? "QPP" : "CPP"}</span>
                       <p className="tabular-nums">{fmtCAD(item.result.cpp)}</p>
                     </div>
                     <div>
@@ -696,9 +721,15 @@ export function PayRunWizard({ plan = "growth", payGroups, employees, previewAct
                       <p className="tabular-nums">{fmtCAD(item.result.ei)}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">CPP2</span>
+                      <span className="text-muted-foreground">{item.province === "QC" ? "QPP2" : "CPP2"}</span>
                       <p className="tabular-nums">{fmtCAD(item.result.cpp2)}</p>
                     </div>
+                    {item.province === "QC" && (
+                      <div>
+                        <span className="text-muted-foreground">QPIP</span>
+                        <p className="tabular-nums">{fmtCAD(item.result.qpip)}</p>
+                      </div>
+                    )}
                     <div>
                       <span className="text-muted-foreground">Tax</span>
                       <p className="tabular-nums">

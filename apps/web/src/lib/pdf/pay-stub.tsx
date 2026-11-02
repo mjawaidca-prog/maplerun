@@ -49,8 +49,22 @@ export interface PayStubPdfData {
   companyName: string; employeeName: string; payDate: string; payGroup: string;
   /** Wave 3 B5 — pay-period start (PayRun.periodStart); null on pre-B5 runs. */
   periodStart: string | null;
+  /** Wave 4 (W4-D4) — the ACTUAL pay date (PayRun.actualPayDate). The
+   *  PDF previously showed only the period end (payDate) and labelled
+   *  it "Pay Date"; the pay date now renders as its own field. */
+  actualPayDate: string | null;
   gross: number; cpp: number; cpp2: number; ei: number; federalTax: number; provincialTax: number;
   totalDeductions: number; netPay: number;
+  /** Wave 4 (W4-D3) — Quebec split: when isQuebec, cpp/cpp2 render as
+   *  QPP/QPP2, qpip renders as its own line (it was folded into EI),
+   *  and the employer block splits employerEiPure / employerQpip out
+   *  of the folded employerEi. ytdEi / ytdInsurable arrive PRE-SPLIT
+   *  (EI-only) from the routes; ytdQpip / ytdQpipInsurable carry the
+   *  Quebec shares. */
+  isQuebec: boolean;
+  qpip: number;
+  employerEiPure: number; employerQpip: number;
+  ytdQpip: number; ytdQpipInsurable: number;
   /** Wave 3 B5 — itemized earnings lines (Regular/Overtime/Stat/Vacation/Bonus…). */
   earnings: { label: string; detail: string | null; amount: number }[];
   /** Wave 3 B6 — named custom deduction lines. */
@@ -81,8 +95,10 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.headerLabel}>PAY STUB</Text>
             <Text style={styles.headerValue}>
-              {data.periodStart ? `Pay Period · ${data.periodStart} → ${data.payDate}` : `Pay Date · ${data.payDate}`}
+              {data.periodStart ? `Pay Period · ${data.periodStart} → ${data.payDate}` : `Period End · ${data.payDate}`}
             </Text>
+            {/* W4-D4 — the pay date always renders (it is NOT the period end). */}
+            <Text style={styles.headerValue}>{`Pay Date · ${data.actualPayDate ?? data.payDate}`}</Text>
             <Text style={styles.headerValue}>{data.payGroup}</Text>
           </View>
         </View>
@@ -95,9 +111,12 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
             <Text style={styles.empSub}>SIN •••-•••-•••</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={styles.empLabel}>Pay Period</Text>
+            <Text style={styles.empLabel}>Pay Date</Text>
             <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 1 }}>
-              {data.periodStart ? `${data.periodStart} → ${data.payDate}` : data.payDate}
+              {data.actualPayDate ?? data.payDate}
+            </Text>
+            <Text style={styles.empSub}>
+              {data.periodStart ? `Period ${data.periodStart} → ${data.payDate}` : `Period end ${data.payDate}`}
             </Text>
           </View>
         </View>
@@ -121,11 +140,12 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
           <View style={styles.col}>
             <Text style={styles.sectionTitle}>Deductions</Text>
             <View style={styles.ledger}>
-              <LedgerRow label="CPP" value={fmtCAD(data.cpp)} />
-              <LedgerRow label="CPP2" value={fmtCAD(data.cpp2)} alt />
+              <LedgerRow label={data.isQuebec ? "QPP" : "CPP"} value={fmtCAD(data.cpp)} />
+              <LedgerRow label={data.isQuebec ? "QPP2" : "CPP2"} value={fmtCAD(data.cpp2)} alt />
               <LedgerRow label="EI" value={fmtCAD(data.ei)} />
-              <LedgerRow label="Federal Tax" value={fmtCAD(data.federalTax)} alt />
-              <LedgerRow label="Provincial Tax" value={fmtCAD(data.provincialTax)} />
+              {data.isQuebec && <LedgerRow label="QPIP" value={fmtCAD(data.qpip)} alt />}
+              <LedgerRow label="Federal Tax" value={fmtCAD(data.federalTax)} alt={!data.isQuebec} />
+              <LedgerRow label={data.isQuebec ? "Quebec Tax" : "Provincial Tax"} value={fmtCAD(data.provincialTax)} />
               {data.customDeductions.map((d, i) => (
                 <LedgerRow key={d.name} label={d.name} value={fmtCAD(d.amount)} alt={i % 2 === 0} />
               ))}
@@ -153,9 +173,10 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
           <View style={styles.col}>
             <Text style={styles.sectionTitle}>Employer Costs</Text>
             <View style={styles.ledger}>
-              <LedgerRow label="CPP Match" value={fmtCAD(data.employerCpp)} />
-              <LedgerRow label="CPP2 Match" value={fmtCAD(data.employerCpp2)} alt />
-              <LedgerRow label="EI (1.4×)" value={fmtCAD(data.employerEi)} />
+              <LedgerRow label={data.isQuebec ? "QPP Match" : "CPP Match"} value={fmtCAD(data.employerCpp)} />
+              <LedgerRow label={data.isQuebec ? "QPP2 Match" : "CPP2 Match"} value={fmtCAD(data.employerCpp2)} alt />
+              <LedgerRow label="EI (1.4×)" value={fmtCAD(data.employerEiPure)} />
+              {data.isQuebec && <LedgerRow label="QPIP (employer)" value={fmtCAD(data.employerQpip)} alt />}
               <LedgerRow label="Total" value={fmtCAD(data.employerTotal)} total />
             </View>
           </View>
@@ -165,10 +186,12 @@ export function PayStubPdf({ data }: { data: PayStubPdfData }) {
               <LedgerRow label="Gross Pay" value={fmtCAD(data.ytdGrossPay)} />
               <LedgerRow label="Income Tax" value={fmtCAD(data.ytdIncomeTax)} alt />
               <LedgerRow label="Pensionable" value={fmtCAD(data.ytdPensionable)} />
-              <LedgerRow label="Insurable" value={fmtCAD(data.ytdInsurable)} alt />
-              <LedgerRow label="CPP" value={fmtCAD(data.ytdCpp)} />
+              <LedgerRow label={data.isQuebec ? "Insurable (EI)" : "Insurable"} value={fmtCAD(data.ytdInsurable)} alt />
+              {data.isQuebec && <LedgerRow label="Insurable (QPIP)" value={fmtCAD(data.ytdQpipInsurable)} />}
+              <LedgerRow label={data.isQuebec ? "QPP" : "CPP"} value={fmtCAD(data.ytdCpp)} />
               <LedgerRow label="EI" value={fmtCAD(data.ytdEi)} alt />
-              <LedgerRow label="CPP2" value={fmtCAD(data.ytdCpp2)} />
+              {data.isQuebec && <LedgerRow label="QPIP" value={fmtCAD(data.ytdQpip)} />}
+              <LedgerRow label={data.isQuebec ? "QPP2" : "CPP2"} value={fmtCAD(data.ytdCpp2)} />
             </View>
             {data.vacationBalanceAfterCents != null && (
               <View style={{ marginTop: 8 }}>
