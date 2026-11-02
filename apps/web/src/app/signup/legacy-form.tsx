@@ -118,6 +118,6 @@ function SignUpForm() {
   );
 }
 
-export default function SignUpPage() {
+export function LegacySignUpForm() {
   return <Suspense><SignUpForm /></Suspense>;
 }

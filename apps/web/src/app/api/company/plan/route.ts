@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const userId = await getAuthUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
   // Verify user is OWNER of this company
   const membership = await prisma.membership.findFirst({
-    where: { userId: session.user.id, companyId, role: "OWNER" },
+    where: { userId: userId, companyId, role: "OWNER" },
   });
   if (!membership) {
     return NextResponse.json({ error: "Only the company owner can change the plan" }, { status: 403 });

@@ -108,6 +108,6 @@ function SignInForm() {
   );
 }
 
-export default function SignInPage() {
+export function LegacySignInForm() {
   return <Suspense><SignInForm /></Suspense>;
 }
