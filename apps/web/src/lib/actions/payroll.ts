@@ -341,6 +341,11 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
       payDate,
       province: empProvince,
       frequency,
+      // W4-D2(a) — the vacation-pay component of the period's gross.
+      // PDOC prices CPP/QPP on it as a separate no-exemption component;
+      // the engine composes regular + vacation itself, so the amount is
+      // passed alongside (it is already inside regularGross).
+      vacationPay: vacationAmount,
       federalClaim: td1?.federalClaim ?? undefined,
       provincialClaim: td1?.provincialClaim ?? undefined,
       cppExempt: td1?.cppExempt ?? false,

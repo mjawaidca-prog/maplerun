@@ -69,7 +69,12 @@ export function calculatePay(input: PayInput): PayResult {
   // ── CPP/QPP ──────────────────────────────────────────────────────────────
   // Quebec uses QPP (6.30%) instead of CPP (5.95%). Same formula, different table.
   const cppTable = isQC ? QPP_2026 : tables.cpp;
-  const cppRes = calcCpp(pensionableBase, P, ytd, cppTable, input.cppExempt ?? false);
+  // W4-D2(a): the vacation-pay component of the pensionable base is
+  // priced by calcCpp as a separate no-exemption component (PDOC's
+  // composition). Bounded by the pensionable base; pensionable-reducing
+  // named deductions are attributed to regular pay first.
+  const vacationPensionable = Math.min(Math.max(0, input.vacationPay ?? 0), pensionableBase);
+  const cppRes = calcCpp(pensionableBase, P, ytd, cppTable, input.cppExempt ?? false, vacationPensionable);
 
   // ── EI (QC gets reduced rate) + QPIP (QC only) ───────────────────────────
   const eiRes = calcEi(insurableBase, input.province, ytd, tables.ei, input.eiExempt ?? false);
