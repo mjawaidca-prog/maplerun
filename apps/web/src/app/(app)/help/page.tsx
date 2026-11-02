@@ -20,7 +20,7 @@ export default function HelpPage() {
       <Section title="Payroll calculations">
         <Q q="Are the tax calculations accurate?" a="Yes. Nexvar Pay uses CRA T4127 formulas (2026 editions). CPP, CPP2, EI, and income tax are calculated exactly per CRA guidelines. All provinces and territories are supported including Quebec (QPP/QPIP)." />
         <Q q="What rates does Nexvar Pay use?" a="CPP: 5.95% (employee) on pensionable earnings up to $74,600. CPP2: 4.00% on $74,600–$85,000. EI: 1.63% (employee) on insurable earnings up to $68,900 (QC: 1.30%). Federal/provincial income tax per T4127 brackets." />
-        <Q q="How is vacation pay handled?" a="Check 'Vacation pay' on any employee in the wizard and enter a percentage (typically 4% or 6%). The amount is calculated automatically and shown on the pay stub." />
+        <Q q="How is vacation pay handled?" a="Vacation is set per employee (Employees → the employee → Edit → Vacation pay). 'Pay out each run': enter the amount in the pay-run wizard and it is paid with that run at the employee's vacation rate. 'Accrue': every finalized run adds the employee's vacation rate % of gross to their vacation balance — shown on their profile — and you pay it out from the wizard when they take time off; the payout comes off the balance. Reversing a run unwinds that run's accrual or payout exactly." />
         <Q q="How are insurable hours tracked?" a="Enter hours per employee in the pay run wizard (defaults to 75 for biweekly). Hours are stored per pay period and used for ROE Block 15A." />
       </Section>
 
