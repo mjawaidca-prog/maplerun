@@ -170,6 +170,71 @@ export function periodLabel(periodKey: string): string {
   return periodKey;
 }
 
+// ─── Report scope selection (W4-D11) ─────────────────────────────────────────
+
+/** `period` search-param value that selects the year-to-date scope. */
+export const REMITTANCE_YTD_SCOPE = "ytd";
+
+/**
+ * The Remittances page scope: one period, or the year-to-date totals.
+ * Selection is URL-driven (the `period` search param) so a view is
+ * linkable and survives reload — the page previously rendered hardcoded
+ * decorative period buttons and could only ever show the current period.
+ */
+export type RemittanceScope =
+  | { kind: "period"; period: string }
+  | { kind: "ytd" };
+
+const MONTHLY_KEY_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
+const QUARTERLY_KEY_RE = /^\d{4}-Q[1-4]$/;
+
+/** True when `key` is a well-formed period key for the grouping. */
+export function isPeriodKeyForGrouping(
+  key: string,
+  grouping: RemittanceGrouping,
+): boolean {
+  return grouping === "quarterly"
+    ? QUARTERLY_KEY_RE.test(key)
+    : MONTHLY_KEY_RE.test(key);
+}
+
+/**
+ * Resolve the raw `period` search param into a scope.
+ * - "ytd" → the year-to-date scope
+ * - a well-formed key for the grouping → that period (a period with no
+ *   finalized runs renders zeros; it is never offered in the selector,
+ *   but a hand-typed or stale link must not crash the page — e.g. a
+ *   monthly key left in the URL after the remitter type regroups to
+ *   quarterly fails the format check and falls back)
+ * - anything else (absent, malformed, wrong grouping) → the current period
+ */
+export function resolveRemittanceScope(
+  param: string | undefined,
+  currentPeriod: string,
+  grouping: RemittanceGrouping,
+): RemittanceScope {
+  if (param === REMITTANCE_YTD_SCOPE) return { kind: "ytd" };
+  if (param && isPeriodKeyForGrouping(param, grouping)) {
+    return { kind: "period", period: param };
+  }
+  return { kind: "period", period: currentPeriod };
+}
+
+/**
+ * Period keys the selector offers: every period present in the
+ * aggregation (i.e. with finalized runs) plus the current period (always
+ * selectable, even before its first run), newest first. Keys within one
+ * grouping share a format, so string order is chronological order.
+ */
+export function remittancePeriodOptions(
+  aggregatedPeriods: readonly string[],
+  currentPeriod: string,
+): string[] {
+  const keys = new Set(aggregatedPeriods);
+  keys.add(currentPeriod);
+  return [...keys].sort().reverse();
+}
+
 /**
  * CRA due date for a period, as an ISO date string ("YYYY-MM-DD").
  * Regular remitter: the 15th of the month following the period —

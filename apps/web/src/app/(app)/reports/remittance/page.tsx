@@ -2,9 +2,13 @@
  * Remittance Report — pixel-matched to MapleRun Remittance Report design spec.
  * Due dates come from the shared remitter-aware helper
  * (remittanceDueDateFor): CRA's next-business-day rule lives there, never
- * inline. The lead figure is the CURRENT PERIOD's scope (labelled as such);
- * year-to-date figures are labelled "Year to date" wherever they appear —
- * the Reports hub PD7A figure is the YTD one (PR #14 FLAG A).
+ * inline. The scope is URL-driven (the `period` search param, resolved by
+ * resolveRemittanceScope): one period — current, or any period with
+ * finalized runs — or the year-to-date totals. The scope is labelled
+ * wherever a figure appears; the Reports hub PD7A figure is the YTD one
+ * (PR #14 FLAG A). W4-D11: the period selector used to be hardcoded
+ * decorative buttons and the report was pinned to the current period, so
+ * past periods (and their Revenu Québec section) were unreachable.
  */
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
@@ -16,7 +20,10 @@ import {
   periodKeyForPayDate,
   periodLabel,
   remittanceDueDateFor,
+  remittancePeriodOptions,
   remitterTypeLabel,
+  resolveRemittanceScope,
+  REMITTANCE_YTD_SCOPE,
   type QuebecRemittanceItemRow,
 } from "@/lib/remittance/aggregate";
 import {
@@ -35,9 +42,9 @@ function pct(part: number, total: number): number { return total > 0 ? Math.roun
 
 type Tab = "breakdown" | "employees" | "history" | "schedule";
 
-export default async function RemittancePage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+export default async function RemittancePage({ searchParams }: { searchParams: Promise<{ tab?: string; period?: string }> }) {
   const { companyId } = await requireCompany();
-  const { tab: rawTab } = await searchParams;
+  const { tab: rawTab, period: rawPeriod } = await searchParams;
   const activeTab: Tab = (rawTab as Tab) ?? "breakdown";
 
   const runs = await prisma.payRun.findMany({
@@ -55,31 +62,61 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
 
   const now = new Date();
   const currentPeriod = periodKeyForDate(now, grouping);
-  // Runs belonging to the current period, via the shared period-key helper
-  // (monthly behaviour identical to the old payDate-prefix filter).
-  const periodRuns = runs.filter(
-    (r) => periodKeyForPayDate(r.payDate, grouping) === currentPeriod,
-  );
-  const employeeSet = new Set<string>(); periodRuns.forEach((r) => r.items.forEach((i) => employeeSet.add(i.employeeId)));
 
   // Totals — computed by the shared remittance aggregation (the same code
   // path behind the Reports hub PD7A figure), never recomputed inline.
   // Grouping follows the company's remitter type.
   const remittanceAgg = aggregateRemittances(runs, grouping);
   const periodAgg = new Map(remittanceAgg.periods.map((p) => [p.period, p]));
-  const cur = periodAgg.get(currentPeriod);
-  // Year-to-date scope (FLAG A): the totals over every period in the
-  // aggregation — the same scope the Reports hub PD7A card shows. Labelled
-  // "Year to date" wherever displayed; the lead cards are current-period.
+
+  // Scope (W4-D11): the `period` search param selects a single period or
+  // the year-to-date totals; absent/invalid → the current period, exactly
+  // the pre-D11 behaviour. The selector offers the current period plus
+  // every period present in the aggregation (finalized runs), and YTD.
+  const scope = resolveRemittanceScope(rawPeriod, currentPeriod, grouping);
+  const isYtd = scope.kind === "ytd";
+  const selectedPeriod = isYtd ? null : scope.period;
+  const periodOptions = remittancePeriodOptions(
+    remittanceAgg.periods.map((p) => p.period),
+    currentPeriod,
+  );
+  const scopeLabel = isYtd
+    ? "Year to date"
+    : selectedPeriod === currentPeriod
+      ? `Current period — ${periodLabel(selectedPeriod!)}`
+      : `${periodLabel(selectedPeriod!)} (${selectedPeriod})`;
+
+  // Runs inside the scope, via the shared period-key helper (monthly
+  // behaviour identical to the old payDate-prefix filter).
+  const periodRuns = isYtd
+    ? runs
+    : runs.filter(
+        (r) => periodKeyForPayDate(r.payDate, grouping) === selectedPeriod,
+      );
+  const employeeSet = new Set<string>(); periodRuns.forEach((r) => r.items.forEach((i) => employeeSet.add(i.employeeId)));
+
+  // Scope figures: the selected period's Pd7aPeriod, or the aggregation
+  // totals for YTD — both carry the same money fields, so every figure
+  // below reads from `sel` regardless of scope. A selected period with
+  // no runs (deep link only) reads zeros.
+  const sel = isYtd
+    ? remittanceAgg.totals
+    : (periodAgg.get(selectedPeriod!) ?? {
+        employeeCpp: 0, employeeCpp2: 0, employeeEi: 0,
+        employerCpp: 0, employerCpp2: 0, employerEi: 0,
+        federalTax: 0, provincialTax: 0, totalRemittance: 0,
+      });
+  // Year-to-date total (FLAG A): the totals over every period in the
+  // aggregation — the same scope the Reports hub PD7A card shows.
   const ytdTotal = remittanceAgg.totals.totalRemittance;
   const t = {
-    cppEe: cur?.employeeCpp ?? 0, cppEr: cur?.employerCpp ?? 0,
-    cpp2Ee: cur?.employeeCpp2 ?? 0, cpp2Er: cur?.employerCpp2 ?? 0,
-    eiEe: cur?.employeeEi ?? 0, eiEr: cur?.employerEi ?? 0,
-    fedTax: cur?.federalTax ?? 0, provTax: cur?.provincialTax ?? 0,
+    cppEe: sel.employeeCpp, cppEr: sel.employerCpp,
+    cpp2Ee: sel.employeeCpp2, cpp2Er: sel.employerCpp2,
+    eiEe: sel.employeeEi, eiEr: sel.employerEi,
+    fedTax: sel.federalTax, provTax: sel.provincialTax,
     gross: periodRuns.reduce((s, r) => s + r.totalGross, 0),
   };
-  const totalCRA = cur?.totalRemittance ?? 0;
+  const totalCRA = sel.totalRemittance;
   const cppTotal = t.cppEe + t.cppEr; const eiTotal = t.eiEe + t.eiEr;
   const taxTotal = t.fedTax + t.provTax;
   const employeeEeTotal = t.cppEe + t.cpp2Ee + t.eiEe + t.fedTax + t.provTax;
@@ -97,10 +134,12 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
   }
   const employees = Array.from(empMap.values());
 
-  // W4-D3 — Revenu Québec section: the current period's Quebec items,
-  // aggregated from the split columns (the CRA figures above fold QPP
-  // into CPP and QPIP into EI because they are built from run totals;
-  // this section separates the amounts owed to Revenu Québec instead).
+  // W4-D3 — Revenu Québec section: the scope's Quebec items, aggregated
+  // from the split columns (the CRA figures above fold QPP into CPP and
+  // QPIP into EI because they are built from run totals; this section
+  // separates the amounts owed to Revenu Québec instead). W4-D11: the
+  // scope follows the selected period / YTD, so a past period's Quebec
+  // amounts stay reachable after the period stops being current.
   const qcItems: QuebecRemittanceItemRow[] = [];
   for (const r of periodRuns) {
     for (const i of r.items) {
@@ -119,11 +158,25 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
   // old inline code shifted Saturday BACK to the Friday 14th; CRA's rule
   // is the NEXT business day, and that rule now lives in
   // lib/remittance/aggregate.ts alongside every other remittance rule).
-  const dueDateStr = remittanceDueDateFor(currentPeriod, remitterType);
-  const dueDate = new Date(`${dueDateStr}T12:00:00`);
-  const daysLeft = Math.ceil((dueDate.getTime() - now.getTime()) / 86400000);
-  const isUrgent = daysLeft <= 14 && daysLeft > 0 && totalCRA > 0;
-  const currentSubmission = submissions[currentPeriod];
+  // A single period has one due date and one submission state; the YTD
+  // scope has neither, so both stay null there.
+  const dueDateStr = isYtd ? null : remittanceDueDateFor(selectedPeriod!, remitterType);
+  const dueDate = dueDateStr ? new Date(`${dueDateStr}T12:00:00`) : null;
+  const daysLeft = dueDate ? Math.ceil((dueDate.getTime() - now.getTime()) / 86400000) : null;
+  const isUrgent = !isYtd && selectedPeriod === currentPeriod && daysLeft !== null && daysLeft <= 14 && daysLeft > 0 && totalCRA > 0;
+  const selectedSubmission = isYtd ? undefined : submissions[selectedPeriod!];
+
+  // URL builder for the scope selector and the tab bar: each preserves
+  // the other param so switching scope keeps the tab and vice versa.
+  const hrefFor = (opts: { tab?: Tab; period?: string | null }) => {
+    const params = new URLSearchParams();
+    const period = opts.period === undefined ? rawPeriod : opts.period;
+    if (period) params.set("period", period);
+    const tab = opts.tab ?? activeTab;
+    if (tab !== "breakdown") params.set("tab", tab);
+    const qs = params.toString();
+    return qs ? `/reports/remittance?${qs}` : "/reports/remittance";
+  };
 
   return (
     <div className="space-y-5 print:space-y-3">
@@ -133,7 +186,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
       {/* Print-only header */}
       <div className="hidden print:block text-center border-b-2 border-black pb-4 mb-4">
         <h1 className="text-xl font-bold">Nexvar Pay — Remittance Report</h1>
-        <p className="text-sm">Current period — {periodLabel(currentPeriod)} ({currentPeriod}) · {remitterLabel} · Due {dueDateStr}</p>
+        <p className="text-sm">{isYtd ? "Year to date" : `${selectedPeriod === currentPeriod ? "Current period — " : ""}${periodLabel(selectedPeriod!)} (${selectedPeriod})`} · {remitterLabel}{dueDateStr ? ` · Due ${dueDateStr}` : ""}</p>
         <p className="text-sm font-bold mt-1">Total Owing to CRA: {fmtCAD(totalCRA)}</p>
       </div>
 
@@ -141,9 +194,11 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
       <div className="flex justify-between items-start print:hidden">
         <div>
           <h1 className="text-[26px] font-extrabold tracking-[-0.02em] text-[#1C1917]">Remittance Report</h1>
-          <p className="text-sm text-[#78716C] mt-1">Source deductions owing to the CRA — Current period — {periodLabel(currentPeriod)} · {employeeSet.size} employees</p>
+          <p className="text-sm text-[#78716C] mt-1">Source deductions owing to the CRA — {scopeLabel} · {employeeSet.size} employees</p>
         </div>
-        <RemittanceActions totalCRA={totalCRA} period={currentPeriod} dueDate={dueDateStr} remitterLabel={remitterLabel} alreadySubmitted={!!currentSubmission} />
+        {!isYtd && (
+          <RemittanceActions totalCRA={totalCRA} period={selectedPeriod!} dueDate={dueDateStr!} remitterLabel={remitterLabel} alreadySubmitted={!!selectedSubmission} />
+        )}
       </div>
 
       {/* Alert Banner */}
@@ -158,28 +213,38 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
         </div>
       )}
 
-      {/* Filter Bar */}
+      {/* Filter Bar — W4-D11: the period control is real now (URL-driven
+          Links, same pattern as the tab bar). The old bar rendered
+          hardcoded decorative period buttons plus placeholder Type /
+          Pay group dropdowns and a dead Apply button — those are gone;
+          no control remains that does not change the report. */}
       <div className="flex items-end gap-3.5 bg-white border border-[#E7E5E4] rounded-xl px-[18px] py-3.5 flex-wrap shadow-[0_1px_3px_rgba(0,0,0,0.04)] print:hidden">
         <div className="flex flex-col gap-[5px]">
           <span className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em]">Period</span>
-          <div className="inline-flex gap-0.5 bg-[#F5F5F4] border border-[#E7E5E4] rounded-[9px] p-[3px]">
-            {["Current month","Jan 2026","Year to date","Custom"].map((l,i)=>(
-              <button key={l} className={`text-xs font-semibold px-[11px] py-1.5 rounded-md ${i===0?"bg-white text-[#1C1917] shadow-[0_1px_2px_rgba(0,0,0,0.08)]":"text-[#78716C]"}`}>{l}</button>
-            ))}
+          <div className="inline-flex gap-0.5 bg-[#F5F5F4] border border-[#E7E5E4] rounded-[9px] p-[3px] flex-wrap">
+            {periodOptions.map((p) => {
+              const active = !isYtd && p === selectedPeriod;
+              return (
+                <Link
+                  key={p}
+                  href={hrefFor({ period: p === currentPeriod ? null : p })}
+                  className={`text-xs font-semibold px-[11px] py-1.5 rounded-md no-underline ${active ? "bg-white text-[#1C1917] shadow-[0_1px_2px_rgba(0,0,0,0.08)]" : "text-[#78716C]"}`}
+                >
+                  {periodLabel(p)}{p === currentPeriod ? " (current)" : ""}
+                </Link>
+              );
+            })}
+            <Link
+              href={hrefFor({ period: REMITTANCE_YTD_SCOPE })}
+              className={`text-xs font-semibold px-[11px] py-1.5 rounded-md no-underline ${isYtd ? "bg-white text-[#1C1917] shadow-[0_1px_2px_rgba(0,0,0,0.08)]" : "text-[#78716C]"}`}
+            >
+              Year to date
+            </Link>
           </div>
-        </div>
-        <div className="flex flex-col gap-[5px]">
-          <span className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em]">Type</span>
-          <select className="border border-[#D6D3D1] rounded-lg px-3 py-2 text-[13px] bg-white"><option>All types</option></select>
-        </div>
-        <div className="flex flex-col gap-[5px]">
-          <span className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.05em]">Pay group</span>
-          <select className="border border-[#D6D3D1] rounded-lg px-3 py-2 text-[13px] bg-white"><option>All staff</option></select>
         </div>
         {/* Remitter type — Wave 1's Company.remitterType, settable here.
             Changing it regroups periods (QUARTERLY) and re-derives due dates. */}
         <RemitterTypeSelector current={remitterType} />
-        <button className="rounded-[9px] border border-[#D6D3D1] bg-white text-[#1C1917] text-[13px] font-semibold px-4 py-2">Apply</button>
       </div>
 
       {/* Summary Cards */}
@@ -187,14 +252,15 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
         <div className="bg-[#1C1917] border border-[#1C1917] rounded-[14px] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <p className="text-[11px] font-bold text-[#A8A29E] uppercase tracking-[0.06em]">Total owing to CRA</p>
           <p className="text-[28px] font-extrabold tracking-[-0.02em] text-white font-mono tabular-nums mt-2">{fmtCAD(totalCRA)}</p>
-          {/* FLAG A scope label: this lead figure is the CURRENT PERIOD only —
-              the Reports hub PD7A figure is the year-to-date scope. */}
-          <p className="text-xs text-[#78716C] mt-1">Current period — {periodLabel(currentPeriod)} · {employeeSet.size} employees</p>
-          <p className="text-xs text-[#78716C] mt-0.5">Year to date: {fmtCAD(ytdTotal)}</p>
-          {currentSubmission ? (
-            <span className="inline-flex mt-2 text-[11px] font-bold tracking-[0.04em] bg-[#14532D] text-[#4ADE80] rounded-full px-2.5 py-1">✓ Submitted {currentSubmission.submittedAt.toISOString().slice(0, 10)}{currentSubmission.reference ? ` · ${currentSubmission.reference}` : ""}</span>
-          ) : totalCRA > 0 ? (
-            <span className="inline-flex mt-2 text-[11px] font-bold tracking-[0.04em] bg-[#3F1413] text-[#E56A5C] rounded-full px-2.5 py-1">Due {dueDateStr} · {daysLeft > 0 ? `${daysLeft} days` : "Overdue"}</span>
+          {/* FLAG A scope label: this lead figure is the SELECTED scope
+              only — the Reports hub PD7A figure is the year-to-date scope.
+              The scope is named on the card itself (W4-D11). */}
+          <p className="text-xs text-[#78716C] mt-1">{scopeLabel} · {employeeSet.size} employees</p>
+          {!isYtd && <p className="text-xs text-[#78716C] mt-0.5">Year to date: {fmtCAD(ytdTotal)}</p>}
+          {selectedSubmission ? (
+            <span className="inline-flex mt-2 text-[11px] font-bold tracking-[0.04em] bg-[#14532D] text-[#4ADE80] rounded-full px-2.5 py-1">✓ Submitted {selectedSubmission.submittedAt.toISOString().slice(0, 10)}{selectedSubmission.reference ? ` · ${selectedSubmission.reference}` : ""}</span>
+          ) : !isYtd && totalCRA > 0 ? (
+            <span className="inline-flex mt-2 text-[11px] font-bold tracking-[0.04em] bg-[#3F1413] text-[#E56A5C] rounded-full px-2.5 py-1">Due {dueDateStr} · {daysLeft !== null && daysLeft > 0 ? `${daysLeft} days` : "Overdue"}</span>
           ) : null}
         </div>
         <div className="bg-white border border-[#E7E5E4] rounded-[14px] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
@@ -219,9 +285,9 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
         {[
           ["Business number","—"],
           ["Remitter type",remitterLabel],
-          ["Pay period",currentPeriod],
+          ["Pay period",isYtd ? "Year to date" : selectedPeriod!],
           ["Pay runs",`${periodRuns.length} finalized`],
-          ["Filing status",currentSubmission?"Submitted":totalCRA>0?"Pending review":"No activity"],
+          ["Filing status",isYtd?"—":selectedSubmission?"Submitted":totalCRA>0?"Pending review":"No activity"],
           ["Prior month","—"],
         ].map(([label,value],i)=>(
           <div key={label} className={`flex-1 px-5 py-3.5 ${i<5?"border-r border-[#F0EFED]":""}`}>
@@ -234,7 +300,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
       {/* Tab Bar — pill style from spec */}
       <div className="inline-flex gap-0.5 bg-[#F5F5F4] border border-[#E7E5E4] rounded-[10px] p-[3px] print:hidden">
         {(["breakdown","employees","history","schedule"] as Tab[]).map((t)=>(
-          <Link key={t} href={`/reports/remittance?tab=${t}`} className={`text-[13px] font-semibold px-[15px] py-[7px] rounded-[7px] no-underline capitalize ${activeTab===t?"bg-white text-[#1C1917] shadow-[0_1px_3px_rgba(0,0,0,0.08)]":"text-[#78716C]"}`}>{t==="breakdown"?"Deduction breakdown":t==="employees"?"By employee":t==="history"?"Remittance history":"Schedule & rates"}</Link>
+          <Link key={t} href={hrefFor({ tab: t })} className={`text-[13px] font-semibold px-[15px] py-[7px] rounded-[7px] no-underline capitalize ${activeTab===t?"bg-white text-[#1C1917] shadow-[0_1px_3px_rgba(0,0,0,0.08)]":"text-[#78716C]"}`}>{t==="breakdown"?"Deduction breakdown":t==="employees"?"By employee":t==="history"?"Remittance history":"Schedule & rates"}</Link>
         ))}
       </div>
 
@@ -286,7 +352,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
                 ))}
               </tbody>
               <tfoot><tr className="bg-[#1C1917] text-white font-bold text-[13px]">
-                <td className="px-4 py-3">Total remittance to CRA — {currentPeriod}</td><td className="text-right px-4 py-3"></td>
+                <td className="px-4 py-3">Total remittance to CRA — {isYtd ? "Year to date" : selectedPeriod}</td><td className="text-right px-4 py-3"></td>
                 <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(employeeEeTotal)}</td>
                 <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(employerTotal)}</td>
                 <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(totalCRA)}</td><td className="px-4 py-3"></td>
@@ -299,7 +365,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
               totals) — this section separates them for the RQ payment. */}
           {rq.items > 0 && (
             <>
-              <p className="text-[13px] font-bold text-[#78716C] uppercase tracking-[0.06em] pt-2">Revenu Québec — {periodLabel(currentPeriod)}</p>
+              <p className="text-[13px] font-bold text-[#78716C] uppercase tracking-[0.06em] pt-2">Revenu Québec — {isYtd ? "Year to date" : periodLabel(selectedPeriod!)}</p>
               <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
                 <table className="w-full">
                   <thead><tr className="bg-[#FAFAF9] text-[11px] font-bold text-[#78716C] uppercase tracking-[0.04em] border-b border-[#E7E5E4]">
@@ -321,7 +387,7 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
                     ))}
                   </tbody>
                   <tfoot><tr className="bg-[#1C1917] text-white font-bold text-[13px]">
-                    <td className="px-4 py-3">Total remittance to Revenu Québec — {currentPeriod}</td>
+                    <td className="px-4 py-3">Total remittance to Revenu Québec — {isYtd ? "Year to date" : selectedPeriod}</td>
                     <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(rq.qppEmployee + rq.qpp2Employee + rq.qpipEmployee + rq.quebecTax)}</td>
                     <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(rq.qppEmployer + rq.qpp2Employer + rq.qpipEmployer)}</td>
                     <td className="text-right px-4 py-3 font-mono tabular-nums">{fmtCAD(rq.totalRq)}</td>
@@ -417,14 +483,18 @@ export default async function RemittancePage({ searchParams }: { searchParams: P
                   // Due date from the shared remitter-aware helper (FLAG B).
                   const due = remittanceDueDateFor(period, remitterType);
                   const isCurrent = i===0;
+                  // W4-D11: the row for the period being viewed is
+                  // highlighted, so the history tab reflects the scope
+                  // selected in the filter bar.
+                  const isSelected = !isYtd && period === selectedPeriod;
                   // Submission state comes from the persisted
                   // RemittanceSubmission records — a date/reference is shown
                   // ONLY when a real record exists (PR #14 removed the
                   // fabricated ones; this restores them on real data).
                   const sub = submissions[period];
                   return (
-                    <tr key={period} className="border-b border-[#F0EFED] hover:bg-[#FAFAF9] text-[13px]">
-                      <td className="px-4 py-3 font-semibold">{period}</td>
+                    <tr key={period} className={`border-b border-[#F0EFED] hover:bg-[#FAFAF9] text-[13px] ${isSelected ? "bg-[#EFF6FF]" : ""}`}>
+                      <td className="px-4 py-3 font-semibold">{period}{isSelected ? <span className="ml-2 text-[10.5px] font-bold uppercase tracking-[0.04em] text-[#2563EB]">Viewing</span> : null}</td>
                       <td className="text-right px-4 py-3">{due}</td>
                       <td className="text-right px-4 py-3">{sub ? sub.submittedAt.toISOString().slice(0, 10) : <span className="text-[#A8A29E]">—</span>}</td>
                       <td className="text-right px-4 py-3 font-mono tabular-nums">{cpp>0?fmtCAD(cpp):"—"}</td>
