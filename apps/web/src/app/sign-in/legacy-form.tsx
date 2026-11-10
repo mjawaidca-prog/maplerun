@@ -1,17 +1,20 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, getSession, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 function SignInForm() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"password" | "magic">("password");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +32,26 @@ function SignInForm() {
 
   if (sessionStatus === "authenticated" && session?.user) return null;
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault(); if (loading) return;
+    setError(null); setLoading(true);
+    try {
+      const result = await signIn("credentials", { email, password, redirect: false });
+      if (result?.error) {
+        setError("Invalid email or password. Please try again.");
+      } else {
+        const s = await getSession();
+        const dest = s?.user?.companyId
+          ? (callbackUrl !== "/app" ? callbackUrl : "/app")
+          : "/onboarding";
+        window.location.href = dest;
+        return;
+      }
+    } catch { setError("An unexpected error occurred."); }
+    finally { setLoading(false); }
+  }
+
+  async function handleMagicSubmit(e: React.FormEvent) {
     e.preventDefault(); if (loading) return;
     setError(null); setLoading(true);
     try {
@@ -72,17 +94,47 @@ function SignInForm() {
                   <Separator className="flex-1" /><span>or sign in with email</span><Separator className="flex-1" />
                 </div>
 
-                {/* Magic link — always available */}
-                <form onSubmit={handleSubmit} className="space-y-3.5">
-                  <div className="space-y-1.5">
-                    <Label className="text-[13px] font-semibold text-[#44403C]">Work email</Label>
-                    <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
-                  </div>
-                  {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs text-destructive">{error}</div>}
-                  <Button type="submit" className="w-full h-[44px] rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-[15px] font-semibold" disabled={loading}>
-                    {loading ? "Sending link…" : "Send magic link"}
-                  </Button>
-                </form>
+                {mode === "password" ? (
+                  <>
+                    <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
+                      <div className="space-y-1.5">
+                        <Label className="text-[13px] font-semibold text-[#44403C]">Work email</Label>
+                        <Input type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-[13px] font-semibold text-[#44403C]">Password</Label>
+                        <Input type="password" autoComplete="current-password" placeholder="Your password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                      </div>
+                      {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs text-destructive">{error}</div>}
+                      <Button type="submit" className="w-full h-[44px] rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-[15px] font-semibold" disabled={loading}>
+                        {loading ? "Signing in…" : "Sign in"}
+                      </Button>
+                    </form>
+                    <p className="text-center">
+                      <button onClick={() => { setMode("magic"); setError(null); }} className="text-[13px] text-[#B3261E] font-semibold hover:underline">
+                        Email me a sign-in link instead
+                      </button>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <form onSubmit={handleMagicSubmit} className="space-y-3.5">
+                      <div className="space-y-1.5">
+                        <Label className="text-[13px] font-semibold text-[#44403C]">Work email</Label>
+                        <Input type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                      </div>
+                      {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs text-destructive">{error}</div>}
+                      <Button type="submit" className="w-full h-[44px] rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-[15px] font-semibold" disabled={loading}>
+                        {loading ? "Sending link…" : "Send magic link"}
+                      </Button>
+                    </form>
+                    <p className="text-center">
+                      <button onClick={() => { setMode("password"); setError(null); }} className="text-[13px] text-[#B3261E] font-semibold hover:underline">
+                        ← Sign in with a password instead
+                      </button>
+                    </p>
+                  </>
+                )}
               </CardContent>
             </>
           ) : (
@@ -100,6 +152,10 @@ function SignInForm() {
             </CardContent>
           )}
         </Card>
+        <p className="text-center text-sm text-[#78716C]">
+          New to Nexvar Pay?{" "}
+          <Link href="/signup" className="text-[#B3261E] font-semibold no-underline">Create your account →</Link>
+        </p>
         <p className="text-center text-xs text-[#A8A29E] leading-relaxed">
           By continuing you agree to our <a href="#" className="text-[#78716C]">Terms</a> and <a href="#" className="text-[#78716C]">Privacy Policy</a>.
         </p>

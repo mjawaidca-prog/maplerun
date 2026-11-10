@@ -1,5 +1,6 @@
 /**
- * Auth.js v5 configuration — magic link (Resend) + Google OAuth.
+ * Auth.js v5 configuration — magic link (Resend) + Google OAuth +
+ * email/password (Credentials, scrypt hashes in User.passwordHash).
  *
  * Session strategy: JWT (stateless, no DB session lookups per request).
  * The Prisma adapter is used only for User/Account persistence; sessions
@@ -9,8 +10,10 @@
 import NextAuth from "next-auth";
 import Resend from "next-auth/providers/resend";
 import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
+import { verifyCredentials } from "@/lib/credentials";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -24,6 +27,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.AUTH_GOOGLE_ID ?? "",
       clientSecret: process.env.AUTH_GOOGLE_SECRET ?? "",
       allowDangerousEmailAccountLinking: true,
+    }),
+    // Email + password — accounts are created by /api/register (no
+    // email-verification gate, mirroring LedgerPro, so an accountant can
+    // create a client's account for them; the owner can always reclaim
+    // the account through the magic-link or Google sign-in for the same
+    // email). authorize() returns null for every failure mode.
+    Credentials({
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const email =
+          typeof credentials?.email === "string" ? credentials.email : "";
+        const password =
+          typeof credentials?.password === "string"
+            ? credentials.password
+            : "";
+        return verifyCredentials(email, password);
+      },
     }),
   ],
 

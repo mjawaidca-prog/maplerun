@@ -35,6 +35,7 @@ function isPublicPath(pathname: string): boolean {
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/verify-request") ||
     pathname.startsWith("/api/auth") ||
+    pathname === "/api/register" ||
     pathname === "/portal" ||
     pathname.startsWith("/portal/")
   );
@@ -72,6 +73,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/verify-request(.*)",
   "/api/auth(.*)",
+  "/api/register",
   "/portal(.*)",
 ]);
 

@@ -38,6 +38,10 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
+  /// Legacy Auth.js password sign-in: scrypt hash (see lib/password.ts).
+  /// Nullable — magic-link, Google and Clerk-linked users have no password
+  /// until one is set through the password sign-up flow.
+  passwordHash  String?
   /// Clerk user id (identity provider link). Nullable: legacy Auth.js users
   /// link lazily on first Clerk sign-in by verified email. Unique when set.
   clerkUserId   String?   @unique
