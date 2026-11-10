@@ -10,6 +10,7 @@ import { BillingUpgradeCards } from "@/components/upgrade-plan-button";
 import { PlanSwitcher } from "@/components/plan-switcher";
 import { PayGroupsManager } from "@/components/pay-groups-manager";
 import { LedgerProIntegrations } from "@/components/ledgerpro-integrations";
+import { updatePayrollSettings } from "@/lib/actions/company";
 import { normalizeMapping, type MappingMode } from "@/lib/ledgerpro-journal";
 import Link from "next/link";
 
@@ -130,6 +131,33 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
 
       {/* ── Payroll tab ── */}
       {activeTab === "payroll" && (
+        <div className="space-y-5">
+        {/* Pay-stub email opt-in (Wave 3 B5) */}
+        <form action={updatePayrollSettings} className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="px-[22px] py-[18px] border-b border-[#F0EFED]">
+            <span className="text-base font-bold">Pay stub delivery</span>
+          </div>
+          <div className="p-[22px] space-y-3">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="stubEmailOnFinalize"
+                defaultChecked={company.stubEmailOnFinalize ?? false}
+                className="mt-0.5 rounded"
+              />
+              <span>
+                <span className="text-sm font-semibold block">Email pay stubs when a pay run is finalized</span>
+                <span className="text-[13px] text-muted-foreground leading-relaxed block mt-0.5">
+                  Each employee with an email address on file gets a notice pointing to the employee
+                  portal sign-in. Off by default — email failures never block finalizing a run.
+                </span>
+              </span>
+            </label>
+            <button type="submit" className="rounded-[9px] border border-[#D6D3D1] bg-white px-4 py-2 text-[13px] font-semibold">
+              Save
+            </button>
+          </div>
+        </form>
         <div className="bg-white border border-[#E7E5E4] rounded-[14px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="px-[22px] py-[18px] border-b border-[#F0EFED] flex justify-between items-center">
             <span className="text-base font-bold">Tax rates & limits</span>
@@ -159,6 +187,7 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
               Source: CRA T4127 (123rd ed., Jul 2026) + Revenu Québec TP-1015.3. Rates apply per pay date — past runs keep their original year's rates.
             </p>
           </div>
+        </div>
         </div>
       )}
 
