@@ -12,11 +12,8 @@ import { trialGate, trialBlockMessage } from "@/lib/trial";
 import { prisma } from "@/lib/prisma";
 import {
   calculatePay,
-  calculateBonus,
   ZERO_YTD,
   type PayResult,
-  type BonusResult,
-  type NamedDeduction,
   type ProvinceCode,
   type PayFrequency,
   type EmployeeYtd,
@@ -25,8 +22,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { syncPayRun, voidPayRunSync } from "@/lib/ledgerpro-sync";
 import { ledgerProSyncDeps } from "@/lib/ledgerpro-store";
-import { derivePeriodStart } from "@/lib/pay-period";
-import { sendPayStubEmail } from "@/lib/email";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -36,49 +31,6 @@ export type PayRunPreviewItem = {
   gross: number;
   result: PayResult;
   ytdBefore: EmployeeYtd;
-  hours: number;
-  vacationPay: number;
-  vacationRate: number;
-  bonus: number;
-  /** Wave 3 B5 — itemized earnings split of the item's gross. Regular
-   *  is the residual: gross − overtime − stat − vacation − bonus (the
-   *  wizard's overtime/stat inputs are "of-which" components of the
-   *  gross the user entered, entry aids until now). Finalize asserts
-   *  the components sum back to gross within $0.01. */
-  regularPay: number;
-  overtimePay: number;
-  statPay: number;
-  overtimeHours: number;
-  statHours: number;
-  /** Employee vacation mode (ACCRUE employees get a balance snapshot
-   *  stamped on the item at finalize). */
-  vacationMode: string;
-  /** Wave 1 PR E — ACCRUE employees only: vacationRatePct% of this
-   *  run's vacationable earnings (gross + bonus), in cents, that
-   *  finalize will add to the employee's vacation balance. */
-  vacationAccruedCents: number;
-  /** Wave 1 PR E — ACCRUE employees only: wizard vacation payout for
-   *  this run, in cents, drawn from the accrued balance at finalize.
-   *  (PAYOUT employees' wizard payout is ordinary pay — see
-   *  vacationPay — and never touches a balance.) */
-  vacationPayoutCents: number;
-  /** Wave 3 B6 — province of employment resolved for THIS employee
-   *  (employee.provinceOfEmployment ?? payGroup.defaultProvince). */
-  province: ProvinceCode;
-  /** Wave 3 B6 — named custom deductions applied this run (persisted
-   *  on the item as JSON). Their total is withheld from net pay. */
-  customDeductions: NamedDeduction[];
-  customDeductionsTotal: number;
-  /** Wave 3 B6 — non-taxable reimbursement: outside gross and every
-   *  deduction base, added to net pay. */
-  reimbursement: number;
-  /** Wave 3 B6 — non-cash taxable benefits included in the bases. */
-  taxableBenefits: number;
-  /** Item-level totals AFTER the custom-deduction / reimbursement
-   *  adjustments (result.* stays the pure engine output): what
-   *  finalize persists as the item's totalDeductions / netPay. */
-  totalDeductions: number;
-  netPay: number;
 };
 
 export type PayRunPreview = {
@@ -92,13 +44,6 @@ export type PayRunPreview = {
     cpp: number;
     cpp2: number;
     ei: number;
-    /** Wave 4 (W4-D3) — Quebec subtotals for DISPLAY only: the QPP/QPP2
-     *  parts of cpp/cpp2 (Quebec items) and total employee QPIP. The
-     *  cpp/cpp2/ei totals keep their established meaning (finalize maps
-     *  them onto the PayRun totals unchanged). */
-    qpp: number;
-    qpp2: number;
-    qpip: number;
     federalTax: number;
     provincialTax: number;
     deductions: number;
@@ -118,59 +63,6 @@ export type PayRunPreview = {
  */
 export async function previewPayRun(formData: FormData): Promise<PayRunPreview> {
   const { companyId } = await requireCompany();
-  return computePayRun(companyId, formData);
-}
-
-/**
- * Wave 3 B6 — merge a calculateBonus result into the regular-pay
- * result so the rest of the pipeline (preview, finalize persistence,
- * YTD) sees one PayResult per employee. Employer CPP/CPP2 match the
- * employee amounts 1:1; employer EI is the employee premium × 1.4
- * (the engine's employer multiple). YTD rolls forward by the bonus's
- * own pensionable/insurable earnings and contributions.
- */
-function mergeBonusResult(regular: PayResult, bonus: BonusResult): PayResult {
-  const r2 = (n: number) => Math.round(n * 100) / 100;
-  const employerCpp = r2(regular.employer.cpp + bonus.bonusCpp);
-  const employerCpp2 = r2(regular.employer.cpp2 + bonus.bonusCpp2);
-  const employerEi = r2(regular.employer.ei + bonus.bonusEi * 1.4);
-  return {
-    gross: r2(regular.gross + bonus.bonus),
-    taxableBenefits: regular.taxableBenefits ?? 0,
-    cpp: r2(regular.cpp + bonus.bonusCpp),
-    cpp2: r2(regular.cpp2 + bonus.bonusCpp2),
-    ei: r2(regular.ei + bonus.bonusEi),
-    qpip: regular.qpip,
-    federalTax: r2(regular.federalTax + bonus.bonusFederalTax),
-    provincialTax: r2(regular.provincialTax + bonus.bonusProvincialTax),
-    totalDeductions: r2(regular.totalDeductions + bonus.totalDeductions),
-    netPay: r2(regular.netPay + bonus.netBonus),
-    annualTaxableIncome: regular.annualTaxableIncome,
-    employer: {
-      cpp: employerCpp,
-      cpp2: employerCpp2,
-      ei: employerEi,
-      total: r2(employerCpp + employerCpp2 + employerEi),
-    },
-    newYtd: {
-      pensionableEarnings: r2(regular.newYtd.pensionableEarnings + bonus.bonusPensionableEarnings),
-      cpp: r2(regular.newYtd.cpp + bonus.bonusCpp),
-      cpp2: r2(regular.newYtd.cpp2 + bonus.bonusCpp2),
-      insurableEarnings: r2(regular.newYtd.insurableEarnings + bonus.bonusInsurableEarnings),
-      ei: r2(regular.newYtd.ei + bonus.bonusEi),
-    },
-    warnings: [...regular.warnings, ...bonus.warnings],
-  };
-}
-
-/**
- * The single calculation path for a pay run, shared by preview AND
- * finalize (Wave 1 PR C). Takes the run INPUTS (pay group, pay date,
- * per-employee gross/hours/bonus/vacation) and computes every figure on
- * the server through the tax engine. Finalize persists ONLY what this
- * function computed — client-posted totals are never read.
- */
-async function computePayRun(companyId: string, formData: FormData): Promise<PayRunPreview> {
 
   const payGroupId = formData.get("payGroupId") as string;
   const payDate = formData.get("payDate") as string;
@@ -197,70 +89,9 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
   const vacationData: Record<string, { enabled: boolean; rate: number; amount: number }> = vacationStr ? JSON.parse(vacationStr) : {};
   const bonusData: Record<string, number> = bonusStr ? JSON.parse(bonusStr) : {};
 
-  // Wave 3 B5 — overtime / stat-holiday components of gross, collected
-  // by the wizard as entry aids ({ hours, amount } per employee). They
-  // are "of-which" slices of the entered gross, never added on top.
-  const overtimeStr = formData.get("overtime") as string;
-  const statStr = formData.get("stat") as string;
-  const overtimeData: Record<string, { hours: number; amount: number }> = overtimeStr ? JSON.parse(overtimeStr) : {};
-  const statData: Record<string, { hours: number; amount: number }> = statStr ? JSON.parse(statStr) : {};
-
-  // Wave 3 B6 — per-employee breadth inputs: named custom deductions,
-  // non-taxable reimbursements, non-cash taxable benefits. Validated
-  // here (server-side recompute path — client input is never trusted):
-  // deduction names must be non-empty, every amount finite and ≥ 0
-  // (deductions strictly > 0 to be kept).
-  const customDeductionsStr = formData.get("customDeductions") as string;
-  const customDeductionsRaw: Record<string, unknown> = customDeductionsStr ? JSON.parse(customDeductionsStr) : {};
-  const customDeductionsData: Record<string, NamedDeduction[]> = {};
-  for (const [empId, list] of Object.entries(customDeductionsRaw)) {
-    if (!Array.isArray(list)) throw new Error("Custom deductions must be a list per employee.");
-    const cleaned: NamedDeduction[] = [];
-    for (const entry of list) {
-      const rec = (entry ?? {}) as Record<string, unknown>;
-      const name = typeof rec.name === "string" ? rec.name.trim() : "";
-      const amount = typeof rec.amount === "number" ? rec.amount : NaN;
-      if (!name) throw new Error("Every custom deduction needs a name.");
-      if (!Number.isFinite(amount) || amount < 0) {
-        throw new Error(`Custom deduction "${name}" must have a non-negative amount.`);
-      }
-      if (amount === 0) continue;
-      cleaned.push({
-        name,
-        amount,
-        reducesPensionable: rec.reducesPensionable === true,
-        reducesInsurable: rec.reducesInsurable === true,
-        reducesTaxable: rec.reducesTaxable === true,
-      });
-    }
-    if (cleaned.length > 0) customDeductionsData[empId] = cleaned;
-  }
-  const reimbursementsStr = formData.get("reimbursements") as string;
-  const taxableBenefitsStr = formData.get("taxableBenefits") as string;
-  const reimbursementData: Record<string, number> = reimbursementsStr ? JSON.parse(reimbursementsStr) : {};
-  const taxableBenefitsData: Record<string, number> = taxableBenefitsStr ? JSON.parse(taxableBenefitsStr) : {};
-  for (const [label, data] of [["Reimbursement", reimbursementData], ["Taxable benefits", taxableBenefitsData]] as const) {
-    for (const [empId, amount] of Object.entries(data)) {
-      if (typeof amount !== "number" || !Number.isFinite(amount) || amount < 0) {
-        throw new Error(`${label} for employee ${empId} must be a non-negative amount.`);
-      }
-    }
-  }
-
-  // Load active employees with YTD and TD1.
-  // Wave 1 pay-group scoping rule: an employee assigned to THIS pay group
-  // is in scope; an employee assigned to a DIFFERENT group is excluded;
-  // an unassigned employee (payGroupId NULL — every employee created
-  // before Wave 1, and any not yet assigned) stays in scope for every
-  // group's runs until they are assigned. This keeps all pre-Wave-1
-  // companies behaving exactly as before (their employees are unassigned)
-  // while making assignment meaningful the moment it is used.
+  // Load active employees with YTD and TD1
   const employees = await prisma.employee.findMany({
-    where: {
-      companyId,
-      active: true,
-      OR: [{ payGroupId }, { payGroupId: null }],
-    },
+    where: { companyId, active: true },
     include: {
       td1Profiles: { where: { year: 2026 }, take: 1 },
       ytdLedgers: { where: { year: 2026 }, take: 1 },
@@ -274,9 +105,6 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     cpp: 0,
     cpp2: 0,
     ei: 0,
-    qpp: 0,
-    qpp2: 0,
-    qpip: 0,
     federalTax: 0,
     provincialTax: 0,
     deductions: 0,
@@ -320,96 +148,17 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     const vacationAmount = empVacation?.amount ?? 0;
     const effectiveGross = gross + bonusAmount + vacationAmount;
 
-    // Wave 1 PR E — vacation accrual. ACCRUE employees build a balance:
-    // vacationRatePct% of the run's vacationable earnings (gross +
-    // bonus; a vacation payout itself does not accrue). Gross dollars
-    // × pct = cents. For ACCRUE employees the wizard vacation amount
-    // is a payout drawn from that balance at finalize; PAYOUT keeps
-    // today's behaviour (payout is ordinary pay, recorded on the
-    // item); NONE accrues nothing.
-    const vacationAccruedCents =
-      emp.vacationMode === "ACCRUE" && emp.vacationRatePct
-        ? Math.round((gross + bonusAmount) * emp.vacationRatePct)
-        : 0;
-    const vacationPayoutCents =
-      emp.vacationMode === "ACCRUE" ? Math.round(vacationAmount * 100) : 0;
-
-    // ── Wave 3 B6 wiring ─────────────────────────────────────────────
-    // Province of employment resolves PER EMPLOYEE (B6.6).
-    const empProvince = (emp.provinceOfEmployment ?? payGroup.defaultProvince) as ProvinceCode;
-    const customDeductions = customDeductionsData[emp.id] ?? [];
-    const customDeductionsTotal =
-      Math.round(customDeductions.reduce((s, d) => s + d.amount, 0) * 100) / 100;
-    const reimbursement = reimbursementData[emp.id] ?? 0;
-    const empTaxableBenefits = taxableBenefitsData[emp.id] ?? 0;
-
-    // Regular pay = entered gross + vacation payout. The bonus is NO
-    // LONGER lumped in (B6.1): it is taxed by the engine's T4127
-    // lump-sum path (calculateBonus) and merged back below.
-    const regularGross = gross + vacationAmount;
-    const engineInput = {
+    const result = calculatePay({
       payDate,
-      province: empProvince,
+      province,
       frequency,
-      // W4-D2(a) — the vacation-pay component of the period's gross.
-      // PDOC prices CPP/QPP on it as a separate no-exemption component;
-      // the engine composes regular + vacation itself, so the amount is
-      // passed alongside (it is already inside regularGross).
-      vacationPay: vacationAmount,
+      grossPeriodIncome: effectiveGross,
       federalClaim: td1?.federalClaim ?? undefined,
       provincialClaim: td1?.provincialClaim ?? undefined,
       cppExempt: td1?.cppExempt ?? false,
       eiExempt: td1?.eiExempt ?? false,
-      // B6.5 — TD1 additional tax per period, stored on the TD1
-      // profile and never applied until now (engine adds it to the
-      // period's federal tax). Shared compute path: preview and
-      // finalize both get it.
-      extraTaxPerPeriod: td1?.extraTaxPerPeriod ?? undefined,
-      // B6.4 — non-cash taxable benefits widen the CPP/EI/tax bases.
-      taxableBenefits: empTaxableBenefits,
-      // B6.2 — named custom deductions (engine resolves per base).
-      periodDeductions: customDeductions.length > 0 ? customDeductions : undefined,
       ytd,
-    };
-
-    const regularResult = calculatePay({ ...engineInput, grossPeriodIncome: regularGross });
-    let result: PayResult;
-    if (bonusAmount > 0 && empProvince !== "QC") {
-      const bonusResult = calculateBonus({
-        ...engineInput,
-        grossPeriodIncome: regularGross,
-        bonusAmount,
-      });
-      result = mergeBonusResult(regularResult, bonusResult);
-    } else if (bonusAmount > 0) {
-      // QC: calculateBonus has no QPP/QPIP path (it prices the bonus
-      // with CPP/EI tables), so a Quebec bonus stays on the pre-B6
-      // lumped calculatePay path rather than being mis-priced. The
-      // bonus is still recorded on the item's `bonus` field.
-      result = calculatePay({ ...engineInput, grossPeriodIncome: regularGross + bonusAmount });
-    } else {
-      result = regularResult;
-    }
-
-    // Item-level totals (B6.2/B6.3): custom deductions are withheld
-    // from the employee (the engine models only their base effects),
-    // and the non-taxable reimbursement is added to net pay. Gross is
-    // untouched by both.
-    const itemTotalDeductions = Math.round((result.totalDeductions + customDeductionsTotal) * 100) / 100;
-    const itemNetPay = Math.round((result.netPay - customDeductionsTotal + reimbursement) * 100) / 100;
-
-    // Wave 3 B5 — earnings split. Overtime/stat are components OF the
-    // gross; regular is what remains. An over-claimed split is a data
-    // error, not something to silently clamp — fail the run loudly.
-    const overtimePay = overtimeData[emp.id]?.amount ?? 0;
-    const statPay = statData[emp.id]?.amount ?? 0;
-    const regularPay =
-      Math.round((effectiveGross - overtimePay - statPay - vacationAmount - bonusAmount) * 100) / 100;
-    if (regularPay < -0.005) {
-      throw new Error(
-        `Earnings breakdown for ${emp.firstName} ${emp.lastName} exceeds their gross pay — overtime, stat, vacation and bonus components must sum to no more than the gross entered.`,
-      );
-    }
+    });
 
     items.push({
       employeeId: emp.id,
@@ -421,37 +170,16 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
       vacationPay: vacationAmount,
       vacationRate: empVacation?.rate ?? 0,
       bonus: bonusAmount,
-      regularPay: Math.max(0, regularPay),
-      overtimePay,
-      statPay,
-      overtimeHours: overtimeData[emp.id]?.hours ?? 0,
-      statHours: statData[emp.id]?.hours ?? 0,
-      vacationMode: emp.vacationMode ?? "PAYOUT",
-      vacationAccruedCents,
-      vacationPayoutCents,
-      province: empProvince,
-      customDeductions,
-      customDeductionsTotal,
-      reimbursement,
-      taxableBenefits: empTaxableBenefits,
-      totalDeductions: itemTotalDeductions,
-      netPay: itemNetPay,
-    });
+    } as any);
 
     totals.gross += result.gross;
     totals.cpp += result.cpp;
     totals.cpp2 += result.cpp2;
     totals.ei += result.ei;
-    // W4-D3 — Quebec display subtotals (see PayRunPreview.totals).
-    totals.qpip += result.qpip;
-    if (empProvince === "QC") {
-      totals.qpp += result.cpp;
-      totals.qpp2 += result.cpp2;
-    }
     totals.federalTax += result.federalTax;
     totals.provincialTax += result.provincialTax;
-    totals.deductions += itemTotalDeductions;
-    totals.netPay += itemNetPay;
+    totals.deductions += result.totalDeductions;
+    totals.netPay += result.netPay;
     totals.employerCpp += result.employer.cpp;
     totals.employerCpp2 += result.employer.cpp2;
     totals.employerEi += result.employer.ei;
@@ -471,12 +199,6 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
 /**
  * Finalize a pay run — create immutable PayRun + PayRunItem records
  * and update each employee's YTD ledger.
- *
- * Wave 1 PR C (the trust fix): finalize accepts the run INPUTS — the
- * same fields previewPayRun takes — and recomputes every figure on the
- * server via computePayRun. Any client-posted totals or "preview" JSON
- * are ignored entirely; what persists is exactly what the tax engine
- * computed here, from the inputs, against current YTD/TD1 state.
  */
 export async function finalizePayRun(formData: FormData) {
   const { companyId } = await requireCompany();
@@ -484,28 +206,33 @@ export async function finalizePayRun(formData: FormData) {
   const payGroupId = formData.get("payGroupId") as string;
   const payDate = formData.get("payDate") as string;
   const actualPayDate = (formData.get("actualPayDate") as string) || payDate;
+  const previewJson = formData.get("preview") as string;
 
-  if (!payGroupId || !payDate) {
+  if (!payGroupId || !payDate || !previewJson) {
     throw new Error("Missing required fields.");
   }
 
-  // Server-side recompute from inputs (also verifies pay-group
-  // ownership). Nothing in the request body is trusted for figures.
-  const preview = await computePayRun(companyId, formData);
-  if (preview.items.length === 0) {
-    throw new Error("Nothing to finalize — no employees with gross pay in this run.");
+  const preview: PayRunPreview = JSON.parse(previewJson);
+
+  // Verify ownership
+  const payGroup = await prisma.payGroup.findUnique({ where: { id: payGroupId } });
+  if (!payGroup || payGroup.companyId !== companyId) {
+    throw new Error("Invalid pay group.");
   }
 
   // Free trial gate — trialEndsAt (14-day period) + pay-run cap, via the
   // shared helper in lib/trial. The New Pay Run page uses the same helper
   // to explain the state up front; this throw is the server-side backstop
-  // (promo users, trialEndsAt = null, are never gated).
-  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { plan: true, freePayRunsUsed: true, maxFreePayRuns: true, trialEndsAt: true, name: true, stubEmailOnFinalize: true } });
+  // (promo users, trialEndsAt = null, are never gated). A recorded paid
+  // subscription overrides the trial clock; a recorded canceled/unpaid
+  // one blocks even with trialEndsAt cleared.
+  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { plan: true, freePayRunsUsed: true, maxFreePayRuns: true, trialEndsAt: true, subscriptionStatus: true } });
   const blockMessage = trialBlockMessage(
     trialGate({
       trialEndsAt: company?.trialEndsAt ?? null,
       freePayRunsUsed: company?.freePayRunsUsed ?? 0,
       maxFreePayRuns: company?.maxFreePayRuns ?? 2,
+      subscriptionStatus: company?.subscriptionStatus ?? null,
     }),
   );
   if (blockMessage) throw new Error(blockMessage);
@@ -516,9 +243,6 @@ export async function finalizePayRun(formData: FormData) {
       companyId,
       payGroupId,
       payDate,
-      // Wave 3 B5 — period start derived from frequency + period end,
-      // stored so stubs print the full pay-period range.
-      periodStart: derivePeriodStart(preview.frequency.toUpperCase(), payDate),
       actualPayDate: actualPayDate || null,
       status: "FINALIZED",
       totalGross: preview.totals.gross,
@@ -539,46 +263,12 @@ export async function finalizePayRun(formData: FormData) {
   });
 
   // Create items and update YTD ledgers
-  const createdItems: { id?: string; employeeId: string; employeeName: string; warnings: string }[] = [];
   for (const item of preview.items) {
     const newYtd = item.result.newYtd;
     // Safety: ensure all values are defined numbers (JSON.parse may produce nulls)
     const n = (v: any, fallback = 0) => (typeof v === "number" ? v : fallback);
 
-    // Wave 3 B5 — the earnings split must reconcile to the item's
-    // gross (the authoritative total) before anything persists.
-    const splitSum = item.regularPay + item.overtimePay + item.statPay + item.vacationPay + item.bonus;
-    if (Math.abs(splitSum - item.result.gross) > 0.01) {
-      throw new Error(
-        `Earnings breakdown for ${item.employeeName} does not sum to gross pay (split $${splitSum.toFixed(2)} vs gross $${item.result.gross.toFixed(2)}). Finalize aborted — nothing was saved.`,
-      );
-    }
-
-    // Wave 1 PR E — vacation balance: the NET change this run applies
-    // (accrual minus any payout drawn from the balance, the payout
-    // clipped at the available balance so it never goes negative).
-    // The net is what gets recorded on the item, so reversal (PR D)
-    // unwinds exactly what was applied.
-    let vacationBalanceDeltaCents = 0;
-    // Wave 3 B5 — ACCRUE employees also get their post-run balance
-    // snapshotted onto the item, so the stub's vacation-balance line
-    // never changes when later runs post.
-    let vacationBalanceAfterCents: number | null = null;
-    if (item.vacationAccruedCents > 0 || item.vacationPayoutCents > 0 || item.vacationMode === "ACCRUE") {
-      const empRow = await prisma.employee.findUnique({
-        where: { id: item.employeeId },
-        select: { vacationBalanceCents: true },
-      });
-      const balanceBefore = empRow?.vacationBalanceCents ?? 0;
-      const available = balanceBefore + item.vacationAccruedCents;
-      const appliedPayout = Math.min(available, item.vacationPayoutCents);
-      vacationBalanceDeltaCents = item.vacationAccruedCents - appliedPayout;
-      if (item.vacationMode === "ACCRUE") {
-        vacationBalanceAfterCents = balanceBefore + vacationBalanceDeltaCents;
-      }
-    }
-
-    const createdItem = await prisma.payRunItem.create({
+    await prisma.payRunItem.create({
       data: {
         payRunId: payRun.id,
         employeeId: item.employeeId,
@@ -586,21 +276,10 @@ export async function finalizePayRun(formData: FormData) {
         cpp: n(item.result.cpp),
         cpp2: n(item.result.cpp2),
         ei: n(item.result.ei),
-        // Wave 1 Quebec split (dual-write): for QC runs the engine's
-        // cpp/cpp2 ARE the QPP/QPP2 amounts; qpip is surfaced separately.
-        // Legacy cpp/cpp2/ei keep holding the combined totals.
-        // Wave 3 B6: keyed off the ITEM's resolved province of
-        // employment, not the pay group's — a mixed-province run can
-        // now contain both QC and non-QC items.
-        qpp: item.province === "QC" ? n(item.result.cpp) : 0,
-        qpp2: item.province === "QC" ? n(item.result.cpp2) : 0,
-        qpip: n((item.result as any).qpip),
         federalTax: n(item.result.federalTax),
         provincialTax: n(item.result.provincialTax),
-        // Wave 3 B6 — item-level totals include the custom-deduction
-        // withholding and the reimbursement (see computePayRun).
-        totalDeductions: n(item.totalDeductions),
-        netPay: n(item.netPay),
+        totalDeductions: n(item.result.totalDeductions),
+        netPay: n(item.result.netPay),
         employerCpp: n(item.result.employer?.cpp),
         employerCpp2: n(item.result.employer?.cpp2),
         employerEi: n(item.result.employer?.ei),
@@ -611,37 +290,12 @@ export async function finalizePayRun(formData: FormData) {
         ytdInsurable: n(newYtd?.insurableEarnings),
         ytdEi: n(newYtd?.ei),
         warnings: Array.isArray(item.result.warnings) ? item.result.warnings.join("; ") : "",
-        hours: n(item.hours, 0),
-        vacationPay: n(item.vacationPay, 0),
-        vacationPayRate: n(item.vacationRate, 0),
-        // Net vacation-balance change applied by this run (see above).
-        vacationAccruedCents: vacationBalanceDeltaCents,
-        bonus: n(item.bonus, 0),
-        // Wave 3 B5 — itemized earnings split + post-run vacation
-        // balance snapshot (ACCRUE only; null otherwise).
-        regularPay: n(item.regularPay, 0),
-        overtimePay: n(item.overtimePay, 0),
-        statPay: n(item.statPay, 0),
-        overtimeHours: n(item.overtimeHours, 0),
-        statHours: n(item.statHours, 0),
-        vacationBalanceAfterCents,
-        // Wave 3 B6 — breadth inputs persisted for stub/reversal/reports.
-        // (Spread into fresh object literals: anonymous object types
-        // carry implicit index signatures, which Prisma's Json input
-        // type requires.)
-        customDeductions: item.customDeductions.length > 0 ? item.customDeductions.map((d) => ({ ...d })) : undefined,
-        reimbursement: n(item.reimbursement, 0),
-        taxableBenefits: n(item.taxableBenefits, 0),
+        hours: n((item as any).hours, 0),
+        vacationPay: n((item as any).vacationPay, 0),
+        vacationPayRate: n((item as any).vacationRate, 0),
+        bonus: n((item as any).bonus, 0),
       },
     });
-    createdItems.push({ id: (createdItem as { id?: string })?.id, employeeId: item.employeeId, employeeName: item.employeeName, warnings: Array.isArray(item.result.warnings) ? item.result.warnings.join("; ") : "" });
-
-    if (vacationBalanceDeltaCents !== 0) {
-      await prisma.employee.update({
-        where: { id: item.employeeId },
-        data: { vacationBalanceCents: { increment: vacationBalanceDeltaCents } },
-      });
-    }
 
     // Upsert YTD ledger
     await prisma.ytdLedger.upsert({
@@ -659,9 +313,6 @@ export async function finalizePayRun(formData: FormData) {
         cpp2: newYtd.cpp2,
         insurableEarnings: newYtd.insurableEarnings,
         ei: newYtd.ei,
-        // Wave 3 B5 — YTD gross + income tax start at this item's amounts.
-        grossPay: n(item.result.gross),
-        incomeTax: n(item.result.federalTax) + n(item.result.provincialTax),
       },
       update: {
         pensionableEarnings: newYtd.pensionableEarnings,
@@ -669,10 +320,6 @@ export async function finalizePayRun(formData: FormData) {
         cpp2: newYtd.cpp2,
         insurableEarnings: newYtd.insurableEarnings,
         ei: newYtd.ei,
-        // Wave 3 B5 — incremented (not engine-derived, so no absolute
-        // value exists); reversal decrements by the same per-item sum.
-        grossPay: { increment: n(item.result.gross) },
-        incomeTax: { increment: n(item.result.federalTax) + n(item.result.provincialTax) },
       },
     });
   }
@@ -692,46 +339,6 @@ export async function finalizePayRun(formData: FormData) {
     await syncPayRun(ledgerProSyncDeps, payRun.id);
   } catch {
     // Intentionally swallowed — see above.
-  }
-
-  // Wave 3 B5 — pay-stub email on finalize (Company.stubEmailOnFinalize,
-  // opt-in, default OFF). Post-commit and failure-isolated exactly like
-  // the LedgerPro sync above: the run is already finalized, so an email
-  // problem must never block or fail it. The email points employees at
-  // the portal sign-in (/portal — Clerk track); per-item outcomes are
-  // logged through the run's existing warnings channel (the item's
-  // warnings string).
-  if (company?.stubEmailOnFinalize) {
-    try {
-      const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://nexvarpay.nexvarlab.com"}/portal`;
-      for (const created of createdItems) {
-        if (!created.id) continue;
-        const emp = await prisma.employee.findUnique({
-          where: { id: created.employeeId },
-          select: { email: true },
-        });
-        let outcome: string;
-        if (!emp?.email) {
-          outcome = "Pay stub email skipped — no email address on file.";
-        } else {
-          const sent = await sendPayStubEmail({
-            to: emp.email,
-            employeeName: created.employeeName,
-            payDate,
-            stubUrl: portalUrl,
-          });
-          outcome = sent.success
-            ? "Pay stub email sent."
-            : `Pay stub email failed: ${sent.error ?? "unknown error"}`;
-        }
-        await prisma.payRunItem.update({
-          where: { id: created.id },
-          data: { warnings: created.warnings ? `${created.warnings}; ${outcome}` : outcome },
-        });
-      }
-    } catch {
-      // Intentionally swallowed — see above.
-    }
   }
 
   revalidatePath("/payroll");
@@ -755,131 +362,6 @@ export async function getPayRuns() {
 /**
  * Get a single pay run with all items.
  */
-/**
- * Reverse a finalized pay run (Wave 1 PR D) — the supported correction
- * path, replacing delete-and-lose-the-trail:
- *  - the run row is KEPT, marked REVERSED with reversedAt set, so the
- *    audit trail survives; every report (they all filter FINALIZED)
- *    stops counting it immediately;
- *  - each employee's YTD ledger is decremented by exactly the
- *    increments this run added — its items' stored YTD-after minus the
- *    YTD-after of the employee's previous finalized item (finalization
- *    order). Reversing in LIFO order restores the ledger exactly;
- *    reversing an earlier run while a later one stands removes exactly
- *    this run's own contribution (the later run's stored snapshots stay
- *    as historical record);
- *  - vacation accrued by this run (PayRunItem.vacationAccruedCents,
- *    Wave 1 PR E) is subtracted back from the employee's balance;
- *  - Wave 3 B5: the YtdLedger grossPay/incomeTax increments are NOT
- *    snapshot-based (see the rollback below) — for B5-era runs
- *    (periodStart stamped) they are decremented by each item's own
- *    gross and federal+provincial tax, exactly what finalize added;
- *  - a SYNCED LedgerPro journal is voided FIRST (the M5 rule): if the
- *    void fails, the reversal is blocked and nothing changes;
- *  - EFT: files are generated on demand from FINALIZED runs only, so
- *    the status flip voids this run for direct deposit —
- *    generateEftFile refuses a REVERSED run. (There is no batch table.)
- * The trial free-run counter is NOT refunded — a finalize consumed it.
- */
-export async function reversePayRun(formData: FormData) {
-  "use server";
-  const { companyId } = await requireCompany();
-  const id = formData.get("id") as string;
-  if (!id) throw new Error("Pay run ID required.");
-  const run = await prisma.payRun.findUnique({ where: { id }, include: { items: true } });
-  if (!run || run.companyId !== companyId) throw new Error("Pay run not found.");
-  if (run.status !== "FINALIZED") {
-    throw new Error("Only a finalized pay run can be reversed.");
-  }
-
-  // LedgerPro void-then-reverse (M5 rule): if this run was posted to
-  // LedgerPro, reverse that journal FIRST and only proceed once the
-  // void confirms. If the void cannot complete, BLOCK the reversal —
-  // never leave a live LedgerPro journal pointing at a reversed run.
-  const syncRecord = await prisma.ledgerProSyncRecord.findUnique({ where: { payRunId: id } });
-  if (syncRecord?.status === "SYNCED" && syncRecord.ledgerEntryId) {
-    const voidResult = await voidPayRunSync(ledgerProSyncDeps, id);
-    if (voidResult.outcome === "failed") {
-      throw new Error(
-        `This pay run was posted to LedgerPro on ${syncRecord.syncedAt ? syncRecord.syncedAt.toISOString().slice(0, 10) : "an earlier date"}, and that journal could not be reversed (${voidResult.error}). Reversal blocked — fix the LedgerPro connection or period, then try again.`,
-      );
-    }
-  }
-
-  const year = Number(run.payDate.slice(0, 4)) || 2026;
-
-  // Roll back YTD by exactly this run's own increments, per employee.
-  for (const item of run.items) {
-    // Baseline: the YTD snapshot of the employee's previous finalized
-    // item (finalization order: finalizedAt, then createdAt).
-    const prev = await prisma.payRunItem.findFirst({
-      where: {
-        employeeId: item.employeeId,
-        payRunId: { not: id },
-        payRun: {
-          status: "FINALIZED",
-          companyId,
-          OR: [
-            { finalizedAt: { lt: run.finalizedAt! } },
-            { finalizedAt: run.finalizedAt!, createdAt: { lt: run.createdAt } },
-          ],
-        },
-      },
-      orderBy: [{ payRun: { finalizedAt: "desc" } }, { payRun: { createdAt: "desc" } }],
-      select: { ytdPensionable: true, ytdCpp: true, ytdCpp2: true, ytdInsurable: true, ytdEi: true },
-    });
-
-    const ledger = await prisma.ytdLedger.findUnique({
-      where: { employeeId_year: { employeeId: item.employeeId, year } },
-    });
-    if (ledger) {
-      await prisma.ytdLedger.update({
-        where: { employeeId_year: { employeeId: item.employeeId, year } },
-        data: {
-          pensionableEarnings: ledger.pensionableEarnings - (item.ytdPensionable - (prev?.ytdPensionable ?? 0)),
-          cpp: ledger.cpp - (item.ytdCpp - (prev?.ytdCpp ?? 0)),
-          cpp2: ledger.cpp2 - (item.ytdCpp2 - (prev?.ytdCpp2 ?? 0)),
-          insurableEarnings: ledger.insurableEarnings - (item.ytdInsurable - (prev?.ytdInsurable ?? 0)),
-          ei: ledger.ei - (item.ytdEi - (prev?.ytdEi ?? 0)),
-          // Wave 3 B5 — grossPay/incomeTax are NOT covered by the
-          // snapshot-delta mechanism above: finalize INCREMENTS them by
-          // each item's own gross and federal+provincial tax (items
-          // carry no ytd-gross snapshot), so reversal decrements by
-          // exactly those per-item amounts. Only B5-era runs ever
-          // incremented the fields, and B5 finalize always stamps
-          // PayRun.periodStart while pre-B5 runs have it null — that is
-          // the exact run-level marker for whether this run wrote them.
-          ...(run.periodStart != null
-            ? {
-                grossPay: (ledger.grossPay ?? 0) - item.gross,
-                incomeTax: (ledger.incomeTax ?? 0) - (item.federalTax + item.provincialTax),
-              }
-            : {}),
-        },
-      });
-    }
-
-    // Unwind the vacation-balance change this run applied (PR E
-    // records the NET delta — accrual minus any balance-drawn payout —
-    // on the item, so decrementing by it restores the balance exactly,
-    // for negative deltas too).
-    if (item.vacationAccruedCents !== 0) {
-      await prisma.employee.update({
-        where: { id: item.employeeId },
-        data: { vacationBalanceCents: { decrement: item.vacationAccruedCents } },
-      });
-    }
-  }
-
-  await prisma.payRun.update({
-    where: { id },
-    data: { status: "REVERSED", reversedAt: new Date() },
-  });
-
-  revalidatePath("/payroll");
-  revalidatePath(`/payroll/${id}`);
-}
-
 export async function deletePayRun(formData: FormData) {
   "use server";
   const { companyId } = await requireCompany();
@@ -887,16 +369,6 @@ export async function deletePayRun(formData: FormData) {
   if (!id) throw new Error("Pay run ID required.");
   const run = await prisma.payRun.findUnique({ where: { id } });
   if (!run || run.companyId !== companyId) throw new Error("Pay run not found.");
-
-  // Wave 1 PR D: a FINALIZED run can no longer be hard-deleted — that
-  // path silently orphaned YTD increments. Reverse it first (the
-  // reversal unwinds YTD, vacation and the LedgerPro journal exactly);
-  // drafts and already-reversed runs may still be deleted.
-  if (run.status === "FINALIZED") {
-    throw new Error(
-      "This pay run is finalized and can't be deleted directly. Reverse it first — reversal keeps the audit trail and unwinds its YTD totals and LedgerPro journal exactly. You can delete the run afterwards if you still need to.",
-    );
-  }
 
   // LedgerPro void-then-delete (M5): if this run was posted to LedgerPro,
   // reverse that journal FIRST and only delete once the void confirms.

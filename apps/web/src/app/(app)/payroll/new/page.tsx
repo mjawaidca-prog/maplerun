@@ -19,8 +19,8 @@ export default async function NewPayRunPage() {
 
   const [payGroups, employees, company] = await Promise.all([
     prisma.payGroup.findMany({ where: { companyId }, orderBy: { name: "asc" } }),
-    prisma.employee.findMany({ where: { companyId, active: true }, orderBy: { lastName: "asc" }, select: { id: true, firstName: true, lastName: true, payType: true, payRate: true, payGroupId: true } }),
-    prisma.company.findUnique({ where: { id: companyId }, select: { plan: true, freePayRunsUsed: true, maxFreePayRuns: true, trialEndsAt: true } }),
+    prisma.employee.findMany({ where: { companyId, active: true }, orderBy: { lastName: "asc" }, select: { id: true, firstName: true, lastName: true, payType: true, payRate: true } }),
+    prisma.company.findUnique({ where: { id: companyId }, select: { plan: true, freePayRunsUsed: true, maxFreePayRuns: true, trialEndsAt: true, subscriptionStatus: true } }),
   ]);
 
   if (payGroups.length === 0) {
@@ -45,6 +45,7 @@ export default async function NewPayRunPage() {
     trialEndsAt: company?.trialEndsAt ?? null,
     freePayRunsUsed: company?.freePayRunsUsed ?? 0,
     maxFreePayRuns: company?.maxFreePayRuns ?? 2,
+    subscriptionStatus: company?.subscriptionStatus ?? null,
   });
   const blockMessage = trialBlockMessage(gate);
 
@@ -81,7 +82,7 @@ export default async function NewPayRunPage() {
       <PayRunWizard
         plan={(company?.plan as Plan) ?? "growth"}
         payGroups={payGroups.map((pg) => ({ id: pg.id, name: pg.name, frequency: pg.frequency, defaultProvince: pg.defaultProvince }))}
-        employees={employees.map((e) => ({ id: e.id, name: `${e.firstName} ${e.lastName}`, payRate: e.payRate, payGroupId: e.payGroupId }))}
+        employees={employees.map((e) => ({ id: e.id, name: `${e.firstName} ${e.lastName}`, payRate: e.payRate }))}
         previewAction={previewPayRun}
         finalizeAction={finalizePayRun}
         finalizeBlockReason={blockMessage}

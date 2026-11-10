@@ -121,6 +121,17 @@ model Company {
   freePayRunsUsed Int @default(0)
   maxFreePayRuns  Int @default(2)
   trialEndsAt     DateTime?
+  /// Stripe billing, recorded by /api/billing/webhook from the checkout
+  /// session's metadata: the Stripe customer + subscription created by
+  /// /api/billing/checkout, and the subscription's last known status
+  /// (active | trialing | past_due | unpaid | canceled | ...).
+  /// subscriptionStatus == null means the company has NEVER subscribed —
+  /// the trial/promo semantics in lib/trial apply unchanged. Once it is
+  /// non-null, lib/trial trusts the subscription status instead of the
+  /// trial clock (trialEndsAt is cleared at checkout and stays cleared).
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  subscriptionStatus   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
