@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
 function SignUpForm() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"password" | "magic">("password");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +31,33 @@ function SignUpForm() {
 
   if (sessionStatus === "authenticated" && session?.user) return null;
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault(); if (loading) return;
+    setError(null); setLoading(true);
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        setError(d.error ?? "Could not create your account. Please try again.");
+        return;
+      }
+      const result = await signIn("credentials", { email, password, redirect: false });
+      if (result?.error) {
+        setError("Your account was created — please sign in with your new password.");
+        return;
+      }
+      // A brand-new account has no company yet — straight to onboarding.
+      window.location.href = "/onboarding";
+      return;
+    } catch { setError("An unexpected error occurred."); }
+    finally { setLoading(false); }
+  }
+
+  async function handleMagicSubmit(e: React.FormEvent) {
     e.preventDefault(); if (loading) return;
     setError(null); setLoading(true);
     try {
@@ -85,16 +115,51 @@ function SignUpForm() {
               <Separator className="flex-1" /><span>or sign up with email</span><Separator className="flex-1" />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
-              <div className="space-y-1.5">
-                <Label className="text-[13px] font-semibold text-[#44403C]">Work email</Label>
-                <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
-              </div>
-              {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs text-destructive">{error}</div>}
-              <Button type="submit" className="w-full h-[44px] rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-[15px] font-semibold" disabled={loading}>
-                {loading ? "Sending link…" : "Continue with email →"}
-              </Button>
-            </form>
+            {mode === "password" ? (
+              <>
+                <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
+                  <div className="space-y-1.5">
+                    <Label className="text-[13px] font-semibold text-[#44403C]">Full name</Label>
+                    <Input type="text" autoComplete="name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[13px] font-semibold text-[#44403C]">Work email</Label>
+                    <Input type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[13px] font-semibold text-[#44403C]">Password</Label>
+                    <Input type="password" autoComplete="new-password" placeholder="At least 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                  </div>
+                  {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs text-destructive">{error}</div>}
+                  <Button type="submit" className="w-full h-[44px] rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-[15px] font-semibold" disabled={loading}>
+                    {loading ? "Creating account…" : "Create account →"}
+                  </Button>
+                </form>
+                <p className="text-center">
+                  <button onClick={() => { setMode("magic"); setError(null); }} className="text-[13px] text-[#B3261E] font-semibold hover:underline">
+                    Email me a sign-in link instead
+                  </button>
+                </p>
+              </>
+            ) : (
+              <>
+                <form onSubmit={handleMagicSubmit} className="space-y-3.5">
+                  <div className="space-y-1.5">
+                    <Label className="text-[13px] font-semibold text-[#44403C]">Work email</Label>
+                    <Input type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                  </div>
+                  {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs text-destructive">{error}</div>}
+                  <Button type="submit" className="w-full h-[44px] rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-[15px] font-semibold" disabled={loading}>
+                    {loading ? "Sending link…" : "Continue with email →"}
+                  </Button>
+                </form>
+                <p className="text-center">
+                  <button onClick={() => { setMode("password"); setError(null); }} className="text-[13px] text-[#B3261E] font-semibold hover:underline">
+                    ← Create an account with a password instead
+                  </button>
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <div className="bg-white border border-[#E7E5E4] rounded-2xl p-10 shadow-[0_4px_24px_rgba(0,0,0,0.06)] text-center space-y-5">
@@ -111,7 +176,7 @@ function SignUpForm() {
 
         <p className="text-center text-xs text-[#A8A29E] leading-relaxed">
           Already have an account?{" "}
-          <a href="/sign-in" className="text-[#B3261E] font-semibold no-underline">Sign in →</a>
+          <Link href="/sign-in" className="text-[#B3261E] font-semibold no-underline">Sign in →</Link>
         </p>
       </div>
     </div>
