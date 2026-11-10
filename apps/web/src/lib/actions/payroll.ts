@@ -92,13 +92,6 @@ export type PayRunPreview = {
     cpp: number;
     cpp2: number;
     ei: number;
-    /** Wave 4 (W4-D3) — Quebec subtotals for DISPLAY only: the QPP/QPP2
-     *  parts of cpp/cpp2 (Quebec items) and total employee QPIP. The
-     *  cpp/cpp2/ei totals keep their established meaning (finalize maps
-     *  them onto the PayRun totals unchanged). */
-    qpp: number;
-    qpp2: number;
-    qpip: number;
     federalTax: number;
     provincialTax: number;
     deductions: number;
@@ -274,9 +267,6 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     cpp: 0,
     cpp2: 0,
     ei: 0,
-    qpp: 0,
-    qpp2: 0,
-    qpip: 0,
     federalTax: 0,
     provincialTax: 0,
     deductions: 0,
@@ -351,11 +341,6 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
       payDate,
       province: empProvince,
       frequency,
-      // W4-D2(a) — the vacation-pay component of the period's gross.
-      // PDOC prices CPP/QPP on it as a separate no-exemption component;
-      // the engine composes regular + vacation itself, so the amount is
-      // passed alongside (it is already inside regularGross).
-      vacationPay: vacationAmount,
       federalClaim: td1?.federalClaim ?? undefined,
       provincialClaim: td1?.provincialClaim ?? undefined,
       cppExempt: td1?.cppExempt ?? false,
@@ -442,12 +427,6 @@ async function computePayRun(companyId: string, formData: FormData): Promise<Pay
     totals.cpp += result.cpp;
     totals.cpp2 += result.cpp2;
     totals.ei += result.ei;
-    // W4-D3 — Quebec display subtotals (see PayRunPreview.totals).
-    totals.qpip += result.qpip;
-    if (empProvince === "QC") {
-      totals.qpp += result.cpp;
-      totals.qpp2 += result.cpp2;
-    }
     totals.federalTax += result.federalTax;
     totals.provincialTax += result.provincialTax;
     totals.deductions += itemTotalDeductions;
@@ -499,11 +478,14 @@ export async function finalizePayRun(formData: FormData) {
   // Free trial gate — trialEndsAt (14-day period) + pay-run cap, via the
   // shared helper in lib/trial. The New Pay Run page uses the same helper
   // to explain the state up front; this throw is the server-side backstop
-  // (promo users, trialEndsAt = null, are never gated).
-  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { plan: true, freePayRunsUsed: true, maxFreePayRuns: true, trialEndsAt: true, name: true, stubEmailOnFinalize: true } });
+  // (promo users, trialEndsAt = null, are never gated). A recorded paid
+  // subscription overrides the trial clock; a recorded canceled/unpaid
+  // one blocks even with trialEndsAt cleared.
+  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { plan: true, freePayRunsUsed: true, maxFreePayRuns: true, trialEndsAt: true, subscriptionStatus: true, name: true, stubEmailOnFinalize: true } });
   const blockMessage = trialBlockMessage(
     trialGate({
       trialEndsAt: company?.trialEndsAt ?? null,
+      subscriptionStatus: company?.subscriptionStatus ?? null,
       freePayRunsUsed: company?.freePayRunsUsed ?? 0,
       maxFreePayRuns: company?.maxFreePayRuns ?? 2,
     }),

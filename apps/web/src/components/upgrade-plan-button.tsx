@@ -49,11 +49,21 @@ export function UpgradePlanButton({
 
 /**
  * Billing section with monthly/annual toggle — used in Company > Billing tab.
+ *
+ * `onTrial` is computed by the Company page from src/lib/trial.ts: it is
+ * true when the company has NO active paid subscription but can act on
+ * billing — it is on its free trial (`trialEndsAt` set), or its recorded
+ * subscription lapsed/cancelled and it must resubscribe. While onTrial is
+ * true the company's own plan card must offer checkout ("Subscribe");
+ * once onTrial is false (active subscription, or a promo account) the
+ * card is a plain "Current plan" label, as before.
  */
 export function BillingUpgradeCards({
   currentPlan,
+  onTrial,
 }: {
   currentPlan: string;
+  onTrial: boolean;
 }) {
   const [annual, setAnnual] = useState(false);
 
@@ -136,14 +146,14 @@ export function BillingUpgradeCards({
                   ${p.annualMonthly}/mo equivalent
                 </p>
               )}
-              {isCurrent ? (
+              {isCurrent && !onTrial ? (
                 <span className="inline-flex rounded-[9px] bg-[#F0EFED] text-[#A8A29E] text-xs font-semibold px-4 py-2">
                   Current plan
                 </span>
               ) : (
                 <UpgradePlanButton
                   planId={p.id}
-                  label={`Upgrade to ${p.name}`}
+                  label={isCurrent ? `Subscribe to ${p.name}` : `Upgrade to ${p.name}`}
                   annual={annual}
                 />
               )}
