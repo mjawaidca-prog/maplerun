@@ -66,6 +66,7 @@ export async function createEmployee(formData: FormData) {
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       payType: payType || null,
       payRate: payRate ? parseFloat(payRate) : null,
+      payGroupId: payGroupId || null,
       bankEncrypted: (bankTransit || bankInstitution || bankAccount)
         ? encrypt(JSON.stringify({ transit: bankTransit, institution: bankInstitution, account: bankAccount }))
         : null,
@@ -104,7 +105,6 @@ export async function updateEmployee(formData: FormData) {
   const city = formData.get("city") as string;
   const province = formData.get("province") as string;
   const postalCode = formData.get("postalCode") as string;
-  const active = formData.get("active") === "true";
 
   if (!id || !firstName || !lastName) {
     throw new Error("First name and last name are required.");
@@ -127,8 +127,44 @@ export async function updateEmployee(formData: FormData) {
     city: city || null,
     province: province || null,
     postalCode: postalCode || null,
-    active,
   };
+
+  // `active` is written ONLY when the form actually submits the field. The
+  // Edit Employee form carries no "active" input, so reading it
+  // unconditionally (`formData.get("active") === "true"` → false) silently
+  // deactivated the employee on every save — and there is no reactivate
+  // control to undo it. Callers that do submit it keep the === "true"
+  // semantics.
+  if (formData.has("active")) {
+    updateData.active = formData.get("active") === "true";
+  }
+
+  // Employment & pay fields: persist them when the form submits them, with
+  // the same parsing and validation as createEmployee. Fields absent from
+  // the form leave the stored values untouched.
+  if (formData.has("payType")) {
+    const payType = formData.get("payType") as string;
+    updateData.payType = payType || null;
+  }
+  if (formData.has("payRate")) {
+    const payRate = formData.get("payRate") as string;
+    updateData.payRate = payRate ? parseFloat(payRate) : null;
+  }
+  if (formData.has("payGroupId")) {
+    const payGroupId = formData.get("payGroupId") as string;
+    if (payGroupId) {
+      // Verify pay group belongs to the company (mirrors createEmployee)
+      const pg = await prisma.payGroup.findUnique({ where: { id: payGroupId } });
+      if (!pg || pg.companyId !== companyId) {
+        throw new Error("Invalid pay group.");
+      }
+      updateData.payGroupId = payGroupId;
+    } else {
+      // Present-but-empty = unassigned, matching createEmployee's
+      // treatment of an empty value as "no group".
+      updateData.payGroupId = null;
+    }
+  }
 
   if (sin) {
     const sinDigits = sin.replace(/\s/g, "");
