@@ -66,24 +66,6 @@ export async function createEmployee(formData: FormData) {
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       payType: payType || null,
       payRate: payRate ? parseFloat(payRate) : null,
-      // Wave 1: persist the pay-group assignment (previously validated
-      // above and then discarded — the run loader now scopes by it).
-      payGroupId: payGroupId || null,
-      // Wave 3 B6: per-employee province of employment (null = the pay
-      // group's default province applies at run time).
-      provinceOfEmployment: ((formData.get("provinceOfEmployment") as string) || "").trim() || null,
-      // Wave 1 PR E: employment facts + vacation policy (schema PR A).
-      startDate: (formData.get("startDate") as string)
-        ? new Date(formData.get("startDate") as string)
-        : null,
-      jobTitle: ((formData.get("jobTitle") as string) || "").trim() || null,
-      department: ((formData.get("department") as string) || "").trim() || null,
-      vacationMode: ["ACCRUE", "PAYOUT", "NONE"].includes(formData.get("vacationMode") as string)
-        ? (formData.get("vacationMode") as string)
-        : "PAYOUT",
-      vacationRatePct: formData.get("vacationRatePct")
-        ? parseFloat(formData.get("vacationRatePct") as string)
-        : null,
       bankEncrypted: (bankTransit || bankInstitution || bankAccount)
         ? encrypt(JSON.stringify({ transit: bankTransit, institution: bankInstitution, account: bankAccount }))
         : null,
@@ -122,6 +104,7 @@ export async function updateEmployee(formData: FormData) {
   const city = formData.get("city") as string;
   const province = formData.get("province") as string;
   const postalCode = formData.get("postalCode") as string;
+  const active = formData.get("active") === "true";
 
   if (!id || !firstName || !lastName) {
     throw new Error("First name and last name are required.");
@@ -144,64 +127,8 @@ export async function updateEmployee(formData: FormData) {
     city: city || null,
     province: province || null,
     postalCode: postalCode || null,
+    active,
   };
-
-  // Only touch `active` when the form actually carries the field. The
-  // edit form does not render one, and reading a missing field as
-  // false silently deactivated the employee on every save (pre-Wave-1
-  // bug). Reactivation clears the termination date (PR E).
-  if (formData.has("active")) {
-    updateData.active = formData.get("active") === "true";
-    if (updateData.active) updateData.terminationDate = null;
-  }
-
-  // Wave 1 PR E+F — employment facts, vacation policy, pay terms,
-  // date of birth, pay group and bank details are editable here too
-  // (all were create-only before). Fields are applied only when the
-  // submitting form carries them, so partial forms can't wipe data.
-  if (formData.has("startDate")) {
-    const v = formData.get("startDate") as string;
-    updateData.startDate = v ? new Date(v) : null;
-  }
-  if (formData.has("jobTitle")) {
-    updateData.jobTitle = ((formData.get("jobTitle") as string) || "").trim() || null;
-  }
-  if (formData.has("department")) {
-    updateData.department = ((formData.get("department") as string) || "").trim() || null;
-  }
-  if (["ACCRUE", "PAYOUT", "NONE"].includes(formData.get("vacationMode") as string)) {
-    updateData.vacationMode = formData.get("vacationMode") as string;
-  }
-  if (formData.has("vacationRatePct")) {
-    const v = formData.get("vacationRatePct") as string;
-    updateData.vacationRatePct = v ? parseFloat(v) : null;
-  }
-  if (formData.has("payType")) {
-    updateData.payType = (formData.get("payType") as string) || null;
-  }
-  if (formData.has("payRate")) {
-    const v = parseFloat(formData.get("payRate") as string);
-    if (Number.isFinite(v)) updateData.payRate = v;
-  }
-  if (formData.has("dateOfBirth")) {
-    const v = formData.get("dateOfBirth") as string;
-    updateData.dateOfBirth = v ? new Date(v) : null;
-  }
-  if (formData.has("payGroupId")) {
-    updateData.payGroupId = (formData.get("payGroupId") as string) || null;
-  }
-  // Wave 3 B6: province of employment override (blank = pay-group default).
-  if (formData.has("provinceOfEmployment")) {
-    updateData.provinceOfEmployment = ((formData.get("provinceOfEmployment") as string) || "").trim() || null;
-  }
-  const bankTransit = (formData.get("bankTransit") as string) || "";
-  const bankInstitution = (formData.get("bankInstitution") as string) || "";
-  const bankAccount = (formData.get("bankAccount") as string) || "";
-  if (bankTransit || bankInstitution || bankAccount) {
-    updateData.bankEncrypted = encrypt(
-      JSON.stringify({ transit: bankTransit, institution: bankInstitution, account: bankAccount }),
-    );
-  }
 
   if (sin) {
     const sinDigits = sin.replace(/\s/g, "");
@@ -215,6 +142,41 @@ export async function updateEmployee(formData: FormData) {
     where: { id },
     data: updateData,
   });
+
+  // The edit form's TD1 card posts its fields (claim amounts, extra tax,
+  // CPP/EI exemptions) to this same action — persist them too, or nothing in
+  // that card ever saves. Guard on federalClaim: the claim inputs always
+  // submit when the TD1 card is present (possibly empty), while an unchecked
+  // checkbox submits nothing, so the checkboxes can't be the presence
+  // signal. Callers whose forms carry no TD1 fields skip this entirely.
+  // Field parsing mirrors updateTD1Profile below.
+  if (formData.has("federalClaim")) {
+    const federalClaim = formData.get("federalClaim") as string;
+    const provincialClaim = formData.get("provincialClaim") as string;
+    const extraTaxPerPeriod = formData.get("extraTaxPerPeriod") as string;
+    const cppExempt = formData.get("cppExempt") === "true";
+    const eiExempt = formData.get("eiExempt") === "true";
+
+    await prisma.tD1Profile.upsert({
+      where: { employeeId_year: { employeeId: id, year: 2026 } },
+      create: {
+        employeeId: id,
+        year: 2026,
+        federalClaim: federalClaim ? parseFloat(federalClaim) : null,
+        provincialClaim: provincialClaim ? parseFloat(provincialClaim) : null,
+        extraTaxPerPeriod: extraTaxPerPeriod ? parseFloat(extraTaxPerPeriod) : null,
+        cppExempt,
+        eiExempt,
+      },
+      update: {
+        federalClaim: federalClaim ? parseFloat(federalClaim) : null,
+        provincialClaim: provincialClaim ? parseFloat(provincialClaim) : null,
+        extraTaxPerPeriod: extraTaxPerPeriod ? parseFloat(extraTaxPerPeriod) : null,
+        cppExempt,
+        eiExempt,
+      },
+    });
+  }
 
   revalidatePath("/employees");
   redirect("/employees");
@@ -233,9 +195,7 @@ export async function terminateEmployee(formData: FormData) {
 
   await prisma.employee.update({
     where: { id },
-    // Wave 1 PR E: termination is a dated event, not just a flag —
-    // ROE and final-pay work (Wave 2) key off terminationDate.
-    data: { active: false, terminationDate: new Date() },
+    data: { active: false },
   });
 
   revalidatePath("/app/employees");
