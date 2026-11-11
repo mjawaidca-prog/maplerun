@@ -8,6 +8,11 @@
  * updateEmployee upserts the 2026 TD1Profile when (and only when) the form
  * carried TD1 fields.
  *
+ * Extended with regression coverage for two more defects in the same
+ * action: the unconditional `active` read that silently deactivated every
+ * edited employee, and the pay fields (payGroupId / payType / payRate)
+ * that updateEmployee never read at all.
+ *
  * Prisma, session and Next navigation/cache are mocked, following the
  * pattern in payroll-hooks.test.ts.
  */
@@ -50,6 +55,13 @@ vi.mock("@/lib/prisma", () => {
         upsert: async (args: Record<string, unknown>) => {
           calls.td1Upsert.push(args);
           return {};
+        },
+      },
+      payGroup: {
+        findUnique: async ({ where }: { where: { id: string } }) => {
+          if (where.id === "pg_1") return { id: "pg_1", companyId: "co_1" };
+          if (where.id === "pg_other") return { id: "pg_other", companyId: "co_other" };
+          return null;
         },
       },
     },
@@ -145,5 +157,104 @@ describe("updateEmployee — TD1 card persistence", () => {
 
     expect(h.calls.employeeUpdate).toHaveLength(1);
     expect(h.calls.td1Upsert).toHaveLength(0);
+  });
+});
+
+// ─── Regression: silent deactivation + ignored pay fields ────────────────────
+//
+// Two further defects in the same action, found in live testing:
+//  A. updateEmployee read `active` unconditionally
+//     (`formData.get("active") === "true"`), but the Edit Employee form
+//     submits no "active" field — so every save set the employee inactive,
+//     and the app has no reactivate control.
+//  B. updateEmployee never read payGroupId / payType / payRate at all, so
+//     edits to those fields from the edit form silently never saved,
+//     even though createEmployee reads, validates and persists them.
+
+function updateData(): Record<string, unknown> {
+  expect(h.calls.employeeUpdate).toHaveLength(1);
+  return (h.calls.employeeUpdate[0] as { data: Record<string, unknown> }).data;
+}
+
+describe("updateEmployee — active flag", () => {
+  it("does not write `active` when the form submits no active field", async () => {
+    const fd = form({ ...BASE, email: "syed@example.com" });
+
+    await expect(updateEmployee(fd)).rejects.toThrow("REDIRECT:/employees");
+
+    expect(updateData()).not.toHaveProperty("active");
+  });
+
+  it("writes active:false when the form submits active=\"false\"", async () => {
+    const fd = form({ ...BASE, active: "false" });
+
+    await expect(updateEmployee(fd)).rejects.toThrow("REDIRECT:/employees");
+
+    expect(updateData()).toHaveProperty("active", false);
+  });
+
+  it("writes active:true when the form submits active=\"true\"", async () => {
+    const fd = form({ ...BASE, active: "true" });
+
+    await expect(updateEmployee(fd)).rejects.toThrow("REDIRECT:/employees");
+
+    expect(updateData()).toHaveProperty("active", true);
+  });
+});
+
+describe("updateEmployee — employment & pay fields", () => {
+  it("persists payType, payRate and payGroupId submitted by the form", async () => {
+    const fd = form({
+      ...BASE,
+      payType: "salary",
+      payRate: "7371.35",
+      payGroupId: "pg_1",
+    });
+
+    await expect(updateEmployee(fd)).rejects.toThrow("REDIRECT:/employees");
+
+    const data = updateData();
+    expect(data).toHaveProperty("payType", "salary");
+    expect(data).toHaveProperty("payRate", 7371.35);
+    expect(data).toHaveProperty("payGroupId", "pg_1");
+  });
+
+  it("writes no pay keys when the form submits no pay fields", async () => {
+    const fd = form({ ...BASE, email: "syed@example.com" });
+
+    await expect(updateEmployee(fd)).rejects.toThrow("REDIRECT:/employees");
+
+    const data = updateData();
+    expect(data).not.toHaveProperty("payType");
+    expect(data).not.toHaveProperty("payRate");
+    expect(data).not.toHaveProperty("payGroupId");
+  });
+
+  it("treats a present-but-empty pay group as unassigned (null), like createEmployee", async () => {
+    const fd = form({ ...BASE, payType: "", payRate: "", payGroupId: "" });
+
+    await expect(updateEmployee(fd)).rejects.toThrow("REDIRECT:/employees");
+
+    const data = updateData();
+    expect(data).toHaveProperty("payType", null);
+    expect(data).toHaveProperty("payRate", null);
+    expect(data).toHaveProperty("payGroupId", null);
+  });
+
+  it("rejects a pay group belonging to a different company, like createEmployee", async () => {
+    const fd = form({ ...BASE, payGroupId: "pg_other" });
+
+    await expect(updateEmployee(fd)).rejects.toThrow("Invalid pay group.");
+
+    // Validation happens before the write: nothing was updated.
+    expect(h.calls.employeeUpdate).toHaveLength(0);
+  });
+
+  it("rejects a pay group that does not exist, like createEmployee", async () => {
+    const fd = form({ ...BASE, payGroupId: "pg_missing" });
+
+    await expect(updateEmployee(fd)).rejects.toThrow("Invalid pay group.");
+
+    expect(h.calls.employeeUpdate).toHaveLength(0);
   });
 });
