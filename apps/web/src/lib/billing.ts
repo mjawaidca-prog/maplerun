@@ -111,3 +111,128 @@ export function checkoutCompletionCompanyUpdate(input: {
     trialEndsAt: null,
   };
 }
+
+// ---------------------------------------------------------------------------
+// In-place plan upgrade (/api/billing/upgrade)
+//
+// Unlike checkout, an upgrade MUTATES the company's one existing Stripe
+// subscription: its items are swapped for the new plan's catalog prices
+// with proration, so the customer pays only the difference for the rest
+// of the current paid period and the full new price from the next
+// renewal. The helpers below are the pure pieces of that flow — the
+// Stripe-touching parts live in lib/stripe-catalog.ts and the route.
+// ---------------------------------------------------------------------------
+
+/** The two recurring intervals a subscription can bill on. */
+export type BillingInterval = "month" | "year";
+
+/** Annual billing is 10× the monthly amounts (2 months free). */
+export function intervalMultiplier(interval: BillingInterval): number {
+  return interval === "year" ? 10 : 1;
+}
+
+/**
+ * Stable lookup_key for a plan price in the Stripe catalog, e.g.
+ * `nexvarpay_growth_base_month` or `nexvarpay_solo_employees_year`.
+ * lookup_keys are unique per account, so find-or-create by key is
+ * idempotent, and `transfer_lookup_key` lets a later price supersede an
+ * earlier one under the same key without breaking the lookup.
+ */
+export function planPriceLookupKey(
+  planId: string,
+  kind: "base" | "employees",
+  interval: BillingInterval,
+): string {
+  return `nexvarpay_${planId}_${kind}_${interval}`;
+}
+
+/** Unit amount (cents CAD) for a plan price at the given interval. */
+export function planPriceUnitAmount(
+  plan: PlanDefinition,
+  kind: "base" | "employees",
+  interval: BillingInterval,
+): number {
+  const monthly =
+    kind === "base" ? plan.basePriceCents : plan.employeePriceCents;
+  return monthly * intervalMultiplier(interval);
+}
+
+/** Full amount the plan bills per period at the given interval. */
+export function planPeriodTotal(
+  plan: PlanDefinition,
+  employeeCount: number,
+  interval: BillingInterval,
+): number {
+  return (
+    planPriceUnitAmount(plan, "base", interval) +
+    planPriceUnitAmount(plan, "employees", interval) * employeeCount
+  );
+}
+
+/** The billing interval of a subscription, read off its first item. */
+export function subscriptionInterval(
+  subscription: Stripe.Subscription,
+): BillingInterval {
+  return subscription.items.data[0]?.price.recurring?.interval === "year"
+    ? "year"
+    : "month";
+}
+
+/**
+ * The `items` payload for an in-place subscription update that replaces
+ * EVERY current item with the new plan's prices: each existing item is
+ * marked `deleted`, then the new base item (quantity 1) and — only when
+ * the company has active employees — the new per-employee item are
+ * appended. Deleting by id (rather than relying on Stripe's positional
+ * matching) is what guarantees exactly one subscription with exactly
+ * the new plan's items afterwards, however many items the old
+ * subscription carried.
+ */
+export function buildSubscriptionItemReplacement(input: {
+  currentItems: readonly { id: string }[];
+  basePriceId: string;
+  employeePriceId: string | null;
+  employeeCount: number;
+}): Stripe.SubscriptionUpdateParams.Item[] {
+  const items: Stripe.SubscriptionUpdateParams.Item[] = input.currentItems.map(
+    (item) => ({ id: item.id, deleted: true }),
+  );
+  items.push({ price: input.basePriceId, quantity: 1 });
+  if (input.employeePriceId && input.employeeCount > 0) {
+    items.push({
+      price: input.employeePriceId,
+      quantity: input.employeeCount,
+    });
+  }
+  return items;
+}
+
+/**
+ * The Company update a completed in-place upgrade must persist — the
+ * upgrade counterpart of checkoutCompletionCompanyUpdate. The
+ * subscription itself does not change identity, so the recorded
+ * subscription id is carried through unchanged; plan becomes the new
+ * plan, status is the subscription's status after the update, and the
+ * trial is cleared (an upgraded company is a paying company).
+ *
+ * Returns null when the metadata names no known plan (nothing safe to
+ * record — the route logs and skips rather than writing a bogus plan).
+ */
+export function upgradeCompanyUpdate(input: {
+  planId: string | null | undefined;
+  subscriptionId: string;
+  subscriptionStatus: string;
+}): {
+  plan: string;
+  stripeSubscriptionId: string;
+  subscriptionStatus: string;
+  trialEndsAt: null;
+} | null {
+  if (!input.planId || !getPlan(input.planId)) return null;
+  return {
+    plan: input.planId,
+    stripeSubscriptionId: input.subscriptionId,
+    subscriptionStatus: input.subscriptionStatus,
+    trialEndsAt: null,
+  };
+}

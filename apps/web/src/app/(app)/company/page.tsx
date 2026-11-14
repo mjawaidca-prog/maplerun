@@ -40,6 +40,11 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
   const onTrial =
     !hasActiveSubscription(company) &&
     (company.trialEndsAt != null || company.subscriptionStatus != null);
+  // A recorded subscription id in paid standing can change plans in
+  // place (prorated) via /api/billing/upgrade; everyone else subscribes
+  // through checkout. Passed to the billing cards to pick the flow.
+  const canUpgradeInPlace =
+    company.stripeSubscriptionId != null && hasActiveSubscription(company);
 
   const tabs = [
     { key: "profile", label: "Profile" },
@@ -215,7 +220,11 @@ export default async function CompanySettingsPage({ searchParams }: { searchPara
             </div>
           </div>
 
-          <BillingUpgradeCards currentPlan={plan} onTrial={onTrial} />
+          <BillingUpgradeCards
+            currentPlan={plan}
+            onTrial={onTrial}
+            hasActiveSubscription={canUpgradeInPlace}
+          />
         </div>
       )}
     </div>
