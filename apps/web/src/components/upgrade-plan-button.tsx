@@ -2,22 +2,60 @@
 
 import { useState } from "react";
 
+function formatCad(cents: number): string {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
 export function UpgradePlanButton({
   planId,
   label,
   annual = false,
+  hasActiveSubscription = false,
+  planName,
 }: {
   planId: string;
   label: string;
   annual?: boolean;
+  /**
+   * True when the company already has a live Stripe subscription.
+   * Such companies change plans IN PLACE via /api/billing/upgrade
+   * (difference-only proration charge, same subscription, no checkout
+   * redirect); companies without one subscribe via checkout, exactly
+   * as before.
+   */
+  hasActiveSubscription?: boolean;
+  planName?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleUpgrade() {
     setLoading(true);
     setError(null);
+    setSuccess(null);
     try {
+      if (hasActiveSubscription) {
+        const res = await fetch("/api/billing/upgrade", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ planId }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          const name =
+            planName ?? planId.charAt(0).toUpperCase() + planId.slice(1);
+          const per = data.interval === "year" ? "/yr" : "/mo";
+          setSuccess(
+            data.amountChargedCents > 0
+              ? `Upgraded to ${name} — ${formatCad(data.amountChargedCents)} charged for the rest of this period; ${formatCad(data.nextRenewalAmountCents)}${per} from your next renewal.`
+              : `Upgraded to ${name} — no charge for the rest of this period; ${formatCad(data.nextRenewalAmountCents)}${per} from your next renewal.`,
+          );
+        } else {
+          setError(data.error ?? "Failed to upgrade plan");
+        }
+        return;
+      }
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,9 +78,14 @@ export function UpgradePlanButton({
         disabled={loading}
         className="inline-flex rounded-[9px] bg-[#B3261E] hover:bg-[#8F1D17] text-white text-xs font-semibold px-4 py-2 transition-colors disabled:opacity-50"
       >
-        {loading ? "Redirecting…" : label}
+        {loading
+          ? hasActiveSubscription
+            ? "Upgrading…"
+            : "Redirecting…"
+          : label}
       </button>
       {error && <p className="text-[10px] text-[#B3261E] mt-1">{error}</p>}
+      {success && <p className="text-xs text-[#15803D] mt-1">{success}</p>}
     </div>
   );
 }
@@ -61,9 +104,17 @@ export function UpgradePlanButton({
 export function BillingUpgradeCards({
   currentPlan,
   onTrial,
+  hasActiveSubscription = false,
 }: {
   currentPlan: string;
   onTrial: boolean;
+  /**
+   * True when the company has a live Stripe subscription (recorded id
+   * + a paid-standing status, derived on the Company page). Plan
+   * clicks then upgrade in place via /api/billing/upgrade instead of
+   * starting a second subscription through checkout.
+   */
+  hasActiveSubscription?: boolean;
 }) {
   const [annual, setAnnual] = useState(false);
 
@@ -155,6 +206,8 @@ export function BillingUpgradeCards({
                   planId={p.id}
                   label={isCurrent ? `Subscribe to ${p.name}` : `Upgrade to ${p.name}`}
                   annual={annual}
+                  hasActiveSubscription={hasActiveSubscription}
+                  planName={p.name}
                 />
               )}
             </div>
