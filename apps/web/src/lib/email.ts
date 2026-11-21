@@ -63,6 +63,46 @@ export async function sendPayStubEmail(params: {
 }
 
 /**
+ * Send a password reset email (legacy Auth.js credential track).
+ * The link carries a single-use token that expires in 1 hour;
+ * see lib/password-reset.ts.
+ */
+export async function sendPasswordResetEmail(params: {
+  to: string;
+  resetUrl: string;
+}) {
+  const { to, resetUrl } = params;
+
+  try {
+    const client = getResend();
+    await client.emails.send({
+      from: process.env.AUTH_RESEND_FROM ?? "noreply@nexvarlab.com",
+      to,
+      subject: "Reset your password — Nexvar Pay",
+      html: `
+        <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto;">
+          <h1 style="color: #0F172A;">Nexvar Pay</h1>
+          <p style="color: #78716C; font-size: 12px;">A NexvarLab product</p>
+          <p>We received a request to reset the password for your Nexvar Pay account.</p>
+          <p>
+            <a href="${resetUrl}" style="display: inline-block; background: #0F172A; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px;">
+              Reset password
+            </a>
+          </p>
+          <p style="color: #666; font-size: 12px; margin-top: 24px;">
+            This link expires in 1 hour and can be used once. If you didn't request a password reset, you can safely ignore this email — your password will not change.
+          </p>
+        </div>
+      `,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send password reset email:", error);
+    return { success: false, error: String(error) };
+  }
+}
+
+/**
  * Send a welcome email when an employee is added.
  */
 export async function sendWelcomeEmail(params: {
