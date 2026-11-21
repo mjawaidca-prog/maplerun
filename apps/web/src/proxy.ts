@@ -33,9 +33,10 @@ function isPublicPath(pathname: string): boolean {
     pathname.startsWith("/payroll-calculator") ||
     pathname.startsWith("/features") ||
     pathname.startsWith("/sign-in") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
     pathname.startsWith("/verify-request") ||
     pathname.startsWith("/api/auth") ||
-    pathname === "/api/register" ||
     pathname === "/portal" ||
     pathname.startsWith("/portal/")
   );
@@ -71,9 +72,10 @@ const isPublicRoute = createRouteMatcher([
   "/payroll-calculator(.*)",
   "/features(.*)",
   "/sign-in(.*)",
+  "/forgot-password(.*)",
+  "/reset-password(.*)",
   "/verify-request(.*)",
   "/api/auth(.*)",
-  "/api/register",
   "/portal(.*)",
 ]);
 

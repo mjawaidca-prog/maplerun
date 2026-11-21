@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { signIn, getSession, useSession } from "next-auth/react";
+import { getSession, signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { PasswordInput } from "@/components/password-input";
 
 function SignInForm() {
   const [email, setEmail] = useState("");
@@ -20,6 +20,7 @@ function SignInForm() {
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/app";
+  const passwordResetDone = searchParams.get("reset") === "success";
   const { data: session, status: sessionStatus } = useSession();
 
   // Already signed in — redirect
@@ -32,20 +33,26 @@ function SignInForm() {
 
   if (sessionStatus === "authenticated" && session?.user) return null;
 
+  function switchMode(next: "password" | "magic") {
+    setMode(next);
+    setError(null);
+  }
+
   async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault(); if (loading) return;
     setError(null); setLoading(true);
     try {
-      const result = await signIn("credentials", { email, password, redirect: false });
+      const result = await signIn("credentials", { email, password, redirect: false, callbackUrl });
       if (result?.error) {
+        // One generic message for every failure (unknown email, no
+        // password set, wrong password) — never say which.
         setError("Invalid email or password. Please try again.");
       } else {
+        // Signed in — land where this page sends authenticated users.
         const s = await getSession();
-        const dest = s?.user?.companyId
-          ? (callbackUrl !== "/app" ? callbackUrl : "/app")
-          : "/onboarding";
-        window.location.href = dest;
-        return;
+        window.location.href = s?.user
+          ? (s.user.companyId ? "/app" : "/onboarding")
+          : callbackUrl;
       }
     } catch { setError("An unexpected error occurred."); }
     finally { setLoading(false); }
@@ -76,6 +83,11 @@ function SignInForm() {
           {!sent ? (
             <>
               <CardContent className="pt-7 px-7 pb-7 space-y-4">
+                {passwordResetDone && (
+                  <div className="rounded-lg bg-[#F0FDF4] border border-[#BBF7D0] px-3 py-2 text-[13px] text-[#166534]">
+                    Your password has been updated. You can now sign in.
+                  </div>
+                )}
                 {/* Google sign-in — fastest, most prominent */}
                 <button
                   onClick={() => signIn("google", { callbackUrl })}
@@ -96,41 +108,52 @@ function SignInForm() {
 
                 {mode === "password" ? (
                   <>
+                    {/* Email + password — the standard sign-in */}
                     <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
                       <div className="space-y-1.5">
                         <Label className="text-[13px] font-semibold text-[#44403C]">Work email</Label>
-                        <Input type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                        <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
                       </div>
                       <div className="space-y-1.5">
                         <Label className="text-[13px] font-semibold text-[#44403C]">Password</Label>
-                        <Input type="password" autoComplete="current-password" placeholder="Your password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                        <PasswordInput value={password} onChange={setPassword} placeholder="Your password" autoComplete="current-password" required disabled={loading} />
                       </div>
                       {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs text-destructive">{error}</div>}
                       <Button type="submit" className="w-full h-[44px] rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-[15px] font-semibold" disabled={loading}>
                         {loading ? "Signing in…" : "Sign in"}
                       </Button>
                     </form>
-                    <p className="text-center">
-                      <button onClick={() => { setMode("magic"); setError(null); }} className="text-[13px] text-[#B3261E] font-semibold hover:underline">
+
+                    <p className="text-center text-[13px]">
+                      <a href="/forgot-password" className="text-[#B3261E] font-semibold hover:underline">
+                        Forgot password?
+                      </a>
+                    </p>
+                    <p className="text-center text-[13px] text-[#78716C]">
+                      Prefer a link?{" "}
+                      <button type="button" onClick={() => switchMode("magic")} className="text-[#B3261E] font-semibold hover:underline">
                         Email me a sign-in link instead
                       </button>
                     </p>
                   </>
                 ) : (
                   <>
+                    {/* Magic link — passwordless alternative */}
                     <form onSubmit={handleMagicSubmit} className="space-y-3.5">
                       <div className="space-y-1.5">
                         <Label className="text-[13px] font-semibold text-[#44403C]">Work email</Label>
-                        <Input type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
+                        <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="rounded-lg h-[44px]" />
                       </div>
                       {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-xs text-destructive">{error}</div>}
                       <Button type="submit" className="w-full h-[44px] rounded-[10px] bg-[#B3261E] hover:bg-[#8F1D17] text-[15px] font-semibold" disabled={loading}>
                         {loading ? "Sending link…" : "Send magic link"}
                       </Button>
                     </form>
-                    <p className="text-center">
-                      <button onClick={() => { setMode("password"); setError(null); }} className="text-[13px] text-[#B3261E] font-semibold hover:underline">
-                        ← Sign in with a password instead
+
+                    <p className="text-center text-[13px] text-[#78716C]">
+                      Have a password?{" "}
+                      <button type="button" onClick={() => switchMode("password")} className="text-[#B3261E] font-semibold hover:underline">
+                        Sign in with a password instead
                       </button>
                     </p>
                   </>
@@ -152,10 +175,6 @@ function SignInForm() {
             </CardContent>
           )}
         </Card>
-        <p className="text-center text-sm text-[#78716C]">
-          New to Nexvar Pay?{" "}
-          <Link href="/signup" className="text-[#B3261E] font-semibold no-underline">Create your account →</Link>
-        </p>
         <p className="text-center text-xs text-[#A8A29E] leading-relaxed">
           By continuing you agree to our <a href="#" className="text-[#78716C]">Terms</a> and <a href="#" className="text-[#78716C]">Privacy Policy</a>.
         </p>

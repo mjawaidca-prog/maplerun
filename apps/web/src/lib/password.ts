@@ -1,92 +1,87 @@
 /**
- * Password hashing for legacy Auth.js password sign-in — Node's built-in
- * scrypt (no new dependency). Hashes are self-describing:
+ * Password hashing for the legacy Auth.js credential track.
  *
- *   scrypt:<N>:<r>:<p>:<salt base64>:<derived key base64>
+ * User.passwordHash stores a scrypt hash produced here (Node's built-in
+ * crypto.scrypt — no extra dependency). Format is self-describing so the
+ * parameters can be raised later without invalidating existing hashes:
  *
- * so cost parameters can be raised later without invalidating old hashes.
- * N=16384 / r=8 / p=1 is the OWASP-recommended minimum for interactive
- * logins (~16 MiB memory, tens of milliseconds per attempt).
+ *   scrypt$<N>$<r>$<p>$<salt base64>$<derived key base64>
+ *
+ * Magic-link, Google and Clerk-linked users have passwordHash = null until
+ * a password is set (sign-up or the /reset-password flow).
  */
 
 import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
+import { promisify } from "node:util";
 
-// Callback wrapper — util.promisify's scrypt typing in @types/node does
-// not accept the options argument, so promisify it by hand.
-function scryptAsync(
+// util.promisify's scrypt overload in @types/node drops the options
+// argument; type it explicitly so the cost parameters are honoured.
+const scryptAsync = promisify(scrypt) as unknown as (
   password: string,
   salt: Buffer,
   keylen: number,
   options: { N: number; r: number; p: number },
-): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    scrypt(password, salt, keylen, options, (err, derived) =>
-      err ? reject(err) : resolve(derived),
-    );
-  });
-}
+) => Promise<Buffer>;
 
-const N = 16384;
-const R = 8;
-const P = 1;
-const KEYLEN = 64;
-const SALT_BYTES = 16;
-
-// Upper bound accepted when verifying a stored hash, so a corrupted or
-// crafted value can never make verification allocate absurd memory.
-const MAX_N = 2 ** 20;
+const SCRYPT_N = 16384;
+const SCRYPT_R = 8;
+const SCRYPT_P = 1;
+const KEY_LENGTH = 64;
+const SALT_LENGTH = 16;
 
 export async function hashPassword(password: string): Promise<string> {
-  const salt = randomBytes(SALT_BYTES);
-  const derived = (await scryptAsync(password, salt, KEYLEN, {
-    N,
-    r: R,
-    p: P,
-  }));
+  const salt = randomBytes(SALT_LENGTH);
+  const derived = (await scryptAsync(password, salt, KEY_LENGTH, {
+    N: SCRYPT_N,
+    r: SCRYPT_R,
+    p: SCRYPT_P,
+  })) as Buffer;
   return [
     "scrypt",
-    N,
-    R,
-    P,
+    String(SCRYPT_N),
+    String(SCRYPT_R),
+    String(SCRYPT_P),
     salt.toString("base64"),
     derived.toString("base64"),
-  ].join(":");
+  ].join("$");
 }
 
+/**
+ * Constant-time verification. Returns false (never throws) for a null,
+ * malformed or foreign-format stored hash.
+ */
 export async function verifyPassword(
   password: string,
-  stored: string | null | undefined,
+  storedHash: string | null | undefined,
 ): Promise<boolean> {
-  if (!stored) return false;
-  const parts = stored.split(":");
+  if (!storedHash) return false;
+  const parts = storedHash.split("$");
   if (parts.length !== 6 || parts[0] !== "scrypt") return false;
 
-  const n = Number(parts[1]);
+  const N = Number(parts[1]);
   const r = Number(parts[2]);
   const p = Number(parts[3]);
-  if (
-    !Number.isInteger(n) ||
-    !Number.isInteger(r) ||
-    !Number.isInteger(p) ||
-    n <= 1 ||
-    n > MAX_N ||
-    r <= 0 ||
-    p <= 0
-  ) {
+  if (!Number.isInteger(N) || !Number.isInteger(r) || !Number.isInteger(p)) {
     return false;
   }
 
-  const salt = Buffer.from(parts[4], "base64");
-  const expected = Buffer.from(parts[5], "base64");
+  let salt: Buffer;
+  let expected: Buffer;
+  try {
+    salt = Buffer.from(parts[4], "base64");
+    expected = Buffer.from(parts[5], "base64");
+  } catch {
+    return false;
+  }
   if (salt.length === 0 || expected.length === 0) return false;
 
   try {
     const derived = (await scryptAsync(password, salt, expected.length, {
-      N: n,
+      N,
       r,
       p,
-    }));
-    return derived.length === expected.length && timingSafeEqual(derived, expected);
+    })) as Buffer;
+    return timingSafeEqual(derived, expected);
   } catch {
     return false;
   }
