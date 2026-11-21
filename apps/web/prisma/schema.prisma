@@ -139,6 +139,8 @@ model Company {
   employees   Employee[]
   payGroups   PayGroup[]
   payRuns     PayRun[]
+  payees      Payee[]
+  payeePayments PayeePayment[]
   employeePendingUpdates EmployeePendingUpdate[]
   remittanceSubmissions RemittanceSubmission[]
   ledgerProConnection LedgerProConnection?
@@ -477,6 +479,103 @@ model LedgerProSyncRecord {
 
   @@index([companyId])
   @@index([status])
+}
+
+/// Non-employee payee for T4A reporting (Phase 1 item 7a). Contractors,
+/// subcontractors, pensioners and other recipients of non-employment
+/// payments. Deliberately NOT an Employee: no pay runs, no TD1, no YTD
+/// ledger — the T4A slip is aggregated from PayeePayment rows at year-end.
+/// companyId scopes every query, exactly like Employee.
+model Payee {
+  id            String    @id @default(cuid())
+  companyId     String
+  /// INDIVIDUAL | BUSINESS. Drives the slip identity: individuals report
+  /// RCPNT_NM + SIN (box 012); businesses report RCPNT_CORP_NM + BN
+  /// (box 013). CRA: include either the recipient or the corporation
+  /// information on a slip, never both.
+  payeeType     String    @default("INDIVIDUAL")
+  /// Individual name parts (T4A RCPNT_NM) — null for businesses.
+  firstName     String?
+  lastName      String?
+  /// Second given name initial (RCPNT_NM <init>).
+  initial       String?
+  /// Business / corporation / partnership name (T4A RCPNT_CORP_NM line 1)
+  /// and optional second line — null for individuals.
+  businessName  String?
+  businessName2 String?
+  /// AES-256-GCM encrypted SIN (individuals) — same treatment as
+  /// Employee.sinEncrypted: never logged, decrypted only at slip/XML
+  /// generation time.
+  sinEncrypted  String?
+  /// Recipient business number, full BN15 (T4A box 013), e.g.
+  /// 123456789RT0001. Plain text — a BN is a public identifier, like
+  /// Company.businessNumber. Null when the payee has not provided one;
+  /// the slip then carries CRA's zero placeholder (000000000RC0000).
+  businessNumber String?
+  /// Optional recipient number (T4A code 014) — payer-side reference.
+  recipientNumber String?
+  email         String?
+  phone         String?
+  addressLine1  String?
+  addressLine2  String?
+  city          String?
+  province      String?
+  postalCode    String?
+  /// ISO 3166 alpha-3 (RCPNT_ADDR cntry_cd), default CAN.
+  countryCode   String?   @default("CAN")
+  /// Box 015 — payer-offered dental benefits code 1–5. Only meaningful
+  /// when the payee receives pension/superannuation (box 016), where CRA
+  /// makes it mandatory. Null = not recorded.
+  dentalBenefitsCode Int?
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  company  Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  payments PayeePayment[]
+
+  @@index([companyId])
+}
+
+/// One payment to a Payee, TAGGED with its T4A classification at payment
+/// time (design §6.1.3: "tag payees as T4A-reportable during the year so
+/// December is a report, not a reconstruction"). The calendar year of
+/// paymentDate selects the T4A year — T4A is a calendar-year return.
+model PayeePayment {
+  id            String   @id @default(cuid())
+  companyId     String
+  payeeId       String
+  /// ISO payment date (YYYY-MM-DD), same convention as PayRun.payDate.
+  paymentDate   String
+  /// T4A classification captured at payment time — a code from
+  /// lib/filings/t4a-boxes.ts (T4A_BOXES): a main box ("016" pension,
+  /// "018" lump-sum, "020" self-employed commissions, "024" annuities,
+  /// "048" fees for services) or an other-information code ("028",
+  /// "030", "032", "034", "040", "042", "046", "104", "105", "106").
+  /// Validated against the catalogue in the recording action; the pure
+  /// slip module rejects unknown codes loudly.
+  boxCode       String
+  /// Gross amount paid under this classification.
+  amount        Float
+  /// Income tax withheld from THIS payment; the year's withheld total
+  /// aggregates to slip box 022 (income tax deducted). Withholding is a
+  /// property of the payment, not a classification, hence its own column
+  /// rather than a boxCode.
+  incomeTaxDeducted Float @default(0)
+  description   String?
+  /// T5018 tag (design §6.1.3 note): this payment is a construction
+  /// contract payment. T5018 is the sibling return — SAME tagging
+  /// mechanism, different slip; the tag is captured here during the year
+  /// so the future T5018 build is also a report, not a reconstruction.
+  t5018Reportable Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  payee   Payee   @relation(fields: [payeeId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([payeeId])
 }
 
 /// Employee-portal self-service change request (Wave 3). An employee submits

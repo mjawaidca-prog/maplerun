@@ -77,6 +77,7 @@ export const SIDEBAR_NAV: Record<Plan, NavItem[]> = {
   solo: [
     { icon: "🏠", label: "Dashboard", href: "/app" },
     { icon: "👥", label: "Employees", href: "/employees" },
+    { icon: "🧾", label: "Payees", href: "/payees" },
     { icon: "💵", label: "Run Payroll", href: "/payroll" },
     { icon: "📊", label: "Reports", href: "/reports" },
     { icon: "⚙️", label: "Company", href: "/company" },
@@ -85,6 +86,7 @@ export const SIDEBAR_NAV: Record<Plan, NavItem[]> = {
   growth: [
     { icon: "🏠", label: "Dashboard", href: "/app" },
     { icon: "👥", label: "Employees", href: "/employees" },
+    { icon: "🧾", label: "Payees", href: "/payees" },
     { icon: "⏱", label: "Timesheets", href: "/payroll/timesheet", feature: "timesheets" },
     { icon: "💵", label: "Run Payroll", href: "/payroll" },
     { section: "Compliance" },
@@ -99,6 +101,7 @@ export const SIDEBAR_NAV: Record<Plan, NavItem[]> = {
   accountant: [
     { icon: "🏠", label: "Dashboard", href: "/app" },
     { icon: "👥", label: "Employees", href: "/employees" },
+    { icon: "🧾", label: "Payees", href: "/payees" },
     { icon: "⏱", label: "Timesheets", href: "/payroll/timesheet", feature: "timesheets" },
     { icon: "💵", label: "Run Payroll", href: "/payroll" },
     { section: "Compliance" },

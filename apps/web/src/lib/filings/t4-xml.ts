@@ -434,6 +434,16 @@ function t619Xml(transmitter: T4Transmitter, submissionRefId: string): string {
   );
 }
 
+/**
+ * The T619 transmittal is common to every CRA information return
+ * (TransmitterType in complex.xsd is shared by the T4, T4A, T5, …
+ * returns). Exported so sibling serializers (t4a-xml.ts) emit a
+ * byte-identical T619 instead of growing a second copy.
+ */
+export function buildT619Xml(transmitter: T4Transmitter, submissionRefId: string): string {
+  return t619Xml(transmitter, submissionRefId);
+}
+
 // ─── Submission ──────────────────────────────────────────────────────────────
 
 /**

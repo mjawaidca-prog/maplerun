@@ -19,8 +19,9 @@ export default async function ReportsDashboardPage() {
 
   const allCards = [
     { href: "/reports/t4", icon: "📄", title: "T4 slips", desc: "Statement of remuneration paid for each employee.", metric: `${year} · available`, metricVal: "Ready", feature: null },
-    { href: "/reports/rl1", icon: "📄", title: "RL-1 slips", desc: "Québec statement of employment income (Revenu Québec).", metric: `${year} · available`, metricVal: "Ready", feature: null },
-    { href: "/reports/remittance", icon: "🧾", title: "PD7A remittance", desc: "Source deductions owed to the CRA. View breakdown, history, and due dates.", metric: pd7aTotal > 0 ? `${year} year-to-date total` : "No data", metricVal: pd7aTotal > 0 ? fmtCAD(pd7aTotal) : "—", feature: null },
+    { href: "/reports/t4a", icon: "🧾", title: "T4A slips", desc: "Pension, fees for services, commissions and other income paid to non-employees — built from payments tagged during the year.", metric: `${year} · available`, metricVal: "Ready", feature: null },
+    { href: "/reports/remittance", icon: "🧾", title: "PD7A remittance", desc: "Source deductions owed to the CRA. View breakdown, history, and due dates.", metric: pd7aTotal > 0 ? `YTD ${year} total` : "No data", metricVal: pd7aTotal > 0 ? fmtCAD(pd7aTotal) : "—", feature: null },
+    { href: "/reports/t4/tie-out", icon: "🔍", title: "T4 ↔ PD7A tie-out", desc: "PIER-style check of the T4 Summary against the year's PD7A remittances — every difference listed with its likely cause, before filing.", metric: `${year} · available`, metricVal: "Ready", feature: null },
     { href: "/reports/summary", icon: "📄", title: "Payroll summary", desc: "Aggregated wages, deductions, and employer costs.", metric: "All runs", metricVal: "View", feature: "reportsCore" },
     { href: "/reports/gl", icon: "📒", title: "GL journal", desc: "Debit/credit entries ready for accounting software.", metric: "Per pay run", metricVal: "View", feature: "payrollJournal" },
     { href: "/reports/roe", icon: "📋", title: "Record of Employment (ROE)", desc: "Generate ROEs for terminations and leaves.", metric: "Service Canada", metricVal: "View", feature: "roe" },
